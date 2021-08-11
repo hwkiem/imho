@@ -1,0 +1,45 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "The initial davis diver project.",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf dist/",
+    "build": "yarn clean && tsc",
+    "watch": "tsc -w",
+    "start": "nodemon ./dist/index.js"
+  },
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.1.16",
+    "@types/cors": "^2.8.12",
+    "apollo-server-express": "^3.1.2",
+    "argon2": "^0.28.2",
+    "class-validator": "^0.13.1",
+    "connect-pg-simple": "^6.2.1",
+    "connect-redis": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv-safe": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "graphql": "^15.5.1",
+    "ioredis": "^4.27.7",
+    "pg": "^8.7.1",
+    "pg-pool": "^3.4.1",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/connect-pg-simple": "^4.2.4",
+    "@types/connect-redis": "^0.0.17",
+    "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
+    "@types/ioredis": "^4.26.7",
+    "@types/node": "^16.4.14",
+    "@types/pg": "^8.6.1",
+    "@types/pg-pool": "^2.0.3",
+    "nodemon": "^2.0.12",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.3.5"
+  }
+}

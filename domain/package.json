@@ -1,0 +1,12 @@
+{
+  "name": "domain",
+  "version": "1.0.0",
+  "description": "The initial davis diver project.",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^16.4.14",
+    "typescript": "^4.3.5"
+  }
+}
