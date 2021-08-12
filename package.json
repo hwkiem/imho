@@ -2,6 +2,7 @@
   "private": true,
   "workspaces": [
     "client",
-    "api"
+    "api",
+    "entities"
   ]
 }

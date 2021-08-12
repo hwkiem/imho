@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "entities": "1.0.0",
     "@apollo/client": "^3.4.7",
     "@chakra-ui/react": "^1.6.6",
     "@emotion/react": "^11",
