@@ -13,6 +13,7 @@ import { ResidencyResolver } from "./resolvers/residence";
 import { ReviewResolver } from "./resolvers/review";
 import { Client } from "@googlemaps/google-maps-services-js";
 import { initDB } from "./utils/initializeDB";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 // import cors from 'cors';
 // import { initDB } from './utils/initializeDB';
 
@@ -71,6 +72,7 @@ const main = async () => {
 
   // Configure AppolloServer
   const apolloServer = new ApolloServer({
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
     schema: await buildSchema({
       resolvers: [UserResolver, ResidencyResolver, ReviewResolver],
       validate: false,
@@ -91,7 +93,7 @@ const main = async () => {
   });
 
   app.listen(process.env.PORT, () => {
-    console.log("server started on http://localhost:3000");
+    console.log(`server started on http://localhost:${process.env.PORT}`);
   });
 }; //
 
