@@ -1,8 +1,8 @@
 import { Resolver, Mutation, Arg, Ctx, Query } from 'type-graphql';
 import { MyContext } from '../types';
-import { User } from '../entities/User';
+import { User } from './user';
 import { validateRegister } from '../utils/validateRegister';
-import { UserResponse, RegisterInput } from './types';
+import { UserResponse, RegisterInput } from '../types';
 import argon2 from 'argon2';
 import { rowsToUsers } from '../utils/queryUtils';
 

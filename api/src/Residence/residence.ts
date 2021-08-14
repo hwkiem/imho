@@ -1,8 +1,16 @@
-import { ObjectType, Field, Float } from 'type-graphql';
-import { Coords } from '../resolvers/types';
+import { ObjectType, Field, Float } from "type-graphql";
+import { Residence } from "entities";
 
 @ObjectType()
-export class Residence {
+class Coords {
+  @Field()
+  lat: number;
+  @Field()
+  lng: number;
+}
+
+@ObjectType()
+export class ResidenceGQL implements Residence {
   @Field()
   resID: number;
 
@@ -30,7 +38,7 @@ export class Residence {
   postal_code: string;
 
   @Field(() => Coords)
-  coords?: Coords;
+  coords: Coords;
 
   @Field(() => Float, { nullable: true })
   avgRating?: number;

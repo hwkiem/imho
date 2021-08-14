@@ -1,4 +1,4 @@
-import { FieldError, RegisterInput } from '../resolvers/types';
+import { FieldError, RegisterInput } from '../types';
 
 // Ben's, can edit however our form requires
 export const validateRegister = (

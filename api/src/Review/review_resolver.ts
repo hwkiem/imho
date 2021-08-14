@@ -1,9 +1,9 @@
 // import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Review } from '../entities/Reviews';
+import { Review } from './Reviews';
 import { MyContext } from '../types';
 import { rowsToReviews } from '../utils/queryUtils';
-import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from './types';
+import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from '../types';
 // import { MyContext } from '../types';
 // import { rowsToReviews } from '../utils/queryUtils';
 

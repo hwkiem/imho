@@ -1,12 +1,12 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Residence } from '../entities/Residence';
+import { ResidenceGQL } from './residence';
 import { MyContext } from '../types';
 import { geoToData, unpackLocation } from '../utils/mapUtils';
 import { rowsToResidences, rowsToResidencesCoords } from '../utils/queryUtils';
-import { CreateResidencyInput, ResidencyResponse } from './types';
+import { CreateResidencyInput, ResidencyResponse } from '../types';
 
-@Resolver(Residence)
+@Resolver(ResidenceGQL)
 export class ResidencyResolver {
   @Mutation(() => ResidencyResponse)
   async createResidency(
@@ -73,8 +73,8 @@ export class ResidencyResolver {
     return {};
   }
 
-  @Query(() => [Residence])
-  async getResidences(@Ctx() { pool }: MyContext): Promise<Residence[]> {
+  @Query(() => [ResidenceGQL])
+  async getResidences(@Ctx() { pool }: MyContext): Promise<ResidenceGQL[]> {
     const pg = await pool.connect();
     const dbRes =
       await pg.query(`SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat, AVG(rating) AS avgRating, residences.created_at, residences.updated_at 
@@ -83,11 +83,11 @@ export class ResidencyResolver {
     return rowsToResidencesCoords(dbRes);
   }
 
-  @Query(() => [Residence], { nullable: true })
+  @Query(() => [ResidenceGQL], { nullable: true })
   async useGoogle(
     @Arg('address') address: string,
     @Ctx() { client, pool }: MyContext
-  ): Promise<Residence[]> {
+  ): Promise<ResidenceGQL[]> {
     try {
       const val = await client.geocode({
         params: { address: address, key: process.env.GOOGLE_MAPS_API_KEY! },
