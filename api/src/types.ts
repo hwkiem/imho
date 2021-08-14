@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { Pool } from "pg";
 import { ObjectType, Field, InputType, Int } from "type-graphql";
 import { ResidenceGQL } from "./Residence/residence";
-import { Review } from "./Review/Reviews";
+import { ReviewGQL } from "./Review/Reviews";
 import { UserGQL } from "./User/user";
 
 export type MyContext = {
@@ -79,8 +79,8 @@ export class ReviewResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
-  @Field(() => Review, { nullable: true })
-  review?: Review;
+  @Field(() => ReviewGQL, { nullable: true })
+  review?: ReviewGQL;
 }
 
 // @ObjectType()

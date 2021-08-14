@@ -1,7 +1,7 @@
 import { QueryResult } from "pg";
 import { UserGQL } from "src/User/user";
 import { ResidenceGQL } from "../Residence/residence";
-import { Review } from "../Review/Reviews";
+import { ReviewGQL } from "../Review/Reviews";
 
 export const rowsToUsers = (dbRes: QueryResult<any>): UserGQL[] => {
   return dbRes.rows.map((item) => {
@@ -38,7 +38,7 @@ export const rowsToResidences = (dbRes: QueryResult<any>): ResidenceGQL[] => {
   });
 };
 
-export const rowsToReviews = (dbRes: QueryResult<any>): Review[] => {
+export const rowsToReviews = (dbRes: QueryResult<any>): ReviewGQL[] => {
   return dbRes.rows.map((item) => {
     return {
       userId: item.user_id,

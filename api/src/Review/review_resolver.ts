@@ -1,10 +1,10 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { Review } from "./Reviews";
+import { ReviewGQL } from "./Reviews";
 import { MyContext } from "../types";
 import { rowsToReviews } from "../utils/queryUtils";
 import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from "../types";
 
-@Resolver(Review)
+@Resolver(ReviewGQL)
 export class ReviewResolver {
   @Mutation(() => ReviewResponse)
   async writeReview(
@@ -54,12 +54,12 @@ export class ReviewResolver {
     return {};
   }
 
-  @Query(() => [Review])
+  @Query(() => [ReviewGQL])
   async getReviews(
     @Arg("reviewQueryInput", { nullable: true })
     reviewQueryInput: ReviewQueryInput,
     @Ctx() { pool }: MyContext
-  ): Promise<Review[]> {
+  ): Promise<ReviewGQL[]> {
     if (!reviewQueryInput.reviews) {
       const pg = await pool.connect();
       const dbRes = await pg.query(`SELECT * FROM reviews`);
