@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { ObjectType, Field, InputType, Int } from "type-graphql";
 import { ResidenceGQL } from "./Residence/residence";
 import { Review } from "./Review/Reviews";
-import { User } from "./User/user";
+import { UserGQL } from "./User/user";
 
 export type MyContext = {
   req: Request; //& { session: Express.Session };
@@ -26,8 +26,8 @@ export class UserResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
-  @Field(() => User, { nullable: true })
-  user?: User;
+  @Field(() => UserGQL, { nullable: true })
+  user?: UserGQL;
 }
 
 @InputType()
@@ -64,12 +64,6 @@ export class ResidencyResponse {
 
 @InputType()
 export class WriteReviewInput {
-  @Field()
-  address!: string;
-
-  @Field()
-  apptNo: string;
-
   @Field()
   res_id: number;
 

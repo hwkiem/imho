@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 export const initDB = async (db: Pool): Promise<void> => {
   // Define user table
@@ -63,7 +63,7 @@ export const initDB = async (db: Pool): Promise<void> => {
   const resTable = `
   CREATE TABLE IF NOT EXISTS residences (
       res_id serial primary key,
-      google_place_id varchar,
+      google_place_id varchar unique,
       full_address varchar,
       apt_num varchar,
       street_num varchar, 
@@ -86,17 +86,18 @@ export const initDB = async (db: Pool): Promise<void> => {
   // Each User can only review any residence once
   const reviewTable = `
    CREATE TABLE IF NOT EXISTS reviews (
-    res_id INT,
-    user_id INT,
-    foreign key(res_id)  references residences(res_id),
-    foreign key(user_id) references users(user_id),
+    res_id INT NOT NULL,
+    user_id INT NOT NULL,
     rating float,
     rent INT,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP 
+    updated_at TIMESTAMP,
+    CONSTRAINT a foreign key(res_id) references residences(res_id),
+    CONSTRAINT b foreign key(user_id) references users(user_id)
   ); 
-  CREATE UNIQUE INDEX IF NOT EXISTS userResTuple ON reviews (res_id, user_id)
+  CREATE UNIQUE INDEX IF NOT EXISTS userResTuple ON reviews (res_id, user_id);
    `;
+
 
   db.query(reviewTable, (err, _) => {
     if (err) {

@@ -13,6 +13,7 @@ import { Client } from "@googlemaps/google-maps-services-js";
 import { initDB } from "./utils/initializeDB";
 import { UserResolver } from "./User/user_resolver";
 import { ResidencyResolver } from "./Residence/residence_resolver";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 
 const main = async () => {
   const app = express();
@@ -58,7 +59,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
         sameSite: "lax", // csrf
-        secure: __prod__, // cookie only works in https
+        secure: false, // cookie only works in https
         // domain: __prod__ ? '.codeponder.com' : undefined,
       },
       saveUninitialized: false,
@@ -70,6 +71,7 @@ const main = async () => {
   // Configure AppolloServer
   const apolloServer = new ApolloServer({
     // plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
     schema: await buildSchema({
       resolvers: [UserResolver, ResidencyResolver, ReviewResolver],
       validate: false,
@@ -86,7 +88,7 @@ const main = async () => {
 
   apolloServer.applyMiddleware({
     app,
-    cors: { origin: "*", credentials: true },
+    cors: { origin: "*", credentials: true }, // fix *
   });
 
   app.listen(process.env.PORT, () => {

@@ -1,9 +1,9 @@
 import { QueryResult } from "pg";
-import { User } from "src/User/user";
+import { UserGQL } from "src/User/user";
 import { ResidenceGQL } from "../Residence/residence";
 import { Review } from "../Review/Reviews";
 
-export const rowsToUsers = (dbRes: QueryResult<any>): User[] => {
+export const rowsToUsers = (dbRes: QueryResult<any>): UserGQL[] => {
   return dbRes.rows.map((item) => {
     return {
       userId: item.user_id,
@@ -19,7 +19,6 @@ export const rowsToUsers = (dbRes: QueryResult<any>): User[] => {
 
 export const rowsToResidences = (dbRes: QueryResult<any>): ResidenceGQL[] => {
   return dbRes.rows.map((item): ResidenceGQL => {
-    // const lat = item.
     return {
       resID: item.res_id,
       google_place_id: item.google_place_id,
@@ -33,29 +32,8 @@ export const rowsToResidences = (dbRes: QueryResult<any>): ResidenceGQL[] => {
       coords: { lat: item.lat, lng: item.lng },
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-      avgRating: item.avgrating,
-    };
-  });
-};
-
-export const rowsToResidencesCoords = (
-  dbRes: QueryResult<any>
-): ResidenceGQL[] => {
-  return dbRes.rows.map((item): ResidenceGQL => {
-    return {
-      resID: item.res_id,
-      google_place_id: item.google_place_id,
-      full_address: item.full_address,
-      apt_num: item.apt_num,
-      street_num: item.street_num,
-      route: item.route,
-      city: item.city,
-      state: item.state,
-      postal_code: item.postal_code,
-      coords: { lat: item.lat, lng: item.lng },
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-      avgRating: item.avgrating,
+      avgRating: item.avg_rating,
+      avgRent: item.avg_rent,
     };
   });
 };
