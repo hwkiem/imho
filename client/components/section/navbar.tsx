@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import {
   Box,
   Flex,
@@ -16,6 +16,15 @@ import {
   Stack,
   chakra,
   Icon,
+  UseDisclosureReturn,
+  Drawer,
+  DrawerFooter,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Input,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 import { RiHomeSmileFill } from "react-icons/ri";
@@ -47,8 +56,13 @@ const NavLink: React.FC<NavLinkProps> = ({
   </Link>
 );
 
-export const NavBar: React.FC = () => {
+interface NavBarProps {
+  reviewDrawer: UseDisclosureReturn;
+}
+
+export const NavBar: React.FC<NavBarProps> = ({ reviewDrawer }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -82,9 +96,38 @@ export const NavBar: React.FC = () => {
               size={"sm"}
               mr={4}
               leftIcon={<AddIcon />}
+              ref={btnRef}
+              onClick={reviewDrawer.onOpen}
             >
               Review
             </Button>
+            <Drawer
+              isOpen={reviewDrawer.isOpen}
+              placement="right"
+              onClose={reviewDrawer.onClose}
+              finalFocusRef={btnRef}
+            >
+              <DrawerOverlay />
+              <DrawerContent>
+                <DrawerCloseButton />
+                <DrawerHeader>Create your account</DrawerHeader>
+
+                <DrawerBody>
+                  <Input placeholder="Type here..." />
+                </DrawerBody>
+
+                <DrawerFooter>
+                  <Button
+                    variant="outline"
+                    mr={3}
+                    onClick={reviewDrawer.onClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button colorScheme="blue">Save</Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
             <Menu>
               <MenuButton
                 as={Button}

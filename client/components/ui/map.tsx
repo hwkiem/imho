@@ -1,37 +1,48 @@
 import { AspectRatio } from "@chakra-ui/react";
 import { Residence } from "entities";
 import GoogleMap from "google-map-react";
+import { chakra } from "@chakra-ui/react";
+import { RiHomeSmile2Fill } from "react-icons/ri";
+import { Icon } from "@chakra-ui/react";
 
-interface myMapProps {
-  residences: Residence[];
+const CRiHomeSmile = chakra(RiHomeSmile2Fill);
+
+interface MapProps {
+  residences: Pick<Residence, "full_address" | "coords">[];
+  center: { lat: number; lng: number };
 }
 
-const Marker = ({
-  lat,
-  lng,
-  address,
-}: {
+interface MarkerProps {
   lat: number;
   lng: number;
   address: string;
-}) => <div>{address}</div>;
+}
 
-export const myMap: React.FC<myMapProps> = ({ residences }) => {
-  const defaultProps = {
-    center: {
-      lat: 59.95,
-      lng: 30.33,
-    },
-    zoom: 11,
-  };
+const Marker = ({ lat, lng, address }: MarkerProps) => (
+  <Icon
+    as={CRiHomeSmile}
+    h={8}
+    w={8}
+    style={{ transform: "translate(-50%, -100%)" }}
+    color={"teal"}
+  />
+);
 
+export const Map: React.FC<MapProps> = ({ residences, center }) => {
   return (
-    <AspectRatio ratio={16 / 9}>
+    <AspectRatio ratio={21 / 9}>
       <div style={{ height: "100%", width: "100%" }}>
         <GoogleMap
           bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_MAPS_API_KEY! }}
-          defaultCenter={defaultProps.center}
-          defaultZoom={defaultProps.zoom}
+          defaultCenter={center}
+          defaultZoom={11}
+          options={(map) => ({
+            panControl: false,
+            fullscreenControl: false,
+            zoomControl: false,
+            scrollwheel: true,
+            mapTypeControl: false,
+          })}
         >
           {residences.map((res) => (
             <Marker
