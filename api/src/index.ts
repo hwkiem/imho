@@ -82,6 +82,7 @@ const main = async () => {
       pool,
       client,
     }),
+    dataSources: () => ({}),
   });
 
   await apolloServer.start();
