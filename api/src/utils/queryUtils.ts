@@ -1,10 +1,9 @@
-import { QueryResult } from 'pg';
-import { User } from 'src/entities/User';
-import { Residence } from '../entities/Residence';
-import { Review } from '../entities/Reviews';
-import { Coords } from '../resolvers/types';
+import { QueryResult } from "pg";
+import { UserGQL } from "src/User/user";
+import { ResidenceGQL } from "../Residence/residence";
+import { ReviewGQL } from "../Review/Reviews";
 
-export const rowsToUsers = (dbRes: QueryResult<any>): User[] => {
+export const rowsToUsers = (dbRes: QueryResult<any>): UserGQL[] => {
   return dbRes.rows.map((item) => {
     return {
       userId: item.user_id,
@@ -18,9 +17,8 @@ export const rowsToUsers = (dbRes: QueryResult<any>): User[] => {
   });
 };
 
-export const rowsToResidences = (dbRes: QueryResult<any>): Residence[] => {
-  return dbRes.rows.map((item): Residence => {
-    // const lat = item.
+export const rowsToResidences = (dbRes: QueryResult<any>): ResidenceGQL[] => {
+  return dbRes.rows.map((item): ResidenceGQL => {
     return {
       resID: item.res_id,
       google_place_id: item.google_place_id,
@@ -31,36 +29,16 @@ export const rowsToResidences = (dbRes: QueryResult<any>): Residence[] => {
       city: item.city,
       state: item.state,
       postal_code: item.postal_code,
+      coords: { lat: item.lat, lng: item.lng },
       createdAt: item.created_at,
       updatedAt: item.updated_at,
-      avgRating: item.avgrating,
+      avgRating: item.avg_rating,
+      avgRent: item.avg_rent,
     };
   });
 };
 
-export const rowsToResidencesCoords = (dbRes: QueryResult<any>): Residence[] => {
-  return dbRes.rows.map((item): Residence => {
-    // const lat = item.
-    const cords: Coords = { lat: item.lat, lng: item.lng };
-    return {
-      resID: item.res_id,
-      google_place_id: item.google_place_id,
-      full_address: item.full_address,
-      apt_num: item.apt_num,
-      street_num: item.street_num,
-      route: item.route,
-      city: item.city,
-      state: item.state,
-      postal_code: item.postal_code,
-      coords: cords,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-      avgRating: item.avgrating,
-    };
-  });
-};
-
-export const rowsToReviews = (dbRes: QueryResult<any>): Review[] => {
+export const rowsToReviews = (dbRes: QueryResult<any>): ReviewGQL[] => {
   return dbRes.rows.map((item) => {
     return {
       userId: item.user_id,

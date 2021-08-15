@@ -1,7 +1,8 @@
-import { ObjectType, Field } from 'type-graphql';
+import { ObjectType, Field } from "type-graphql";
+import { User } from "entities";
 
 @ObjectType()
-export class User {
+export class UserGQL implements User {
   @Field()
   userId!: number;
 

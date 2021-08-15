@@ -13,7 +13,7 @@
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.1.16",
     "@types/cors": "^2.8.12",
-    "apollo-server-express": "^3.1.2",
+    "apollo-server": "^3.1.2",
     "argon2": "^0.28.2",
     "class-validator": "^0.13.1",
     "connect-pg-simple": "^6.2.1",
@@ -29,6 +29,7 @@
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1"
   },
+  
   "devDependencies": {
     "@types/connect-pg-simple": "^4.2.4",
     "@types/connect-redis": "^0.0.17",

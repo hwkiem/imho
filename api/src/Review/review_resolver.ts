@@ -1,36 +1,31 @@
-// import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Review } from '../entities/Reviews';
-import { MyContext } from '../types';
-import { rowsToReviews } from '../utils/queryUtils';
-import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from './types';
-// import { MyContext } from '../types';
-// import { rowsToReviews } from '../utils/queryUtils';
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { ReviewGQL } from "./Reviews";
+import { MyContext } from "../types";
+import { rowsToReviews } from "../utils/queryUtils";
+import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from "../types";
 
-// import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from './types';
-
-@Resolver(Review)
+@Resolver(ReviewGQL)
 export class ReviewResolver {
   @Mutation(() => ReviewResponse)
   async writeReview(
-    @Arg('options') options: WriteReviewInput,
+    @Arg("options") options: WriteReviewInput,
     @Ctx() { pool, req }: MyContext
   ): Promise<ReviewResponse> {
     if (!req.session.userId) {
-      return { errors: [{ message: 'session', field: 'not logged in' }] };
+      return { errors: [{ message: "session", field: "not logged in" }] };
     }
     try {
       const pg = await pool.connect();
       const dbRes = await pg.query(
         `
-        INSERT INTO reviews (res_id, user_id, apptno, rating, created_at, updated_at)
+        INSERT INTO reviews (res_id, user_id, rating, rent, created_at, updated_at)
         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *
         `,
-        [options.res_id, req.session.userId, options.apptNo, options.rating]
+        [options.res_id, req.session.userId, options.rating, options.rent]
       );
       pg.release();
       if (dbRes.rowCount == 0) {
-        return { errors: [{ message: 'insert', field: 'could not insert' }] };
+        return { errors: [{ message: "insert", field: "could not insert" }] };
       }
       return { review: rowsToReviews(dbRes)[0] };
     } catch (errs) {
@@ -38,8 +33,18 @@ export class ReviewResolver {
         return {
           errors: [
             {
-              message: 'duplicate',
-              field: 'you have already reviewed this residency',
+              message: "duplicate",
+              field: "you have already reviewed this residency",
+            },
+          ],
+        };
+      }
+      if (errs.code == 23503) {
+        return {
+          errors: [
+            {
+              message: "foreign key",
+              field: "this res_id does not exist in residences",
             },
           ],
         };
@@ -49,12 +54,12 @@ export class ReviewResolver {
     return {};
   }
 
-  @Query(() => [Review])
+  @Query(() => [ReviewGQL])
   async getReviews(
-    @Arg('reviewQueryInput', { nullable: true })
+    @Arg("reviewQueryInput", { nullable: true })
     reviewQueryInput: ReviewQueryInput,
     @Ctx() { pool }: MyContext
-  ): Promise<Review[]> {
+  ): Promise<ReviewGQL[]> {
     if (!reviewQueryInput.reviews) {
       const pg = await pool.connect();
       const dbRes = await pg.query(`SELECT * FROM reviews`);
@@ -63,12 +68,12 @@ export class ReviewResolver {
     }
     const placeholders = reviewQueryInput.reviews
       .map((_, i) => {
-        return '$' + (i + 1);
+        return "$" + (i + 1);
       })
-      .join(',');
+      .join(",");
 
     const dbRes = await pool.query(
-      'SELECT * FROM reviews WHERE res_id in (' + placeholders + ')',
+      "SELECT * FROM reviews WHERE res_id in (" + placeholders + ")",
       reviewQueryInput.reviews
     );
     return rowsToReviews(dbRes);
@@ -76,12 +81,12 @@ export class ReviewResolver {
 
   @Mutation(() => ReviewResponse)
   async updateRating(
-    @Arg('resId') resId: number,
-    @Arg('newRating') newRating: number,
+    @Arg("resId") resId: number,
+    @Arg("newRating") newRating: number,
     @Ctx() { pool, req }: MyContext
   ): Promise<ReviewResponse> {
     if (!req.session.userId) {
-      return { errors: [{ message: 'session', field: 'not logged in' }] };
+      return { errors: [{ message: "session", field: "not logged in" }] };
     }
     try {
       const pg = await pool.connect();
@@ -93,7 +98,7 @@ export class ReviewResolver {
       );
       pg.release();
       if (dbRes.rowCount == 0) {
-        return { errors: [{ message: 'insert', field: 'could not insert' }] };
+        return { errors: [{ message: "insert", field: "could not insert" }] };
       }
       const res = rowsToReviews(dbRes)[0];
       return { review: res };
@@ -102,8 +107,8 @@ export class ReviewResolver {
         return {
           errors: [
             {
-              message: 'duplicate',
-              field: 'you have already reviewed this residence',
+              message: "duplicate",
+              field: "you have already reviewed this residence",
             },
           ],
         };
