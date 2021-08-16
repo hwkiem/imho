@@ -12,14 +12,11 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "noEmit": false,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
-<<<<<<< HEAD
     "composite": true,
-=======
->>>>>>> main
     "resolveJsonModule": true,
     "jsx": "preserve"
   },
