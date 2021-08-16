@@ -16,6 +16,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
+    "composite": true,
     "resolveJsonModule": true,
     "jsx": "preserve"
   },
