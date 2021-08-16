@@ -1,6 +1,6 @@
 import { AspectRatio, Grid, GridItem } from "@chakra-ui/react";
 import { Residence } from "entities";
-import { Layout } from "../components/layout/Layout";
+import { Layout } from "../components/layout/layout";
 import { Map } from "../components/ui/map";
 
 const residences: Pick<Residence, "resID" | "full_address" | "coords">[] = [
