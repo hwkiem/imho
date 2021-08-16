@@ -1,4 +1,4 @@
-import { AspectRatio } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { Residence } from "entities";
 import GoogleMap from "google-map-react";
 import { chakra } from "@chakra-ui/react";
@@ -30,29 +30,26 @@ const Marker = ({ lat, lng, address }: MarkerProps) => (
 
 export const Map: React.FC<MapProps> = ({ residences, center }) => {
   return (
-    <AspectRatio ratio={21 / 9}>
-      <div style={{ height: "100%", width: "100%" }}>
-        <GoogleMap
-          bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_MAPS_API_KEY! }}
-          defaultCenter={center}
-          defaultZoom={11}
-          options={(map) => ({
-            panControl: false,
-            fullscreenControl: false,
-            zoomControl: false,
-            scrollwheel: true,
-            mapTypeControl: false,
-          })}
-        >
-          {residences.map((res) => (
-            <Marker
-              lat={res.coords.lat}
-              lng={res.coords.lng}
-              address={res.full_address}
-            />
-          ))}
-        </GoogleMap>
-      </div>
-    </AspectRatio>
+    <GoogleMap
+      bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_MAPS_API_KEY! }}
+      defaultCenter={center}
+      defaultZoom={11}
+      options={(map) => ({
+        panControl: false,
+        fullscreenControl: false,
+        zoomControl: false,
+        scrollwheel: true,
+        mapTypeControl: false,
+      })}
+    >
+      {residences.map((res) => (
+        <Marker
+          key={res.full_address}
+          lat={res.coords.lat}
+          lng={res.coords.lng}
+          address={res.full_address}
+        />
+      ))}
+    </GoogleMap>
   );
 };

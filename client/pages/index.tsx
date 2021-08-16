@@ -1,4 +1,4 @@
-import { AspectRatio, Grid, GridItem } from "@chakra-ui/react";
+import { AspectRatio, Grid, GridItem, Box } from "@chakra-ui/react";
 import { Residence } from "entities";
 import { Layout } from "../components/layout/layout";
 import { Map } from "../components/ui/map";
@@ -25,21 +25,9 @@ const residences: Pick<Residence, "resID" | "full_address" | "coords">[] = [
 const center = { lat: 40.7969087, lng: -73.96190469999999 };
 
 const Index = () => {
-  console.log("Index Page!");
   return (
     <Layout>
-      <Grid
-        h="200px"
-        templateRows="repeat(2, 1fr)"
-        templateColumns="repeat(5, 1fr)"
-        gap={4}
-      >
-        <GridItem colSpan={5}>
-          <AspectRatio ratio={21 / 9}>
-            <Map residences={residences} center={center} />
-          </AspectRatio>
-        </GridItem>
-      </Grid>
+      <Map residences={residences} center={center} />
     </Layout>
   );
 };
