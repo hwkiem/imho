@@ -18,7 +18,7 @@ interface MarkerProps {
   address: string;
 }
 
-const Marker = ({ lat, lng, address }: MarkerProps) => (
+const Marker: React.FC<MarkerProps> = ({ lat, lng, address }) => (
   <Icon
     as={CRiHomeSmile}
     h={8}
