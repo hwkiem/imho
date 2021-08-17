@@ -30,6 +30,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 import { RiHomeSmileFill } from "react-icons/ri";
+import { ReviewForm } from "../forms/review";
 
 const CRiHomeSmile = chakra(RiHomeSmileFill);
 
@@ -116,7 +117,8 @@ export const NavBar: React.FC<NavBarProps> = ({ reviewDrawer }) => {
               <DrawerHeader>Create a Review!</DrawerHeader>
 
               <DrawerBody>
-                <form>
+                <ReviewForm />
+                {/* <form>
                   <Stack
                     spacing={4}
                     p="1rem"
@@ -143,7 +145,7 @@ export const NavBar: React.FC<NavBarProps> = ({ reviewDrawer }) => {
                       Login
                     </Button>
                   </Stack>
-                </form>
+                </form> */}
               </DrawerBody>
 
               <DrawerFooter>

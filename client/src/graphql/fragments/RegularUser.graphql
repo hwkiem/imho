@@ -1,0 +1,8 @@
+fragment RegularUser on UserGQL {
+  createdAt
+  email
+  firstName
+  lastName
+  updatedAt
+  userId
+}
