@@ -14,6 +14,7 @@ import { initDB } from "./utils/initializeDB";
 import { UserResolver } from "./User/user_resolver";
 import { ResidencyResolver } from "./Residence/residence_resolver";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { Database } from "./DataSources/postgres";
 
 const main = async () => {
   const app = express();
@@ -68,6 +69,19 @@ const main = async () => {
     })
   );
 
+  const knexConfig = {
+    client: "pg",
+    connection: {
+      user: process.env.DB_USER,
+      host: process.env.DB_HOST,
+      database: process.env.DATABASE,
+      password: process.env.DB_PASSWORD,
+      port: parseInt(process.env.DB_PORT!),
+    },
+  };
+
+  // const db: Database = new Database(knexConfig);
+
   // Configure AppolloServer
   const apolloServer = new ApolloServer({
     // plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
@@ -82,7 +96,11 @@ const main = async () => {
       pool,
       client,
     }),
-    dataSources: () => ({}),
+    dataSources: () => {
+      return {
+        pgHandler: new Database(knexConfig),
+      };
+    },
   });
 
   await apolloServer.start();

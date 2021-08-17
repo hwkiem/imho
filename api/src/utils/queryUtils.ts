@@ -3,16 +3,18 @@ import { UserGQL } from "src/User/user";
 import { ResidenceGQL } from "../Residence/residence";
 import { ReviewGQL } from "../Review/Reviews";
 
+// REDUCERS
+
 export const rowsToUsers = (dbRes: QueryResult<any>): UserGQL[] => {
   return dbRes.rows.map((item) => {
     return {
-      userId: item.user_id,
+      user_id: item.user_id,
       email: item.email,
-      firstName: item.first_name,
-      lastName: item.last_name,
+      first_name: item.first_name,
+      last_name: item.last_name,
       password: item.password,
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
     };
   });
 };

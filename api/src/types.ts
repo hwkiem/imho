@@ -2,6 +2,7 @@ import { Client } from "@googlemaps/google-maps-services-js";
 import { Request, Response } from "express";
 import { Pool } from "pg";
 import { ObjectType, Field, InputType, Int } from "type-graphql";
+import { Database } from "./DataSources/postgres";
 import { ResidenceGQL } from "./Residence/residence";
 import { ReviewGQL } from "./Review/Reviews";
 import { UserGQL } from "./User/user";
@@ -11,6 +12,7 @@ export type MyContext = {
   res: Response;
   pool: Pool;
   client: Client;
+  dataSources: { pgHandler: Database };
 };
 
 @ObjectType()

@@ -4,24 +4,22 @@ import { User } from "entities";
 @ObjectType()
 export class UserGQL implements User {
   @Field()
-  userId!: number;
+  user_id!: number;
 
   @Field()
-  firstName!: string;
+  first_name!: string;
 
   @Field()
-  lastName!: string;
+  last_name!: string;
 
   @Field()
   email!: string;
 
   password!: string;
 
-  // housingHistory: [TenantReport]
+  @Field(() => String)
+  created_at = new Date();
 
   @Field(() => String)
-  createdAt = new Date();
-
-  @Field(() => String)
-  updatedAt = new Date();
+  updated_at = new Date();
 }

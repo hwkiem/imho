@@ -17,22 +17,12 @@ declare module "express-session" {
 export class UserResolver {
   // Me Query
   @Query(() => UserResponse)
-  async me(@Ctx() { req, pool }: MyContext) {
-    const userId = req.session.userId;
+  async me(@Ctx() context: MyContext): Promise<UserResponse> {
+    const userId = context.req.session.userId;
     if (!userId) {
       return { errors: [{ field: "login", message: "not logged in" }] };
     }
-    const pg = await pool.connect();
-    const dbRes = await pg.query("SELECT * FROM users WHERE user_id = $1", [
-      userId,
-    ]);
-    pg.release();
-    if (dbRes.rowCount == 0) {
-      return {
-        errors: [{ field: "account", message: "no User with your id" }],
-      };
-    }
-    return { user: rowsToUsers(dbRes)[0] };
+    return await context.dataSources.pgHandler.getUserById(userId);
   }
 
   // Create User
@@ -61,7 +51,7 @@ export class UserResolver {
       if (dbRes.rowCount > 0) {
         const newUser: UserGQL = rowsToUsers(dbRes)[0];
         // Set session's userId
-        req.session!.userId = newUser.userId;
+        req.session!.userId = newUser.user_id;
         return { user: newUser };
       }
     } catch (err) {
@@ -117,7 +107,7 @@ export class UserResolver {
           ],
         };
       }
-      req.session!.userId = user.userId;
+      req.session!.userId = user.user_id;
       return { user: user };
     } catch (err) {
       console.log(err);
