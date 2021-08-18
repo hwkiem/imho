@@ -45,23 +45,31 @@ export class RegisterInput {
 }
 
 @InputType()
+export class LoginInput {
+  @Field()
+  email: string;
+  @Field()
+  password: string;
+}
+
+@InputType()
 export class ReviewQueryInput {
   @Field(() => [Int], { nullable: true })
   reviews?: [number];
 }
 
 @InputType()
-export class CreateResidencyInput {
+export class CreateResidenceInput {
   @Field()
-  address: string;
+  google_place_id: string;
 }
 @ObjectType()
-export class ResidencyResponse {
+export class ResidenceResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
-  @Field(() => ResidenceGQL, { nullable: true })
-  residency?: ResidenceGQL;
+  @Field(() => [ResidenceGQL], { nullable: true })
+  residences?: [ResidenceGQL];
 }
 
 @InputType()
@@ -85,10 +93,10 @@ export class ReviewResponse {
   review?: ReviewGQL;
 }
 
-// @ObjectType()
-// export class Coords {
-//   @Field()
-//   lat: number;
-//   @Field()
-//   lng: number;
-// }
+@ObjectType()
+export class Coords {
+  @Field()
+  lat: number;
+  @Field()
+  lng: number;
+}

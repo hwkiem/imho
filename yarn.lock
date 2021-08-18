@@ -1596,6 +1596,11 @@
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.2.0.tgz#f3933a44e365864f4dad5db94158106d511e8131"
   integrity sha512-sqKVVVOe5ivCaXDWivIJYVSaEgdQK9ul7a4Kity5Iw7u9+wBAPbX1RMSnLLmp7O4Vzj0WOWwMAJsTL00xwaNug==
 
+"@humanwhocodes/momoa@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@humanwhocodes/momoa/-/momoa-2.0.2.tgz#127d18c22abf4dd988797c898b4356db8d99b662"
+  integrity sha512-mkMcsshJ7L17AyntqpyjLiGqhbG62w93B0StW+HSNVJ1WUeVFA2uPssV/GufEfDqN6lRKI1I+uDzBUw83C0VuA==
+
 "@iarna/toml@^2.2.5":
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
@@ -1700,6 +1705,15 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@phc/format/-/format-1.0.0.tgz#b5627003b3216dc4362125b13f48a4daa76680e4"
   integrity sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ==
+
+"@placemarkio/check-geojson@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@placemarkio/check-geojson/-/check-geojson-0.1.6.tgz#26be4f8b983f64dc2caca02984a17b06aaa67058"
+  integrity sha512-RZxxu2wpBiQbaL9B2miBHW01Ltof8S2WaWWGbfFR8CRtzWOFlAdYKEPihUCK14WCwekPfF6Z/xa6PPaVlUlC0g==
+  dependencies:
+    "@humanwhocodes/momoa" "^2.0.2"
+    "@types/geojson" "^7946.0.7"
+    type-fest "^1.2.1"
 
 "@popperjs/core@2.4.4":
   version "2.4.4"
@@ -1881,6 +1895,11 @@
     "@types/express-serve-static-core" "^4.17.18"
     "@types/qs" "*"
     "@types/serve-static" "*"
+
+"@types/geojson@^7946.0.7":
+  version "7946.0.8"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.8.tgz#30744afdb385e2945e22f3b033f897f76b1f12ca"
+  integrity sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==
 
 "@types/glob@^7.1.3":
   version "7.1.4"
@@ -5374,6 +5393,14 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
+knex-postgis@^0.14.1:
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/knex-postgis/-/knex-postgis-0.14.1.tgz#a7f9cd7ddb248f207cd46e328c6706d3c6c9aad4"
+  integrity sha512-uFiHlTFIIbHQcYgd3pzUyN66xOrd8fxHffwGctONITF2rPpwknnXPw0dJKIp8Ju41qI3MeFfpXZrnv/rq2vOgQ==
+  dependencies:
+    "@placemarkio/check-geojson" "^0.1.6"
+    "@types/geojson" "^7946.0.7"
+
 knex-tiny-logger@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/knex-tiny-logger/-/knex-tiny-logger-2.1.0.tgz#11a7cc9b6979eb9dc34c8c5591abb31eff5f5b81"
@@ -7841,6 +7868,11 @@ type-fest@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
+
+type-fest@^1.2.1:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-1.4.0.tgz#e9fb813fe3bf1744ec359d55d1affefa76f14be1"
+  integrity sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==
 
 type-graphql@^1.1.1:
   version "1.1.1"

@@ -1,7 +1,8 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
 import { UserGQL } from './user';
 import { validateRegister } from '../utils/validateRegister';
-import { UserResponse, RegisterInput, MyContext } from '../types';
+import { UserResponse, RegisterInput, MyContext, LoginInput } from '../types';
+import argon2 from 'argon2';
 
 declare module 'express-session' {
   interface Session {
@@ -57,6 +58,32 @@ export class UserResolver {
     return response;
   }
 
+  // Login User
+  @Mutation(() => UserResponse)
+  async login(
+    @Arg('input') input: LoginInput,
+    @Ctx() { dataSources, req }: MyContext
+  ): Promise<UserResponse> {
+    const response = await dataSources.pgHandler.getUsersObject(
+      (({ email }) => ({ email }))(input)
+    );
+    // console.log(response);
+    if (response.users) {
+      if (!(await argon2.verify(response.users[0].password, input.password))) {
+        return {
+          errors: [
+            {
+              field: 'password',
+              message: 'wrong password',
+            },
+          ],
+        };
+      }
+      req.session.userId = response.users[0].user_id;
+    }
+    return response;
+  }
+
   // Delete User
   @Mutation(() => UserResponse)
   async deleteUser(
@@ -81,7 +108,7 @@ export class UserResolver {
     @Arg('limit', () => Int) limit: number,
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
-    return await dataSources.pgHandler.getUsers(limit);
+    return await dataSources.pgHandler.getUsersLimit(limit);
   }
 
   // // changes signed in user's password, to test updated_at

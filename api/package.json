@@ -25,6 +25,7 @@
     "express-session": "^1.17.2",
     "graphql": "^15.5.1",
     "ioredis": "^4.27.7",
+    "knex-postgis": "^0.14.1",
     "pg": "^8.7.1",
     "pg-pool": "^3.4.1",
     "reflect-metadata": "^0.1.13",
