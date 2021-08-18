@@ -1,18 +1,18 @@
-import { Client } from "@googlemaps/google-maps-services-js";
-import { Request, Response } from "express";
-import { Pool } from "pg";
-import { ObjectType, Field, InputType, Int } from "type-graphql";
-import { Database } from "./DataSources/postgres";
-import { ResidenceGQL } from "./Residence/residence";
-import { ReviewGQL } from "./Review/Reviews";
-import { UserGQL } from "./User/user";
+import { Client } from '@googlemaps/google-maps-services-js';
+import { Request, Response } from 'express';
+import { Pool } from 'pg';
+import { ObjectType, Field, InputType, Int } from 'type-graphql';
+import { postgresHandler } from './dataSources/postgres';
+import { ResidenceGQL } from './Residence/residence';
+import { ReviewGQL } from './Review/Reviews';
+import { UserGQL } from './User/user';
 
 export type MyContext = {
   req: Request; //& { session: Express.Session };
   res: Response;
   pool: Pool;
   client: Client;
-  dataSources: { pgHandler: Database };
+  dataSources: { pgHandler: postgresHandler };
 };
 
 @ObjectType()
@@ -28,8 +28,8 @@ export class UserResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
-  @Field(() => UserGQL, { nullable: true })
-  user?: UserGQL;
+  @Field(() => [UserGQL], { nullable: true })
+  users?: UserGQL[];
 }
 
 @InputType()
@@ -37,9 +37,9 @@ export class RegisterInput {
   @Field()
   email: string;
   @Field()
-  firstName: string;
+  first_name: string;
   @Field()
-  lastName: string;
+  last_name: string;
   @Field()
   password: string;
 }

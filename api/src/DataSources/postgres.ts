@@ -1,38 +1,61 @@
-import { SQLDataSource } from "datasource-sql";
-import { UserResponse } from "../types";
-import { UserGQL } from "../User/user";
-// import { Pool } from "pg";
-// import { UserResponse } from "../types";
-// import { rowsToUsers } from "../utils/queryUtils";
+import { SQLDataSource } from 'datasource-sql';
+import { RegisterInput, UserResponse } from '../types';
+import argon2 from 'argon2';
+import { UserGQL } from '../User/user';
 
-export class Database extends SQLDataSource {
-  async getUserById(id: number): Promise<UserResponse> {
-    this.knex
-      .select("*")
-      .from<UserGQL>("users")
-      .where("user_id", "=", id)
-      .then((res) => {
-        return { user: res };
-      })
-      .catch((e) => {
-        return {
-          errors: [{ field: "not sure", message: e }],
-        };
-      });
-    return {
-      errors: [{ field: "catch", message: "catch" }],
+export class postgresHandler extends SQLDataSource {
+  async getUsersById(ids: [number]): Promise<UserResponse> {
+    let r: UserResponse = {};
+    await this.knex<UserGQL>('users')
+      .select('*')
+      .where('user_id', 'in', ids) // in
+      .then((users) => (r.users = users))
+      .catch(
+        (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+      );
+    return r;
+  }
+
+  async getUsers(limit: number): Promise<UserResponse> {
+    let r: UserResponse = {};
+    await this.knex<UserGQL>('users')
+      .select('*')
+      .limit(limit)
+      .then((users) => (r.users = users))
+      .catch(
+        (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+      );
+    return r;
+  }
+
+  async createUser(input: RegisterInput): Promise<UserResponse> {
+    let r: UserResponse = {};
+    input.password = await argon2.hash(input.password);
+    const args = {
+      ...input,
+      created_at: this.knex.fn.now(),
+      updated_at: this.knex.fn.now(),
     };
+    await this.knex<UserGQL>('users')
+      .insert(args)
+      .returning('*')
+      .then((users) => (r.users = users))
+      .catch(
+        (e) => (r.errors = [{ field: 'insert user', message: e.toString() }])
+      );
+    return r;
+  }
 
-    // const pg = await pool.connect();
-    // const dbRes = await pg.query("SELECT * FROM users WHERE user_id = $1", [
-    //   userId,
-    // ]);
-    // pg.release();
-    // if (dbRes.rowCount == 0) {
-    //   return {
-    //     errors: [{ field: "account", message: "no User with your id" }],
-    //   };
-    // }
-    // return { user: rowsToUsers(dbRes)[0] };
+  async deleteUser(id: number): Promise<UserResponse> {
+    let r: UserResponse = {};
+    await this.knex<UserGQL>('users')
+      .where('user_id', '=', id)
+      .del()
+      .returning('*')
+      .then((user) => (r.users = user))
+      .catch(
+        (e) => (r.errors = [{ field: 'delete user', message: e.toString() }])
+      );
+    return r;
   }
 }

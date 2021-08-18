@@ -14,7 +14,7 @@ import { initDB } from "./utils/initializeDB";
 import { UserResolver } from "./User/user_resolver";
 import { ResidencyResolver } from "./Residence/residence_resolver";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-import { Database } from "./DataSources/postgres";
+import { postgresHandler } from "./dataSources/postgres";
 
 const main = async () => {
   const app = express();
@@ -98,7 +98,7 @@ const main = async () => {
     }),
     dataSources: () => {
       return {
-        pgHandler: new Database(knexConfig),
+        pgHandler: new postgresHandler(knexConfig),
       };
     },
   });
