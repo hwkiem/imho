@@ -1,7 +1,13 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
 import { UserGQL } from './user';
 import { validateRegister } from '../utils/validateRegister';
-import { UserResponse, RegisterInput, MyContext, LoginInput } from '../types';
+import {
+  UserResponse,
+  RegisterInput,
+  MyContext,
+  LoginInput,
+  PartialUser,
+} from '../types';
 import argon2 from 'argon2';
 
 declare module 'express-session' {
@@ -102,13 +108,20 @@ export class UserResolver {
     return await dataSources.pgHandler.getUsersById(ids);
   }
 
-  // Query Users
   @Query(() => UserResponse)
-  async getUsers(
+  async getUsersLimit(
     @Arg('limit', () => Int) limit: number,
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.getUsersLimit(limit);
+  }
+
+  @Query(() => UserResponse) // return number of rows returned? everywhere?
+  async getUsersObjFilter(
+    @Arg('obj') obj: PartialUser,
+    @Ctx() { dataSources }: MyContext
+  ): Promise<UserResponse> {
+    return await dataSources.pgHandler.getUsersObject(obj);
   }
 
   // // changes signed in user's password, to test updated_at

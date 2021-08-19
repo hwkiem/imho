@@ -1,13 +1,13 @@
-import { ObjectType, Field, Int, Float } from "type-graphql";
-import { Review } from "entities";
+import { ObjectType, Field, Int, Float } from 'type-graphql';
+import { Review } from 'entities';
 
 @ObjectType()
 export class ReviewGQL implements Review {
   @Field(() => Int)
-  resId!: string;
+  res_id!: number;
 
   @Field()
-  userId!: number;
+  user_id!: number;
 
   @Field(() => Float)
   rating!: number;
@@ -16,8 +16,8 @@ export class ReviewGQL implements Review {
   rent!: number;
 
   @Field(() => String)
-  createdAt = new Date();
+  created_at = new Date();
 
   @Field(() => String)
-  updatedAt = new Date();
+  updated_at = new Date();
 }

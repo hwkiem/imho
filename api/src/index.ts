@@ -14,6 +14,7 @@ import { UserResolver } from './User/user_resolver';
 import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { postgresHandler } from './dataSources/postgres';
+import { ReviewResolver } from './Review/review_resolver';
 
 const main = async () => {
   const app = express();
@@ -74,7 +75,7 @@ const main = async () => {
   const apolloServer = new ApolloServer({
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
     schema: await buildSchema({
-      resolvers: [UserResolver, ResidencyResolver],
+      resolvers: [UserResolver, ResidencyResolver, ReviewResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({

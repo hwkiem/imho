@@ -3,7 +3,9 @@ import {
   Coords,
   RegisterInput,
   ResidenceResponse,
+  ReviewResponse,
   UserResponse,
+  WriteReviewInput,
 } from '../types';
 import argon2 from 'argon2';
 import { UserGQL } from '../User/user';
@@ -11,6 +13,7 @@ import { ResidenceGQL } from '../Residence/residence';
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
+import { ReviewGQL } from '../Review/Reviews';
 
 const knexConfig = {
   client: 'pg',
@@ -27,7 +30,7 @@ export class postgresHandler extends SQLDataSource {
   constructor() {
     super(knexConfig);
   }
-  // Users
+  // @Users
   async getUsersById(ids: [number]): Promise<UserResponse> {
     let r: UserResponse = {};
     await this.knex<UserGQL>('users')
@@ -95,7 +98,7 @@ export class postgresHandler extends SQLDataSource {
     return r;
   }
 
-  // Residences
+  // @Residences
   async createResidence(
     input: Partial<ResidenceGQL>,
     location: GeocodeResult
@@ -191,5 +194,70 @@ export class postgresHandler extends SQLDataSource {
     );
 
     return res.rows[0];
+  }
+
+  // @Reviews
+  async writeReview(input: WriteReviewInput): Promise<ReviewResponse> {
+    let r: ReviewResponse = {};
+    const args = {
+      ...input,
+      created_at: this.knex.fn.now(),
+      updated_at: this.knex.fn.now(),
+    };
+    await this.knex<ReviewGQL>('reviews')
+      .insert(args)
+      .returning('*')
+      .then((reviews) => (r.reviews = reviews))
+      .catch(
+        (e) => (r.errors = [{ field: 'insert review', message: e.toString() }])
+      );
+    return r;
+  }
+  async getReviewsByUserId(ids: [number]): Promise<ReviewResponse> {
+    let r: ReviewResponse = {};
+    await this.knex<ReviewGQL>('reviews')
+      .select('*')
+      .where('user_id', 'in', ids)
+      .then((reviews) => (r.reviews = reviews))
+      .catch(
+        (e) => (r.errors = [{ field: 'query review', message: e.toString() }])
+      );
+    return r;
+  }
+
+  async getReviewsByResidenceId(ids: [number]): Promise<ReviewResponse> {
+    let r: ReviewResponse = {};
+    await this.knex<ReviewGQL>('reviews')
+      .select('*')
+      .where('res_id', 'in', ids)
+      .then((reviews) => (r.reviews = reviews))
+      .catch(
+        (e) => (r.errors = [{ field: 'query review', message: e.toString() }])
+      );
+    return r;
+  }
+
+  async getReviewsLimit(limit: number): Promise<ReviewResponse> {
+    let r: ReviewResponse = {};
+    await this.knex<ReviewGQL>('reviews')
+      .select('*')
+      .limit(limit)
+      .then((reviews) => (r.reviews = reviews))
+      .catch(
+        (e) => (r.errors = [{ field: 'query review', message: e.toString() }])
+      );
+    return r;
+  }
+
+  async getReviewsObject(obj: Partial<ReviewGQL>): Promise<ReviewResponse> {
+    let r: ReviewResponse = {};
+    await this.knex<ReviewGQL>('reviews')
+      .select('*')
+      .where(obj)
+      .then((reviews) => (r.reviews = reviews))
+      .catch(
+        (e) => (r.errors = [{ field: 'query review', message: e.toString() }])
+      );
+    return r;
   }
 }

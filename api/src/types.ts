@@ -15,6 +15,47 @@ export type MyContext = {
   dataSources: { pgHandler: postgresHandler };
 };
 
+@InputType() // subset of User used as filter values
+export class PartialUser implements Partial<UserGQL> {
+  @Field({ nullable: true })
+  first_name?: string;
+  @Field({ nullable: true })
+  last_name?: string;
+}
+
+@InputType()
+export class PartialReview implements Partial<ReviewGQL> {
+  @Field({ nullable: true })
+  rating: number;
+
+  @Field({ nullable: true })
+  rent: number;
+}
+@InputType()
+export class PartialResidence implements Partial<ResidenceGQL> {
+  @Field({ nullable: true })
+  apt_num: string;
+  @Field({ nullable: true })
+  avg_rent: number;
+  @Field({ nullable: true })
+  city: string;
+  @Field({ nullable: true })
+  postal_code: string;
+  @Field({ nullable: true })
+  route: string;
+  @Field({ nullable: true })
+  state: string;
+}
+
+// use this for getReviewById?
+// @InputType()
+// export class PickReviewID implements Pick<ReviewGQL, 'res_id' | 'user_id'> {
+//   @Field()
+//   user_id: number;
+//   @Field()
+//   res_id: number;
+// }
+
 @ObjectType()
 export class FieldError {
   @Field()
@@ -82,6 +123,8 @@ export class WriteReviewInput {
 
   @Field()
   rent: number;
+
+  user_id: number;
 }
 
 @ObjectType()
@@ -89,8 +132,8 @@ export class ReviewResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 
-  @Field(() => ReviewGQL, { nullable: true })
-  review?: ReviewGQL;
+  @Field(() => [ReviewGQL], { nullable: true })
+  reviews?: ReviewGQL[];
 }
 
 @ObjectType()

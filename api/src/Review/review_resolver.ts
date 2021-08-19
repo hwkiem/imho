@@ -1,62 +1,104 @@
-// import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-// import { ReviewGQL } from './Reviews';
-// import { MyContext } from '../types';
-// import { rowsToReviews } from '../utils/queryUtils';
-// import { ReviewQueryInput, ReviewResponse, WriteReviewInput } from '../types';
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { ReviewGQL } from './Reviews';
+import { MyContext, PartialReview } from '../types';
+import { ReviewResponse, WriteReviewInput } from '../types';
 
-// @Resolver(ReviewGQL)
-// export class ReviewResolver {
-//   @Mutation(() => ReviewResponse)
-//   async writeReview(
-//     @Arg("options") options: WriteReviewInput,
-//     @Ctx() { pool, req }: MyContext
-//   ): Promise<ReviewResponse> {
-//     if (!req.session.userId) {
-//       return { errors: [{ message: "session", field: "not logged in" }] };
-//     }
-//     try {
-//       const pg = await pool.connect();
-//       const dbRes = await pg.query(
-//         `
-//         INSERT INTO reviews (res_id, user_id, rating, rent, created_at, updated_at)
-//         VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *
-//         `,
-//         [options.res_id, req.session.userId, options.rating, options.rent]
-//       );
-//       pg.release();
-//       if (dbRes.rowCount == 0) {
-//         return { errors: [{ message: "insert", field: "could not insert" }] };
-//       }
-//       return { review: rowsToReviews(dbRes)[0] };
-//     } catch (errs) {
-//       if (errs.code == 23505) {
-//         return {
-//           errors: [
-//             {
-//               message: "duplicate",
-//               field: "you have already reviewed this residency",
-//             },
-//           ],
-//         };
-//       }
-//       if (errs.code == 23503) {
-//         return {
-//           errors: [
-//             {
-//               message: "foreign key",
-//               field: "this res_id does not exist in residences",
-//             },
-//           ],
-//         };
-//       }
-//       console.log(errs);
-//     }
-//     return {};
+@Resolver(ReviewGQL)
+export class ReviewResolver {
+  @Mutation(() => ReviewResponse)
+  async writeReview(
+    @Arg('options') options: WriteReviewInput,
+    @Ctx() { dataSources, req }: MyContext
+  ): Promise<ReviewResponse> {
+    if (!req.session.userId) {
+      return { errors: [{ message: 'session', field: 'not logged in' }] };
+    }
+
+    options.user_id = req.session.userId;
+    const response = await dataSources.pgHandler.writeReview(options);
+    return response;
+  }
+
+  @Query(() => ReviewResponse)
+  async getReviewsByUserId(
+    @Arg('user_ids', () => [Int]) ids: [number],
+    @Ctx() { dataSources }: MyContext
+  ): Promise<ReviewResponse> {
+    return await dataSources.pgHandler.getReviewsByUserId(ids);
+  }
+
+  @Query(() => ReviewResponse)
+  async getReviewsByResidenceId(
+    @Arg('residence_ids', () => [Int]) ids: [number],
+    @Ctx() { dataSources }: MyContext
+  ): Promise<ReviewResponse> {
+    return await dataSources.pgHandler.getReviewsByResidenceId(ids);
+  }
+
+  @Query(() => ReviewResponse)
+  async getReviewsLimit(
+    @Arg('limit', () => Int) limit: number,
+    @Ctx() { dataSources }: MyContext
+  ): Promise<ReviewResponse> {
+    return await dataSources.pgHandler.getReviewsLimit(limit);
+  }
+
+  @Query(() => ReviewResponse) // return number of rows returned? everywhere?
+  async getReviewsObjFilter(
+    @Arg('obj') obj: PartialReview,
+    @Ctx() { dataSources }: MyContext
+  ): Promise<ReviewResponse> {
+    return await dataSources.pgHandler.getReviewsObject(obj);
+  }
+}
+
+//     options.user_id = req.session.userId;
+//     const response = dataSources.pgHandler.writeReview(options);
+//     return response;
+
+// try {
+//   const pg = await pool.connect();
+//   const dbRes = await pg.query(
+//     `
+//     INSERT INTO reviews (res_id, user_id, rating, rent, created_at, updated_at)
+//     VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING *
+//     `,
+//     [options.res_id, req.session.userId, options.rating, options.rent]
+//   );
+//   pg.release();
+//   if (dbRes.rowCount == 0) {
+//     return { errors: [{ message: "insert", field: "could not insert" }] };
+//   }
+//   return { review: rowsToReviews(dbRes)[0] };
+// } catch (errs) {
+//   if (errs.code == 23505) {
+//     return {
+//       errors: [
+//         {
+//           message: "duplicate",
+//           field: "you have already reviewed this residency",
+//         },
+//       ],
+//     };
+//   }
+//   if (errs.code == 23503) {
+//     return {
+//       errors: [
+//         {
+//           message: "foreign key",
+//           field: "this res_id does not exist in residences",
+//         },
+//       ],
+//     };
+//   }
+//   console.log(errs);
+// }
+// return {};
 //   }
 
 //   @Query(() => [ReviewGQL])
 //   async getReviews(
-//     @Arg("reviewQueryInput", { nullable: true })
+//     @Arg('reviewQueryInput', { nullable: true })
 //     reviewQueryInput: ReviewQueryInput,
 //     @Ctx() { pool }: MyContext
 //   ): Promise<ReviewGQL[]> {
@@ -68,12 +110,12 @@
 //     }
 //     const placeholders = reviewQueryInput.reviews
 //       .map((_, i) => {
-//         return "$" + (i + 1);
+//         return '$' + (i + 1);
 //       })
-//       .join(",");
+//       .join(',');
 
 //     const dbRes = await pool.query(
-//       "SELECT * FROM reviews WHERE res_id in (" + placeholders + ")",
+//       'SELECT * FROM reviews WHERE res_id in (' + placeholders + ')',
 //       reviewQueryInput.reviews
 //     );
 //     return rowsToReviews(dbRes);
@@ -81,12 +123,12 @@
 
 //   @Mutation(() => ReviewResponse)
 //   async updateRating(
-//     @Arg("resId") resId: number,
-//     @Arg("newRating") newRating: number,
+//     @Arg('resId') resId: number,
+//     @Arg('newRating') newRating: number,
 //     @Ctx() { pool, req }: MyContext
 //   ): Promise<ReviewResponse> {
 //     if (!req.session.userId) {
-//       return { errors: [{ message: "session", field: "not logged in" }] };
+//       return { errors: [{ message: 'session', field: 'not logged in' }] };
 //     }
 //     try {
 //       const pg = await pool.connect();
@@ -98,7 +140,7 @@
 //       );
 //       pg.release();
 //       if (dbRes.rowCount == 0) {
-//         return { errors: [{ message: "insert", field: "could not insert" }] };
+//         return { errors: [{ message: 'insert', field: 'could not insert' }] };
 //       }
 //       const res = rowsToReviews(dbRes)[0];
 //       return { review: res };
@@ -107,8 +149,8 @@
 //         return {
 //           errors: [
 //             {
-//               message: "duplicate",
-//               field: "you have already reviewed this residence",
+//               message: 'duplicate',
+//               field: 'you have already reviewed this residence',
 //             },
 //           ],
 //         };
@@ -117,6 +159,5 @@
 //     }
 //     return {};
 //   }
-// }
 
 // filter by apptNo
