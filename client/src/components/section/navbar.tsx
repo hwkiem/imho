@@ -27,10 +27,21 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Input,
+  Center,
+  Tooltip,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 import { RiHomeSmileFill } from "react-icons/ri";
 import { ReviewForm } from "../forms/review";
+import {
+  useMeQuery,
+  useLogoutMutation,
+  MeQuery,
+  MeDocument,
+} from "../../generated/graphql";
+import { useRouter } from "next/router";
+import { gql, useApolloClient } from "@apollo/client";
+import { isServer } from "../../utils/isServer";
 
 const CRiHomeSmile = chakra(RiHomeSmileFill);
 
@@ -59,134 +70,112 @@ const NavLink: React.FC<NavLinkProps> = ({
   </Link>
 );
 
-interface NavBarProps {
-  reviewDrawer: UseDisclosureReturn;
-}
+interface NavBarProps {}
 
-export const NavBar: React.FC<NavBarProps> = ({ reviewDrawer }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export const NavBar: React.FC<NavBarProps> = () => {
   const btnRef = useRef<HTMLButtonElement>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
+  const { data, loading } = useMeQuery({ fetchPolicy: "cache-only" });
+  const [logout] = useLogoutMutation();
+  const client = useApolloClient();
+  const out = client.cache.readQuery({
+    query: gql`
+      query {
+        me {
+          errors {
+            field
+            message
+          }
+          users {
+            user_id
+            first_name
+            last_name
+          }
+        }
+      }
+    `,
+    variables: {},
+  });
+  console.log(out);
 
-  return (
-    <Box
-      bg={useColorModeValue("gray.100", "gray.900")}
-      px={4}
-      position={"absolute"}
-      zIndex={2}
-      w={"100%"}
-    >
-      <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-        <IconButton
-          size={"md"}
-          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label={"Open Menu"}
-          display={{ md: "none" }}
-          onClick={isOpen ? onClose : onOpen}
-        />
-        <HStack spacing={8} alignItems={"center"}>
-          <Box>
-            <Icon as={CRiHomeSmile} w={8} h={8} color={"teal"} />
-          </Box>
-          <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
-            ))}
-          </HStack>
-        </HStack>
-        <Flex alignItems={"center"}>
-          <Button
-            variant={"solid"}
-            colorScheme={"teal"}
-            size={"sm"}
-            mr={4}
-            leftIcon={<AddIcon />}
-            ref={btnRef}
-            onClick={reviewDrawer.onOpen}
-          >
-            Review
-          </Button>
-          <Drawer
-            isOpen={reviewDrawer.isOpen}
-            placement="top"
-            onClose={reviewDrawer.onClose}
-            finalFocusRef={btnRef}
-          >
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Create a Review!</DrawerHeader>
-
-              <DrawerBody>
-                <ReviewForm />
-                {/* <form>
-                  <Stack
-                    spacing={4}
-                    p="1rem"
-                    backgroundColor="whiteAlpha.900"
-                    boxShadow="md"
-                  >
-                    <FormControl>
-                      <InputGroup>
-                        <Input type="email" placeholder="email address" />
-                      </InputGroup>
-                    </FormControl>
-                    <FormControl>
-                      <InputGroup>
-                        <Input placeholder="Password" />
-                      </InputGroup>
-                    </FormControl>
-                    <Button
-                      borderRadius={0}
-                      type="submit"
-                      variant="solid"
-                      colorScheme="teal"
-                      width="full"
-                    >
-                      Login
-                    </Button>
-                  </Stack>
-                </form> */}
-              </DrawerBody>
-
-              <DrawerFooter>
-                <Button variant="outline" mr={3} onClick={reviewDrawer.onClose}>
-                  Cancel
-                </Button>
-                <Button colorScheme="blue">Save</Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-          <Menu>
-            <MenuButton
-              as={Button}
-              rounded={"full"}
-              variant={"link"}
-              cursor={"pointer"}
-              minW={0}
-            >
-              <Avatar
+  // data is loading
+  if (loading) {
+    return <div></div>;
+  } else if (!data?.me.users) {
+    router.push("/login");
+    return <div></div>;
+  } else {
+    return (
+      <Center>
+        <Box
+          mt={20}
+          bg={useColorModeValue("gray.100", "gray.900")}
+          px={4}
+          boxShadow={"2xl"}
+          rounded={"md"}
+          position={"absolute"}
+          zIndex={2}
+          w={"80%"}
+        >
+          <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+            <IconButton
+              size={"md"}
+              icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+              aria-label={"Open Menu"}
+              display={{ md: "none" }}
+              onClick={isOpen ? onClose : onOpen}
+            />
+            <HStack spacing={8} alignItems={"center"}>
+              <Box>
+                <Icon as={CRiHomeSmile} w={8} h={8} color={"teal"} />
+              </Box>
+              <HStack
+                as={"nav"}
+                spacing={4}
+                display={{ base: "none", md: "flex" }}
+              >
+                {Links.map((link) => (
+                  <NavLink key={link}>{link}</NavLink>
+                ))}
+              </HStack>
+            </HStack>
+            <Flex alignItems={"center"}>
+              <Button
+                variant={"solid"}
+                colorScheme={"teal"}
                 size={"sm"}
-                src={
-                  "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
-                }
-              />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Logout</MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </Flex>
+                mr={4}
+                ref={btnRef}
+                onClick={async () => {
+                  await logout();
+                  await client.resetStore();
+                }}
+              >
+                Logout
+              </Button>
+              <Tooltip label={JSON.stringify(data?.me.users[0])} fontSize="md">
+                <Avatar
+                  size={"sm"}
+                  src={
+                    "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
+                  }
+                />
+              </Tooltip>
+            </Flex>
+          </Flex>
 
-      {isOpen ? (
-        <Box pb={4} display={{ md: "none" }}>
-          <Stack as={"nav"} spacing={4}>
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
-            ))}
-          </Stack>
+          {isOpen ? (
+            <Box pb={4} display={{ md: "none" }}>
+              <Stack as={"nav"} spacing={4}>
+                {Links.map((link) => (
+                  <NavLink key={link}>{link}</NavLink>
+                ))}
+              </Stack>
+            </Box>
+          ) : null}
         </Box>
-      ) : null}
-    </Box>
-  );
+      </Center>
+    );
+  }
 };

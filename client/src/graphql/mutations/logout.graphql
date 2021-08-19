@@ -1,14 +1,11 @@
-query Me {
-  me {
+mutation Logout {
+  logout {
     errors {
       field
       message
     }
     users {
       user_id
-      first_name
-      last_name
-      email
     }
   }
 }

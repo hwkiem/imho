@@ -18,10 +18,15 @@ import React from "react";
 import {
   useLoginMutation,
   LoginMutationVariables,
+  LoginInput,
+  MeDocument,
+  MeQuery,
 } from "../../generated/graphql";
 import { object, string, SchemaOf } from "yup";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
+import { isServer } from "../../utils/isServer";
 
 interface LoginFormProps {
   variant?: string;
@@ -31,17 +36,17 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
   const router = useRouter();
 
   // Use the codegen login mutation and data state
-  const [login, { loading, data, error }] = useLoginMutation();
+  const [login, { loading, data, error, client }] = useLoginMutation();
 
   // Define validation schema for login form using Yup
-  const validationSchema: SchemaOf<LoginMutationVariables> = object({
+  const validationSchema: SchemaOf<LoginInput> = object({
     email: string().email("Enter a valid email").required("Email is required"),
     password: string()
       .min(8, "Password should be of minimum 8 characters length")
       .required("Password is required"),
   });
 
-  const init: LoginMutationVariables = {
+  const init: LoginInput = {
     email: "",
     password: "",
   };
@@ -51,13 +56,38 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
     validationSchema: validationSchema,
     onSubmit: async (values, actions) => {
       actions.setSubmitting(true);
-      login({ variables: values });
-      while (loading); // wait for loading to finish
-      if (data) {
-        console.log(data);
+      const res = await login({
+        variables: { input: values },
+        update: (cache, { data }) => {
+          if (data?.login)
+            cache.writeQuery<MeQuery>({
+              query: gql`
+                query {
+                  me {
+                    errors {
+                      field
+                      message
+                    }
+                    users {
+                      user_id
+                      first_name
+                      last_name
+                      email
+                    }
+                  }
+                }
+              `,
+              data: {
+                me: data?.login,
+              },
+            });
+        },
+      });
+
+      if (res.data) {
         router.push("/");
       } else if (error) {
-        console.error(error);
+        console.log("!");
         router.push("/error");
       }
     },

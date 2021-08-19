@@ -2,10 +2,11 @@ import { AspectRatio, Grid, GridItem, Box } from "@chakra-ui/react";
 import { Residence } from "entities";
 import { Layout } from "../components/layout/layout";
 import { Map } from "../components/ui/map";
+import { useIsAuth } from "../utils/useIsAuth";
 
-const residences: Pick<Residence, "resID" | "full_address" | "coords">[] = [
+const residences: Pick<Residence, "res_id" | "full_address" | "coords">[] = [
   {
-    resID: 11,
+    res_id: 11,
     full_address: "18 Roosevelt Pl, Rockville Centre, NY 11570, USA",
     coords: {
       lat: 40.66482329999999,
@@ -13,7 +14,7 @@ const residences: Pick<Residence, "resID" | "full_address" | "coords">[] = [
     },
   },
   {
-    resID: 1,
+    res_id: 1,
     full_address: "12 W 104th St #3e, New York, NY 10025, USA",
     coords: {
       lat: 40.7969087,
@@ -25,6 +26,7 @@ const residences: Pick<Residence, "resID" | "full_address" | "coords">[] = [
 const center = { lat: 40.7969087, lng: -73.96190469999999 };
 
 const Index = () => {
+  useIsAuth();
   return (
     <Layout>
       <Map residences={residences} center={center} />
