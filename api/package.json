@@ -19,17 +19,18 @@
     "connect-pg-simple": "^6.2.1",
     "connect-redis": "^6.0.0",
     "cors": "^2.8.5",
+    "datasource-sql": "^1.5.0",
     "dotenv-safe": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "graphql": "^15.5.1",
     "ioredis": "^4.27.7",
+    "knex-postgis": "^0.14.1",
     "pg": "^8.7.1",
     "pg-pool": "^3.4.1",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1"
   },
-  
   "devDependencies": {
     "@types/connect-pg-simple": "^4.2.4",
     "@types/connect-redis": "^0.0.17",

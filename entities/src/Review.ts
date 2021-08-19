@@ -1,8 +1,8 @@
 export default interface Review {
-  resId: string;
-  userId: number;
+  res_id: number;
+  user_id: number;
   rating: number;
   rent: number;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }

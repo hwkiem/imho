@@ -1,9 +1,9 @@
 export default interface User {
-  userId: number;
-  firstName: string;
-  lastName: string;
+  user_id: number;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }

@@ -1,5 +1,5 @@
 export default interface Residence {
-  resID: number;
+  res_id: number;
   google_place_id: string;
   full_address: string;
   apt_num: string;
@@ -9,8 +9,8 @@ export default interface Residence {
   state: string;
   postal_code: string;
   coords: { lat: number; lng: number };
-  avgRating?: number;
-  avgRent?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  avg_rating?: number;
+  avg_rent?: number;
+  created_at: Date;
+  updated_at: Date;
 }
