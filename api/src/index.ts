@@ -81,7 +81,6 @@ const main = async () => {
     context: ({ req, res }) => ({
       req,
       res,
-      pool,
       client,
     }),
     dataSources: () => {

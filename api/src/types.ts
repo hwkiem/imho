@@ -1,6 +1,5 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { Request, Response } from 'express';
-import { Pool } from 'pg';
 import { ObjectType, Field, InputType, Int } from 'type-graphql';
 import { postgresHandler } from './dataSources/postgres';
 import { ResidenceGQL } from './Residence/residence';
@@ -10,7 +9,6 @@ import { UserGQL } from './User/user';
 export type MyContext = {
   req: Request; //& { session: Express.Session };
   res: Response;
-  pool: Pool;
   client: Client;
   dataSources: { pgHandler: postgresHandler };
 };
