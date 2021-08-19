@@ -1,5 +1,5 @@
-import { ObjectType, Field, Float } from "type-graphql";
-import { Residence } from "entities";
+import { ObjectType, Field, Float } from 'type-graphql';
+import { Residence } from 'entities';
 
 @ObjectType()
 class Coords {
@@ -12,7 +12,7 @@ class Coords {
 @ObjectType()
 export class ResidenceGQL implements Residence {
   @Field()
-  resID: number;
+  res_id: number;
 
   google_place_id: string;
 
@@ -40,15 +40,17 @@ export class ResidenceGQL implements Residence {
   @Field(() => Coords)
   coords: Coords;
 
+  geog: any;
+
   @Field(() => Float, { nullable: true })
-  avgRating?: number;
+  avg_rating?: number;
 
   @Field({ nullable: true })
-  avgRent?: number;
+  avg_rent?: number;
 
   @Field(() => String)
-  createdAt = new Date();
+  created_at = new Date();
 
   @Field(() => String)
-  updatedAt = new Date();
+  updated_at = new Date();
 }
