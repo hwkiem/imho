@@ -59,6 +59,16 @@ export class UserResolver {
     }
     const response = await dataSources.pgHandler.getUsersById([userId]);
     if (response.users) {
+      if (response.users.length == 0) {
+        return {
+          errors: [
+            {
+              field: 'user_id',
+              message: 'this user does not exist',
+            },
+          ],
+        };
+      }
       req.session.destroy((err) => console.log(err));
     }
     return response;
@@ -73,8 +83,17 @@ export class UserResolver {
     const response = await dataSources.pgHandler.getUsersObject(
       (({ email }) => ({ email }))(input)
     );
-    // console.log(response);
     if (response.users) {
+      if (response.users.length == 0) {
+        return {
+          errors: [
+            {
+              field: 'email',
+              message: 'no account with this email',
+            },
+          ],
+        };
+      }
       if (!(await argon2.verify(response.users[0].password, input.password))) {
         return {
           errors: [
@@ -123,31 +142,4 @@ export class UserResolver {
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.getUsersObject(obj);
   }
-
-  // // changes signed in user's password, to test updated_at
-  // @Mutation(() => UserResponse)
-  // async changePassword(
-  //   @Ctx() { pool, req }: MyContext,
-  //   @Arg("newPass") newPass: string
-  // ): Promise<UserResponse> {
-  //   if (!req.session!.userId) {
-  //     return {
-  //       errors: [{ message: "session", field: "not logged in" }],
-  //     };
-  //   }
-  //   const hashedPass = await argon2.hash(newPass);
-  //   const dbRes = await pool.query(
-  //     "UPDATE users SET password=$1 WHERE user_id = $2 RETURNING *",
-  //     [hashedPass, req.session.userId]
-  //   );
-  //   if (dbRes.rowCount == 0) {
-  //     return {
-  //       errors: [{ message: "update", field: "could not update password" }],
-  //     };
-  //   }
-
-  //   return { user: rowsToUsers(dbRes)[0] };
-  // }
-
-  // Update User ; new email? name?
 }

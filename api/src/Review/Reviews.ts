@@ -4,16 +4,16 @@ import { Review } from 'entities';
 @ObjectType()
 export class ReviewGQL implements Review {
   @Field(() => Int)
-  res_id!: number;
+  res_id: number;
 
   @Field()
-  user_id!: number;
+  user_id: number;
 
   @Field(() => Float)
-  rating!: number;
+  rating: number;
 
   @Field()
-  rent!: number;
+  rent: number;
 
   @Field(() => String)
   created_at = new Date();

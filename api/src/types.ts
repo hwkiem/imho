@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { ObjectType, Field, InputType, Int } from 'type-graphql';
 import { postgresHandler } from './dataSources/postgres';
 import { ResidenceGQL } from './Residence/residence';
-import { ReviewGQL } from './Review/Reviews';
+import { ReviewGQL } from './Review/reviews';
 import { UserGQL } from './User/user';
 
 export type MyContext = {

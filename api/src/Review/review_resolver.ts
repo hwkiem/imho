@@ -1,5 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { ReviewGQL } from './Reviews';
+import { ReviewGQL } from './reviews';
 import { MyContext, PartialReview } from '../types';
 import { ReviewResponse, WriteReviewInput } from '../types';
 
@@ -18,6 +18,8 @@ export class ReviewResolver {
     const response = await dataSources.pgHandler.writeReview(options);
     return response;
   }
+
+  // write update rating
 
   @Query(() => ReviewResponse)
   async getReviewsByUserId(

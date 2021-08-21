@@ -13,21 +13,20 @@ import { ResidenceGQL } from '../Residence/residence';
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
-import { ReviewGQL } from '../Review/Reviews';
-
-const knexConfig = {
-  client: 'pg',
-  connection: {
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: parseInt(process.env.DB_PORT!),
-  },
-};
+import { ReviewGQL } from '../Review/reviews';
 
 export class postgresHandler extends SQLDataSource {
   constructor() {
+    const knexConfig = {
+      client: 'pg',
+      connection: {
+        user: process.env.DB_USER,
+        host: process.env.DB_HOST,
+        database: process.env.DATABASE,
+        password: process.env.DB_PASSWORD,
+        port: parseInt(process.env.DB_PORT!),
+      },
+    };
     super(knexConfig);
   }
   // @Users
@@ -79,9 +78,12 @@ export class postgresHandler extends SQLDataSource {
       .insert(args)
       .returning('*')
       .then((users) => (r.users = users))
-      .catch(
-        (e) => (r.errors = [{ field: 'insert user', message: e.toString() }])
-      );
+      .catch((e) => {
+        if (e.code === '23505') {
+          r.errors = [{ message: 'email taken', field: 'email' }];
+        }
+        r.errors = [{ field: 'insert user', message: e.toString() }];
+      });
     return r;
   }
 
@@ -208,9 +210,19 @@ export class postgresHandler extends SQLDataSource {
       .insert(args)
       .returning('*')
       .then((reviews) => (r.reviews = reviews))
-      .catch(
-        (e) => (r.errors = [{ field: 'insert review', message: e.toString() }])
-      );
+      .catch((e) => {
+        if (e.code == 23505) {
+          return {
+            errors: [
+              {
+                message: 'duplicate',
+                field: 'you have already reviewed this residency',
+              },
+            ],
+          };
+        }
+        return (r.errors = [{ field: 'insert review', message: e.toString() }]);
+      });
     return r;
   }
   async getReviewsByUserId(ids: [number]): Promise<ReviewResponse> {
