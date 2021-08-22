@@ -1,11 +1,5 @@
 mutation Logout {
   logout {
-    errors {
-      field
-      message
-    }
-    users {
-      user_id
-    }
+    ...RegularUserResponse
   }
 }

@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
@@ -18,6 +17,7 @@ import React from "react";
 import {
   useRegisterMutation,
   RegisterMutationVariables,
+  RegisterInput,
 } from "../../generated/graphql";
 import * as yup from "yup";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
@@ -32,7 +32,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
 
   // Define validation schema for login form using Yup
   const validationSchema: yup.SchemaOf<
-    RegisterMutationVariables["options"] & { confirm: string | undefined }
+    RegisterInput & { confirm: string | undefined }
   > = yup.object({
     email: yup
       .string()
@@ -45,8 +45,8 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
     confirm: yup
       .string()
       .oneOf([yup.ref("password"), null], "Passwords must match"),
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
+    first_name: yup.string().required("First name is required"),
+    last_name: yup.string().required("Last name is required"),
   });
 
   const init: RegisterMutationVariables["options"] & {
@@ -55,16 +55,16 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
     email: "",
     password: "",
     confirm: "",
-    firstName: "",
-    lastName: "",
+    first_name: "",
+    last_name: "",
   };
 
   const formik = useFormik({
     initialValues: init,
     validationSchema: validationSchema,
-    onSubmit: ({ email, firstName, lastName, password }) => {
+    onSubmit: ({ email, first_name, last_name, password }) => {
       register({
-        variables: { options: { email, firstName, lastName, password } },
+        variables: { options: { email, first_name, last_name, password } },
       });
     },
   });
@@ -106,32 +106,32 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                 <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
               </FormControl>
               <FormControl
-                id="firstName"
+                id="first_name"
                 isRequired
                 isInvalid={
-                  formik.touched.firstName && Boolean(formik.errors.firstName)
+                  formik.touched.first_name && Boolean(formik.errors.first_name)
                 }
               >
                 <FormLabel>First Name</FormLabel>
                 <Input
-                  value={formik.values.firstName}
+                  value={formik.values.first_name}
                   onChange={formik.handleChange}
                 />
-                <FormErrorMessage>{formik.errors.firstName}</FormErrorMessage>
+                <FormErrorMessage>{formik.errors.first_name}</FormErrorMessage>
               </FormControl>
               <FormControl
-                id="lastName"
+                id="last_name"
                 isRequired
                 isInvalid={
-                  formik.touched.lastName && Boolean(formik.errors.lastName)
+                  formik.touched.last_name && Boolean(formik.errors.last_name)
                 }
               >
                 <FormLabel>Last Name</FormLabel>
                 <Input
-                  value={formik.values.lastName}
+                  value={formik.values.last_name}
                   onChange={formik.handleChange}
                 />
-                <FormErrorMessage>{formik.errors.lastName}</FormErrorMessage>
+                <FormErrorMessage>{formik.errors.last_name}</FormErrorMessage>
               </FormControl>
               <FormControl
                 id="password"

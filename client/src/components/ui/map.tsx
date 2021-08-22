@@ -1,9 +1,21 @@
-import { Box, Center } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+} from "@chakra-ui/react";
 import { Residence } from "entities";
 import GoogleMap from "google-map-react";
 import { chakra } from "@chakra-ui/react";
 import { RiHomeSmile2Fill } from "react-icons/ri";
 import { Icon } from "@chakra-ui/react";
+import React from "react";
+import ReviewModal from "./reviewModal";
 
 const CRiHomeSmile = chakra(RiHomeSmile2Fill);
 
@@ -18,19 +30,30 @@ interface MarkerProps {
   address: string;
 }
 
-const Marker: React.FC<MarkerProps> = ({ lat, lng, address }) => (
-  <Icon
-    as={CRiHomeSmile}
-    h={8}
-    w={8}
-    style={{ transform: "translate(-50%, -100%)" }}
-    color={"teal"}
-  />
+const Marker: React.FC<MarkerProps> = () => (
+  <Popover>
+    <PopoverTrigger>
+      <Icon
+        as={CRiHomeSmile}
+        h={8}
+        w={8}
+        style={{ transform: "translate(-50%, -100%)" }}
+        color={"teal"}
+      />
+    </PopoverTrigger>
+    <PopoverContent>
+      <PopoverArrow />
+      <PopoverCloseButton />
+      <PopoverHeader>Residence Info here</PopoverHeader>
+      <PopoverBody>We can put review data in here...</PopoverBody>
+    </PopoverContent>
+  </Popover>
 );
 
 export const Map: React.FC<MapProps> = ({ residences, center }) => {
   return (
     <Box w="100%" h="100%">
+      <ReviewModal />
       <GoogleMap
         bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_MAPS_API_KEY! }}
         defaultCenter={center}

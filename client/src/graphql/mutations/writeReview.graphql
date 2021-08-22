@@ -1,0 +1,5 @@
+mutation WriteReview($options: WriteReviewInput!) {
+  writeReview(options: $options) {
+    ...RegularReviewResponse
+  }
+}

@@ -13,20 +13,12 @@ import {
   useColorModeValue,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { Form, Formik, Field, useFormik } from "formik";
+import { useFormik } from "formik";
 import React from "react";
-import {
-  useLoginMutation,
-  LoginMutationVariables,
-  LoginInput,
-  MeDocument,
-  MeQuery,
-} from "../../generated/graphql";
+import { useLoginMutation, LoginInput, MeQuery } from "../../generated/graphql";
 import { object, string, SchemaOf } from "yup";
-import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 import { useRouter } from "next/router";
 import { gql } from "@apollo/client";
-import { isServer } from "../../utils/isServer";
 
 interface LoginFormProps {
   variant?: string;
@@ -36,7 +28,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
   const router = useRouter();
 
   // Use the codegen login mutation and data state
-  const [login, { loading, data, error, client }] = useLoginMutation();
+  const [login, { error }] = useLoginMutation();
 
   // Define validation schema for login form using Yup
   const validationSchema: SchemaOf<LoginInput> = object({
@@ -85,7 +77,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
       });
 
       if (res.data) {
-        router.push("/");
+        router.push("/diver");
       } else if (error) {
         console.log("!");
         router.push("/error");
