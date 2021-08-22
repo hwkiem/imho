@@ -1,16 +1,16 @@
-import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
-import { UserGQL } from './user';
-import { validateRegister } from '../utils/validateRegister';
+import { Resolver, Mutation, Arg, Ctx, Query, Int } from "type-graphql";
+import { UserGQL } from "./user";
+import { validateRegister } from "../utils/validateRegister";
 import {
   UserResponse,
   RegisterInput,
   MyContext,
   LoginInput,
   PartialUser,
-} from '../types';
-import argon2 from 'argon2';
+} from "../types";
+import argon2 from "argon2";
 
-declare module 'express-session' {
+declare module "express-session" {
   interface Session {
     userId: number;
     // favoriteResidency
@@ -24,11 +24,11 @@ export class UserResolver {
   async me(@Ctx() { req, dataSources }: MyContext): Promise<UserResponse> {
     const userId = req.session.userId;
     if (!userId) {
-      return { errors: [{ field: 'session', message: 'not logged in' }] };
+      return { errors: [{ field: "session", message: "not logged in" }] };
     }
     const response = await dataSources.pgHandler.getUsersById([userId]);
     if (response.users && response.users.length == 0) {
-      return { errors: [{ field: 'query', message: 'no user with this id' }] };
+      return { errors: [{ field: "query", message: "no user with this id" }] };
     }
     return response;
   }
@@ -36,7 +36,7 @@ export class UserResolver {
   // Create User
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options') options: RegisterInput,
+    @Arg("options") options: RegisterInput,
     @Ctx() { req, dataSources }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options);
@@ -52,22 +52,37 @@ export class UserResolver {
 
   // Logout User
   @Mutation(() => UserResponse)
-  async logout(@Ctx() { dataSources, req }: MyContext): Promise<UserResponse> {
-    const userId = req.session.userId;
-    if (!userId) {
-      return { errors: [{ field: 'session', message: 'not logged in' }] };
-    }
-    const response = await dataSources.pgHandler.getUsersById([userId]);
-    if (response.users) {
-      req.session.destroy((err) => console.log(err));
-    }
-    return response;
+  async logout(
+    @Ctx() { dataSources, req, res }: MyContext
+  ): Promise<UserResponse> {
+    return new Promise(async (resolve) => {
+      const userId = req.session.userId;
+      if (!userId) {
+        resolve({ errors: [{ field: "session", message: "not logged in" }] });
+      }
+      const response = await dataSources.pgHandler.getUsersById([userId]);
+      if (response.users) {
+        req.session.destroy((err) => {
+          res.clearCookie("oreo");
+          if (err) {
+            console.log(err);
+            resolve({
+              errors: [
+                { field: "session", message: "unable to destroy session." },
+              ],
+            });
+            return;
+          }
+          resolve({ users: response.users });
+        });
+      }
+    });
   }
 
   // Login User
   @Mutation(() => UserResponse)
   async login(
-    @Arg('input') input: LoginInput,
+    @Arg("input") input: LoginInput,
     @Ctx() { dataSources, req }: MyContext
   ): Promise<UserResponse> {
     const response = await dataSources.pgHandler.getUsersObject(
@@ -79,8 +94,8 @@ export class UserResolver {
         return {
           errors: [
             {
-              field: 'password',
-              message: 'wrong password',
+              field: "password",
+              message: "wrong password",
             },
           ],
         };
@@ -93,7 +108,7 @@ export class UserResolver {
   // Delete User
   @Mutation(() => UserResponse)
   async deleteUser(
-    @Arg('id') id: number,
+    @Arg("id") id: number,
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.deleteUser(id);
@@ -102,7 +117,7 @@ export class UserResolver {
   // Query Users
   @Query(() => UserResponse)
   async getUsersbyId(
-    @Arg('user_ids', () => [Int]) ids: [number],
+    @Arg("user_ids", () => [Int]) ids: [number],
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.getUsersById(ids);
@@ -110,7 +125,7 @@ export class UserResolver {
 
   @Query(() => UserResponse)
   async getUsersLimit(
-    @Arg('limit', () => Int) limit: number,
+    @Arg("limit", () => Int) limit: number,
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.getUsersLimit(limit);
@@ -118,7 +133,7 @@ export class UserResolver {
 
   @Query(() => UserResponse) // return number of rows returned? everywhere?
   async getUsersObjFilter(
-    @Arg('obj') obj: PartialUser,
+    @Arg("obj") obj: PartialUser,
     @Ctx() { dataSources }: MyContext
   ): Promise<UserResponse> {
     return await dataSources.pgHandler.getUsersObject(obj);

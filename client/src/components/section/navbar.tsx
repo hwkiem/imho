@@ -5,188 +5,143 @@ import {
   Avatar,
   HStack,
   Link,
-  InputGroup,
   IconButton,
   Button,
-  FormControl,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   useDisclosure,
   useColorModeValue,
   Stack,
   chakra,
   Icon,
-  UseDisclosureReturn,
-  Drawer,
-  DrawerFooter,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  Input,
+  Center,
+  Tooltip,
+  Tabs,
+  Tab,
+  TabList,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon } from "@chakra-ui/icons";
 import { RiHomeSmileFill } from "react-icons/ri";
-import { ReviewForm } from "../forms/review";
+import { useMeQuery, useLogoutMutation } from "../../generated/graphql";
+import { useRouter } from "next/router";
+import { useApolloClient } from "@apollo/client";
+import NextLink from "next/link";
 
 const CRiHomeSmile = chakra(RiHomeSmileFill);
 
-const Links = ["Diver", "Profile", "About"];
+const LINKS = ["diver", "about", "profile"];
 
 interface NavLinkProps {
   children: ReactNode;
+  path: string;
 }
-
-const NavLink: React.FC<NavLinkProps> = ({
-  children,
-}: {
-  children: ReactNode;
-}) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={"#"}
-  >
-    {children}
-  </Link>
-);
-
-interface NavBarProps {
-  reviewDrawer: UseDisclosureReturn;
-}
-
-export const NavBar: React.FC<NavBarProps> = ({ reviewDrawer }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef<HTMLButtonElement>(null);
-
+const NavLink: React.FC<NavLinkProps> = ({ children, path }) => {
   return (
-    <Box
-      bg={useColorModeValue("gray.100", "gray.900")}
-      px={4}
-      position={"absolute"}
-      zIndex={2}
-      w={"100%"}
+    <Link
+      as={NextLink}
+      px={2}
+      py={1}
+      rounded={"md"}
+      _hover={{
+        textDecoration: "none",
+        bg: useColorModeValue("gray.200", "gray.700"),
+      }}
+      href={path}
     >
-      <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-        <IconButton
-          size={"md"}
-          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label={"Open Menu"}
-          display={{ md: "none" }}
-          onClick={isOpen ? onClose : onOpen}
-        />
-        <HStack spacing={8} alignItems={"center"}>
-          <Box>
-            <Icon as={CRiHomeSmile} w={8} h={8} color={"teal"} />
-          </Box>
-          <HStack as={"nav"} spacing={4} display={{ base: "none", md: "flex" }}>
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
-            ))}
+      {children}
+    </Link>
+  );
+};
+
+export const NavBar: React.FC = () => {
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
+  const { data, loading } = useMeQuery();
+  const [logout] = useLogoutMutation();
+  const client = useApolloClient();
+
+  let user = null;
+  if (data?.me.users) {
+    user = data.me.users[0];
+  }
+  return (
+    <Center>
+      <Box
+        mt={20}
+        bg={"gray.100"}
+        px={4}
+        boxShadow={"2xl"}
+        rounded={"md"}
+        position={"absolute"}
+        zIndex={2}
+        w={"80%"}
+      >
+        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+          <IconButton
+            size={"md"}
+            icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+            aria-label={"Open Menu"}
+            display={{ md: "none" }}
+            onClick={isOpen ? onClose : onOpen}
+          />
+          <HStack spacing={8} alignItems={"center"}>
+            <Box>
+              <Icon as={CRiHomeSmile} w={8} h={8} color={"teal"} />
+            </Box>
+            <Tabs variant="line" colorScheme="teal">
+              <TabList>
+                {LINKS.map((link) => (
+                  <Tab key={link}>
+                    <NavLink key={link} path={`/${link}`}>
+                      {link}
+                    </NavLink>
+                  </Tab>
+                ))}
+              </TabList>
+            </Tabs>
           </HStack>
-        </HStack>
-        <Flex alignItems={"center"}>
-          <Button
-            variant={"solid"}
-            colorScheme={"teal"}
-            size={"sm"}
-            mr={4}
-            leftIcon={<AddIcon />}
-            ref={btnRef}
-            onClick={reviewDrawer.onOpen}
-          >
-            Review
-          </Button>
-          <Drawer
-            isOpen={reviewDrawer.isOpen}
-            placement="top"
-            onClose={reviewDrawer.onClose}
-            finalFocusRef={btnRef}
-          >
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-              <DrawerHeader>Create a Review!</DrawerHeader>
-
-              <DrawerBody>
-                <ReviewForm />
-                {/* <form>
-                  <Stack
-                    spacing={4}
-                    p="1rem"
-                    backgroundColor="whiteAlpha.900"
-                    boxShadow="md"
-                  >
-                    <FormControl>
-                      <InputGroup>
-                        <Input type="email" placeholder="email address" />
-                      </InputGroup>
-                    </FormControl>
-                    <FormControl>
-                      <InputGroup>
-                        <Input placeholder="Password" />
-                      </InputGroup>
-                    </FormControl>
-                    <Button
-                      borderRadius={0}
-                      type="submit"
-                      variant="solid"
-                      colorScheme="teal"
-                      width="full"
-                    >
-                      Login
-                    </Button>
-                  </Stack>
-                </form> */}
-              </DrawerBody>
-
-              <DrawerFooter>
-                <Button variant="outline" mr={3} onClick={reviewDrawer.onClose}>
-                  Cancel
-                </Button>
-                <Button colorScheme="blue">Save</Button>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-          <Menu>
-            <MenuButton
-              as={Button}
-              rounded={"full"}
-              variant={"link"}
-              cursor={"pointer"}
-              minW={0}
+          <Flex alignItems={"center"}>
+            <Button
+              variant={"solid"}
+              colorScheme={"teal"}
+              size={"sm"}
+              mr={4}
+              ref={btnRef}
+              onClick={async () => {
+                await logout();
+                await client.clearStore();
+                router.push("/login");
+              }}
             >
-              <Avatar
-                size={"sm"}
-                src={
-                  "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
-                }
-              />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Logout</MenuItem>
-            </MenuList>
-          </Menu>
+              Logout
+            </Button>
+            {user && (
+              <Tooltip
+                label={`Hello ${user.first_name} ${user.last_name}`}
+                fontSize="md"
+              >
+                <Avatar
+                  size={"sm"}
+                  src={
+                    "https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
+                  }
+                />
+              </Tooltip>
+            )}
+          </Flex>
         </Flex>
-      </Flex>
 
-      {isOpen ? (
-        <Box pb={4} display={{ md: "none" }}>
-          <Stack as={"nav"} spacing={4}>
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
-            ))}
-          </Stack>
-        </Box>
-      ) : null}
-    </Box>
+        {isOpen ? (
+          <Box pb={4} display={{ md: "none" }}>
+            <Stack as={"nav"} spacing={4}>
+              {LINKS.map((link) => (
+                <NavLink key={link} path={`/${link}`}>
+                  {link}
+                </NavLink>
+              ))}
+            </Stack>
+          </Box>
+        ) : null}
+      </Box>
+    </Center>
   );
 };

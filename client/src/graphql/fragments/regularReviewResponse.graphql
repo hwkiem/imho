@@ -1,0 +1,8 @@
+fragment RegularReviewResponse on ReviewResponse {
+  errors {
+    ...RegularError
+  }
+  reviews {
+    ...RegularReview
+  }
+}
