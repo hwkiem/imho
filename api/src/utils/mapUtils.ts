@@ -27,7 +27,7 @@ export const unpackLocation = (
     } else if (i.types.includes('administrative_area_level_1')) {
       r.state = String(i.long_name);
     } else if (i.types.includes('postal_code')) {
-      r.postal_code = String(i.long_name);``
+      r.postal_code = String(i.long_name);
     }
   });
 

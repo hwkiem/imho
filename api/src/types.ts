@@ -108,13 +108,13 @@ export class ResidenceResponse {
   errors?: FieldError[];
 
   @Field(() => [ResidenceGQL], { nullable: true })
-  residences?: [ResidenceGQL];
+  residences?: ResidenceGQL[];
 }
 
 @InputType()
 export class WriteReviewInput {
   @Field()
-  res_id: number;
+  google_place_id: string;
 
   @Field()
   rating: number;
@@ -123,6 +123,8 @@ export class WriteReviewInput {
   rent: number;
 
   user_id: number;
+
+  res_id: number;
 }
 
 @ObjectType()

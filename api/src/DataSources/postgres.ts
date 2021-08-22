@@ -1,6 +1,8 @@
 import { SQLDataSource } from 'datasource-sql';
 import {
   Coords,
+  CreateResidenceInput,
+  FieldError,
   RegisterInput,
   ResidenceResponse,
   ReviewResponse,
@@ -10,8 +12,8 @@ import {
 import argon2 from 'argon2';
 import { UserGQL } from '../User/user';
 import { ResidenceGQL } from '../Residence/residence';
-import { GeocodeResult } from '@googlemaps/google-maps-services-js';
-import { unpackLocation } from '../utils/mapUtils';
+import { Client } from '@googlemaps/google-maps-services-js';
+import { locationFromPlaceID, unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
 import { ReviewGQL } from '../Review/reviews';
 
@@ -102,18 +104,26 @@ export class postgresHandler extends SQLDataSource {
 
   // @Residences
   async createResidence(
-    input: Partial<ResidenceGQL>,
-    location: GeocodeResult
+    input: CreateResidenceInput,
+    client: Client
   ): Promise<ResidenceResponse> {
+    const locationResult = await locationFromPlaceID(
+      input.google_place_id,
+      client
+    );
+    if (locationResult instanceof FieldError) {
+      return { errors: [locationResult] };
+    }
+
     const postgis = KnexPostgis(this.knex);
     const args = {
       ...input,
-      ...unpackLocation(location),
+      ...unpackLocation(locationResult),
       geog: postgis.geographyFromText(
         'Point(' +
-          location.geometry.location.lat +
+          locationResult.geometry.location.lat +
           ' ' +
-          location.geometry.location.lng +
+          locationResult.geometry.location.lng +
           ')'
       ),
       created_at: this.knex.fn.now(),
@@ -131,7 +141,7 @@ export class postgresHandler extends SQLDataSource {
           })
           .catch(
             (e) =>
-              (r.errors = [{ field: 'delete user', message: e.toString() }])
+              (r.errors = [{ field: 'fetch residence', message: e.toString() }])
           );
       })
       .catch(
@@ -151,6 +161,40 @@ export class postgresHandler extends SQLDataSource {
     WHERE residences.res_id IN (?)
     GROUP BY residences.res_id`,
       ids
+    );
+    if (!x.rows) {
+      r.errors = [
+        { field: 'select residences', message: 'no residences with those ids' },
+      ];
+    } else {
+      r.residences = x.rows.map((i: any) => {
+        const { lat, lng, ...res } = i;
+        return { coords: { lat: lat, lng: lng }, ...res };
+      });
+    }
+
+    return r;
+  }
+
+  async getResidencesObject(
+    obj: Partial<ResidenceGQL>
+  ): Promise<ResidenceResponse> {
+    let s = '';
+    Object.entries(obj).forEach(([key, val]) => {
+      if (['res_id, avg_rent, avg_rating'].includes(key)) {
+        s += key + ' = ' + String(val) + ' AND ';
+      } else {
+        s += key + " = '" + String(val) + "' AND ";
+      }
+    });
+    s = s.substring(0, s.length - 5); // remove final 'AND'
+    let r: ResidenceResponse = {};
+    const x = await this.knex.raw(
+      `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
+    AVG(rating) AS avg_rating, AVG(rent) AS avg_rent, residences.created_at, residences.updated_at
+    FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id
+    WHERE ${s}
+    GROUP BY residences.res_id`
     );
     if (!x.rows) {
       r.errors = [

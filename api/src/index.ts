@@ -15,6 +15,7 @@ import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { postgresHandler } from './dataSources/postgres';
 import { ReviewResolver } from './Review/review_resolver';
+import { googleMapsHandler } from './DataSources/mapsAPI';
 
 const main = async () => {
   const app = express();
@@ -69,8 +70,6 @@ const main = async () => {
     })
   );
 
-  // const db: Database = new Database(knexConfig);
-
   // Configure AppolloServer
   const apolloServer = new ApolloServer({
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
@@ -86,6 +85,7 @@ const main = async () => {
     dataSources: () => {
       return {
         pgHandler: new postgresHandler(),
+        googleMapsHandler: new googleMapsHandler(client),
       };
     },
   });

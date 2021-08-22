@@ -1,5 +1,0 @@
-// User
-
-// Residence
-
-// Review

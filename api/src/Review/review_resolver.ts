@@ -1,6 +1,6 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { ReviewGQL } from './reviews';
-import { MyContext, PartialReview } from '../types';
+import { MyContext, PartialReview, ResidenceResponse } from '../types';
 import { ReviewResponse, WriteReviewInput } from '../types';
 
 @Resolver(ReviewGQL)
@@ -8,12 +8,35 @@ export class ReviewResolver {
   @Mutation(() => ReviewResponse)
   async writeReview(
     @Arg('options') options: WriteReviewInput,
-    @Ctx() { dataSources, req }: MyContext
+    @Ctx() { dataSources, req, client }: MyContext
   ): Promise<ReviewResponse> {
     if (!req.session.userId) {
       return { errors: [{ message: 'session', field: 'not logged in' }] };
     }
-
+    // does the residence already exist?
+    const res: ResidenceResponse =
+      await dataSources.pgHandler.getResidencesObject({
+        google_place_id: options.google_place_id,
+      });
+    if (res.errors || !res.residences) {
+      return { errors: res.errors };
+    }
+    if (res.residences.length == 0) {
+      // residence does not exist, create
+      const response = await dataSources.pgHandler.createResidence(
+        {
+          google_place_id: options.google_place_id,
+        },
+        client
+      );
+      if (response.errors || !response.residences) {
+        return { errors: response.errors };
+      }
+      options.res_id = response.residences[0].res_id;
+    } else {
+      options.res_id = res.residences[0].res_id;
+    }
+    // residence exists and user is logged in, add their review
     options.user_id = req.session.userId;
     const response = await dataSources.pgHandler.writeReview(options);
     return response;
