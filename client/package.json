@@ -17,11 +17,7 @@
     "@chakra-ui/react": "^1.6.6",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-<<<<<<< HEAD
     "dotenv-safe": "^8.2.0",
-=======
-    "apollo-upload-client": "^16.0.0",
->>>>>>> main
     "entities": "1.0.0",
     "formik": "^2.2.9",
     "framer-motion": "^4",
