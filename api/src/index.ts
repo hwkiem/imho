@@ -1,20 +1,21 @@
-import 'reflect-metadata';
-import 'dotenv-safe/config';
-import { ApolloServer } from 'apollo-server-express';
-import express from 'express';
-import { buildSchema } from 'type-graphql';
-import Pool from 'pg-pool';
-import Redis from 'ioredis';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import { __prod__ } from './constants';
-import { Client } from '@googlemaps/google-maps-services-js';
-import { initDB } from './utils/initializeDB';
-import { UserResolver } from './User/user_resolver';
-import { ResidencyResolver } from './Residence/residence_resolver';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { postgresHandler } from './dataSources/postgres';
-import { ReviewResolver } from './Review/review_resolver';
+import "reflect-metadata";
+import "dotenv-safe/config";
+import { ApolloServer } from "apollo-server-express";
+import express from "express";
+import { buildSchema } from "type-graphql";
+import Pool from "pg-pool";
+import Redis from "ioredis";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import { __prod__ } from "./constants";
+import { Client } from "@googlemaps/google-maps-services-js";
+import { initDB } from "./utils/initializeDB";
+import { UserResolver } from "./User/user_resolver";
+import { ResidencyResolver } from "./Residence/residence_resolver";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { postgresHandler } from "./dataSources/postgres";
+import { ReviewResolver } from "./Review/review_resolver";
+import cors from "cors";
 
 const main = async () => {
   const app = express();
@@ -42,16 +43,16 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redis = new Redis(process.env.REDIS_URL);
 
-  app.set('trust proxy', 1);
-  // app.use(
-  //   cors({
-  //     origin: process.env.CORS_ORIGIN,
-  //     credentials: true,
-  //   })
-  // );
+  app.set("trust proxy", 1);
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN,
+      credentials: true,
+    })
+  );
   app.use(
     session({
-      name: 'oreo',
+      name: "oreo",
       store: new RedisStore({
         client: redis,
         disableTouch: true,
@@ -59,7 +60,7 @@ const main = async () => {
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
-        sameSite: 'lax', // csrf
+        sameSite: "lax", // csrf
         secure: false, // cookie only works in https
         // domain: __prod__ ? '.codeponder.com' : undefined,
       },
@@ -94,7 +95,7 @@ const main = async () => {
 
   apolloServer.applyMiddleware({
     app,
-    cors: { origin: '*', credentials: true }, // fix *
+    cors: false,
   });
 
   app.listen(process.env.PORT, () => {

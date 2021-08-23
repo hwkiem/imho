@@ -20,8 +20,8 @@ export type Coords = {
   lng: Scalars['Float'];
 };
 
-export type CreateResidencyInput = {
-  address: Scalars['String'];
+export type CreateResidenceInput = {
+  google_place_id: Scalars['String'];
 };
 
 export type FieldError = {
@@ -30,27 +30,19 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export type LoginInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
-  writeReview: ReviewResponse;
-  updateRating: ReviewResponse;
   register: UserResponse;
-  login: UserResponse;
   logout: UserResponse;
+  login: UserResponse;
   deleteUser: UserResponse;
-  changePassword: UserResponse;
-  createResidency: ResidencyResponse;
-};
-
-
-export type MutationWriteReviewArgs = {
-  options: WriteReviewInput;
-};
-
-
-export type MutationUpdateRatingArgs = {
-  newRating: Scalars['Float'];
-  resId: Scalars['Float'];
+  createResidency: ResidenceResponse;
+  writeReview: ReviewResponse;
 };
 
 
@@ -60,8 +52,7 @@ export type MutationRegisterArgs = {
 
 
 export type MutationLoginArgs = {
-  password: Scalars['String'];
-  email: Scalars['String'];
+  input: LoginInput;
 };
 
 
@@ -70,50 +61,94 @@ export type MutationDeleteUserArgs = {
 };
 
 
-export type MutationChangePasswordArgs = {
-  newPass: Scalars['String'];
+export type MutationCreateResidencyArgs = {
+  options: CreateResidenceInput;
 };
 
 
-export type MutationCreateResidencyArgs = {
-  options: CreateResidencyInput;
+export type MutationWriteReviewArgs = {
+  options: WriteReviewInput;
+};
+
+export type PartialReview = {
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+};
+
+export type PartialUser = {
+  first_name?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  getReviews: Array<ReviewGql>;
   me: UserResponse;
-  users?: Maybe<Array<UserGql>>;
-  getUser: UserResponse;
-  getResidences: Array<ResidenceGql>;
-  getByPlaceID: ResidenceGql;
+  getUsersbyId: UserResponse;
+  getUsersLimit: UserResponse;
+  getUsersObjFilter: UserResponse;
+  getResidencesById: ResidenceResponse;
+  getResidencesLimit: ResidenceResponse;
+  getReviewsByUserId: ReviewResponse;
+  getReviewsByResidenceId: ReviewResponse;
+  getReviewsLimit: ReviewResponse;
+  getReviewsObjFilter: ReviewResponse;
 };
 
 
-export type QueryGetReviewsArgs = {
-  reviewQueryInput?: Maybe<ReviewQueryInput>;
+export type QueryGetUsersbyIdArgs = {
+  user_ids: Array<Scalars['Int']>;
 };
 
 
-export type QueryGetUserArgs = {
-  id: Scalars['Float'];
+export type QueryGetUsersLimitArgs = {
+  limit: Scalars['Int'];
 };
 
 
-export type QueryGetByPlaceIdArgs = {
-  placeId: Scalars['String'];
+export type QueryGetUsersObjFilterArgs = {
+  obj: PartialUser;
+};
+
+
+export type QueryGetResidencesByIdArgs = {
+  res_ids: Array<Scalars['Int']>;
+};
+
+
+export type QueryGetResidencesLimitArgs = {
+  limit: Scalars['Int'];
+};
+
+
+export type QueryGetReviewsByUserIdArgs = {
+  user_ids: Array<Scalars['Int']>;
+};
+
+
+export type QueryGetReviewsByResidenceIdArgs = {
+  residence_ids: Array<Scalars['Int']>;
+};
+
+
+export type QueryGetReviewsLimitArgs = {
+  limit: Scalars['Int'];
+};
+
+
+export type QueryGetReviewsObjFilterArgs = {
+  obj: PartialReview;
 };
 
 export type RegisterInput = {
   email: Scalars['String'];
-  firstName: Scalars['String'];
-  lastName: Scalars['String'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
   password: Scalars['String'];
 };
 
 export type ResidenceGql = {
   __typename?: 'ResidenceGQL';
-  resID: Scalars['Float'];
+  res_id: Scalars['Float'];
   full_address: Scalars['String'];
   apt_num: Scalars['String'];
   street_num: Scalars['String'];
@@ -122,52 +157,48 @@ export type ResidenceGql = {
   state: Scalars['String'];
   postal_code: Scalars['String'];
   coords: Coords;
-  avgRating?: Maybe<Scalars['Float']>;
-  avgRent?: Maybe<Scalars['Float']>;
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
+  avg_rating?: Maybe<Scalars['Float']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
-export type ResidencyResponse = {
-  __typename?: 'ResidencyResponse';
+export type ResidenceResponse = {
+  __typename?: 'ResidenceResponse';
   errors?: Maybe<Array<FieldError>>;
-  residency?: Maybe<ResidenceGql>;
+  residences?: Maybe<Array<ResidenceGql>>;
 };
 
 export type ReviewGql = {
   __typename?: 'ReviewGQL';
-  resId: Scalars['Int'];
-  userId: Scalars['Float'];
+  res_id: Scalars['Int'];
+  user_id: Scalars['Float'];
   rating: Scalars['Float'];
   rent: Scalars['Float'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-};
-
-export type ReviewQueryInput = {
-  reviews?: Maybe<Array<Scalars['Int']>>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
 export type ReviewResponse = {
   __typename?: 'ReviewResponse';
   errors?: Maybe<Array<FieldError>>;
-  review?: Maybe<ReviewGql>;
+  reviews?: Maybe<Array<ReviewGql>>;
 };
 
 export type UserGql = {
   __typename?: 'UserGQL';
-  userId: Scalars['Float'];
-  firstName: Scalars['String'];
-  lastName: Scalars['String'];
+  user_id: Scalars['Float'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
   email: Scalars['String'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
-  user?: Maybe<UserGql>;
+  users?: Maybe<Array<UserGql>>;
 };
 
 export type WriteReviewInput = {
@@ -178,29 +209,44 @@ export type WriteReviewInput = {
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type RegularUserFragment = { __typename?: 'UserGQL', createdAt: string, email: string, firstName: string, lastName: string, updatedAt: string, userId: number };
+export type RegularReviewFragment = { __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string };
 
-export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'UserGQL', createdAt: string, email: string, firstName: string, lastName: string, updatedAt: string, userId: number }> };
+export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> };
+
+export type RegularUserFragment = { __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
+
+export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> };
 
 export type LoginMutationVariables = Exact<{
-  email: Scalars['String'];
-  password: Scalars['String'];
+  input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'UserGQL', createdAt: string, email: string, firstName: string, lastName: string, updatedAt: string, userId: number }> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+
+export type RegisterMutationVariables = Exact<{
+  options: RegisterInput;
+}>;
+
+
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type WriteReviewMutationVariables = Exact<{
   options: WriteReviewInput;
 }>;
 
 
-export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, review?: Maybe<{ __typename?: 'ReviewGQL', createdAt: string }> } };
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'UserGQL', createdAt: string, email: string, firstName: string, lastName: string, updatedAt: string, userId: number }> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
@@ -208,14 +254,35 @@ export const RegularErrorFragmentDoc = gql`
   message
 }
     `;
+export const RegularReviewFragmentDoc = gql`
+    fragment RegularReview on ReviewGQL {
+  res_id
+  user_id
+  rating
+  rent
+  created_at
+  updated_at
+}
+    `;
+export const RegularReviewResponseFragmentDoc = gql`
+    fragment RegularReviewResponse on ReviewResponse {
+  errors {
+    ...RegularError
+  }
+  reviews {
+    ...RegularReview
+  }
+}
+    ${RegularErrorFragmentDoc}
+${RegularReviewFragmentDoc}`;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on UserGQL {
-  createdAt
+  user_id
+  first_name
+  last_name
   email
-  firstName
-  lastName
-  updatedAt
-  userId
+  created_at
+  updated_at
 }
     `;
 export const RegularUserResponseFragmentDoc = gql`
@@ -223,15 +290,15 @@ export const RegularUserResponseFragmentDoc = gql`
   errors {
     ...RegularError
   }
-  user {
+  users {
     ...RegularUser
   }
 }
     ${RegularErrorFragmentDoc}
 ${RegularUserFragmentDoc}`;
 export const LoginDocument = gql`
-    mutation Login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
+    mutation Login($input: LoginInput!) {
+  login(input: $input) {
     ...RegularUserResponse
   }
 }
@@ -251,8 +318,7 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  * @example
  * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
- *      email: // value for 'email'
- *      password: // value for 'password'
+ *      input: // value for 'input'
  *   },
  * });
  */
@@ -263,19 +329,78 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const RegisterDocument = gql`
+    mutation Register($options: RegisterInput!) {
+  register(options: $options) {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
+
+/**
+ * __useRegisterMutation__
+ *
+ * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerMutation, { data, loading, error }] = useRegisterMutation({
+ *   variables: {
+ *      options: // value for 'options'
+ *   },
+ * });
+ */
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
+      }
+export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
+export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const WriteReviewDocument = gql`
     mutation WriteReview($options: WriteReviewInput!) {
   writeReview(options: $options) {
-    errors {
-      field
-      message
-    }
-    review {
-      createdAt
-    }
+    ...RegularReviewResponse
   }
 }
-    `;
+    ${RegularReviewResponseFragmentDoc}`;
 export type WriteReviewMutationFn = Apollo.MutationFunction<WriteReviewMutation, WriteReviewMutationVariables>;
 
 /**
