@@ -13,30 +13,33 @@ import argon2 from 'argon2';
 import { UserGQL } from '../User/user';
 import { ResidenceGQL } from '../Residence/residence';
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
-import { unpackLocation } from '../utils/mapUtils';
+import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
 import { ReviewGQL } from '../Review/reviews';
 
+const knexConfig = {
+  client: 'pg',
+  connection: {
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: parseInt(process.env.DB_PORT!),
+  },
+};
 export class postgresHandler extends SQLDataSource {
+  #knexPostgis: KnexPostgis.KnexPostgis;
+
   constructor() {
-    const knexConfig = {
-      client: 'pg',
-      connection: {
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        database: process.env.DATABASE,
-        password: process.env.DB_PASSWORD,
-        port: parseInt(process.env.DB_PORT!),
-      },
-    };
     super(knexConfig);
+    this.#knexPostgis = KnexPostgis(this.knex);
   }
   // @Users
   async getUsersById(ids: [number]): Promise<UserResponse> {
     let r: UserResponse = {};
     await this.knex<UserGQL>('users')
       .select('*')
-      .where('user_id', 'in', ids) // in
+      .where('user_id', 'in', ids)
       .then((users) => (r.users = users))
       .catch(
         (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
@@ -114,11 +117,10 @@ export class postgresHandler extends SQLDataSource {
       return { errors: [locationResult] };
     }
 
-    const postgis = KnexPostgis(this.knex);
     const args = {
       ...input,
       ...unpackLocation(locationResult),
-      geog: postgis.geographyFromText(
+      geog: this.#knexPostgis.geographyFromText(
         'Point(' +
           locationResult.geometry.location.lat +
           ' ' +
@@ -153,24 +155,36 @@ export class postgresHandler extends SQLDataSource {
 
   async getResidencesById(ids: number[]): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-    const x = await this.knex.raw(
-      `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
-    AVG(rating) AS avg_rating, AVG(rent) AS avg_rent, residences.created_at, residences.updated_at
-    FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id
-    WHERE residences.res_id IN (?)
-    GROUP BY residences.res_id`,
-      ids
-    );
-    if (!x.rows) {
-      r.errors = [
-        { field: 'select residences', message: 'no residences with those ids' },
-      ];
-    } else {
-      r.residences = x.rows.map((i: any) => {
-        const { lat, lng, ...res } = i;
-        return { coords: { lat: lat, lng: lng }, ...res };
-      });
-    }
+
+    await this.knex<ResidenceGQL>('residences')
+      .select([
+        'residences.res_id',
+        'google_place_id',
+        'full_address',
+        'apt_num',
+        'street_num',
+        'route',
+        'city',
+        'state',
+        'postal_code',
+        this.#knexPostgis.x(this.#knexPostgis.geometry('geog')),
+        this.#knexPostgis.y(this.#knexPostgis.geometry('geog')),
+        this.knex.raw('AVG(rating) as avg_rating'),
+        this.knex.raw('AVG(rent) as avg_rent'),
+        'residences.created_at',
+        'residences.updated_at',
+      ])
+      // .from('residences')
+      .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+      .where('residences.res_id', 'in', ids)
+      .groupBy('residences.res_id')
+      .then((residences) => {
+        r.residences = assembleResidence(residences);
+      })
+      .catch(
+        (e) =>
+          (r.errors = [{ field: 'query residence', message: e.toString() }])
+      );
 
     return r;
   }
@@ -178,63 +192,66 @@ export class postgresHandler extends SQLDataSource {
   async getResidencesObject(
     obj: Partial<ResidenceGQL>
   ): Promise<ResidenceResponse> {
-    let s = '';
-    Object.entries(obj).forEach(([key, val]) => {
-      if (['res_id, avg_rent, avg_rating'].includes(key)) {
-        s += key + ' = ' + String(val) + ' AND ';
-      } else {
-        s += key + " = '" + String(val) + "' AND ";
-      }
-    });
-    s = s.substring(0, s.length - 5); // remove final 'AND'
     let r: ResidenceResponse = {};
-    const x = await this.knex
-      .raw(
-        `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
-    AVG(rating) AS avg_rating, AVG(rent) AS avg_rent, residences.created_at, residences.updated_at
-    FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id
-    WHERE ${s}
-    GROUP BY residences.res_id`
-      )
-      .catch((e) => {
-        console.log(e);
-        return { errors: { field: 'catch', message: 'catch' } };
-      });
-    if (!x.rows) {
-      r.errors = [
-        { field: 'select residences', message: 'no residences with those ids' },
-      ];
-    } else {
-      r.residences = x.rows.map((i: any) => {
-        const { lat, lng, ...res } = i;
-        return { coords: { lat: lat, lng: lng }, ...res };
-      });
-    }
-
+    await this.knex<ResidenceGQL>('residences')
+      .select([
+        'residences.res_id',
+        'google_place_id',
+        'full_address',
+        'apt_num',
+        'street_num',
+        'route',
+        'city',
+        'state',
+        'postal_code',
+        this.#knexPostgis.x(this.#knexPostgis.geometry('geog')),
+        this.#knexPostgis.y(this.#knexPostgis.geometry('geog')),
+        this.knex.raw('AVG(rating) as avg_rating'),
+        this.knex.raw('AVG(rent) as avg_rent'),
+        'residences.created_at',
+        'residences.updated_at',
+      ])
+      .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+      .where(obj)
+      .groupBy('residences.res_id')
+      .then((residences: any) => {
+        r.residences = assembleResidence(residences);
+      })
+      .catch(
+        (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+      );
     return r;
   }
 
   async getResidencesLimit(limit: number): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-    const x = await this.knex.raw(
-      `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
-    AVG(rating) AS avg_rating, AVG(rent) AS avg_rent, residences.created_at, residences.updated_at
-    FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id
-    GROUP BY residences.res_id
-    LIMIT ?`,
-      limit
-    );
-    if (!x.rows) {
-      r.errors = [
-        { field: 'select residences', message: 'no residences with those ids' },
-      ];
-    } else {
-      r.residences = x.rows.map((i: any) => {
-        const { lat, lng, ...res } = i;
-        return { coords: { lat: lat, lng: lng }, ...res };
-      });
-    }
-
+    await this.knex<ResidenceGQL>('residences')
+      .select([
+        'residences.res_id',
+        'google_place_id',
+        'full_address',
+        'apt_num',
+        'street_num',
+        'route',
+        'city',
+        'state',
+        'postal_code',
+        this.#knexPostgis.x(this.#knexPostgis.geometry('geog')),
+        this.#knexPostgis.y(this.#knexPostgis.geometry('geog')),
+        this.knex.raw('AVG(rating) as avg_rating'),
+        this.knex.raw('AVG(rent) as avg_rent'),
+        'residences.created_at',
+        'residences.updated_at',
+      ])
+      .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+      .groupBy('residences.res_id')
+      .limit(limit)
+      .then((residences: any) => {
+        r.residences = assembleResidence(residences);
+      })
+      .catch(
+        (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+      );
     return r;
   }
 
@@ -273,6 +290,7 @@ export class postgresHandler extends SQLDataSource {
       });
     return r;
   }
+
   async getReviewsByUserId(ids: [number]): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<ReviewGQL>('reviews')

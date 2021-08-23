@@ -1,6 +1,6 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { ResidenceGQL } from './residence';
-import { MyContext, PlaceIDResponse } from '../types';
+import { MyContext, PartialResidence, PlaceIDResponse } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 
 @Resolver(ResidenceGQL)
@@ -35,13 +35,21 @@ export class ResidencyResolver {
 
   // get by placeID
   @Query(() => ResidenceResponse)
-  async getResidencesByPlaceId(
+  async getResidencesFromPlaceId(
     @Arg('place_id', () => String) place_id: string,
     @Ctx() { dataSources }: MyContext
   ): Promise<ResidenceResponse> {
     return await dataSources.pgHandler.getResidencesObject({
       google_place_id: place_id,
     });
+  }
+
+  @Query(() => ResidenceResponse) // return number of rows returned? everywhere?
+  async getResidencesObjectFilter(
+    @Arg('obj') obj: PartialResidence,
+    @Ctx() { dataSources }: MyContext
+  ): Promise<ResidenceResponse> {
+    return await dataSources.pgHandler.getResidencesObject(obj);
   }
 
   // just for dev

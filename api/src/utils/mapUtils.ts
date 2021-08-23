@@ -33,3 +33,10 @@ export const unpackLocation = (
 
   return r;
 };
+
+export const assembleResidence = (raw: any): ResidenceGQL[] => {
+  return raw.map((r: any) => {
+    const { st_x, st_y, ...res } = r;
+    return { coords: { lat: st_x, lng: st_y }, ...res };
+  });
+};

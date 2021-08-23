@@ -35,6 +35,7 @@ export class PartialReview implements Partial<ReviewGQL> {
   @Field({ nullable: true })
   rent: number;
 }
+
 @InputType()
 export class PartialResidence implements Partial<ResidenceGQL> {
   @Field({ nullable: true })
