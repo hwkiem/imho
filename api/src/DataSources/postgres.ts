@@ -7,13 +7,13 @@ import {
   ResidenceResponse,
   ReviewResponse,
   UserResponse,
-  WriteReviewInput,
+  WriteReviewArgs,
 } from '../types';
 import argon2 from 'argon2';
 import { UserGQL } from '../User/user';
 import { ResidenceGQL } from '../Residence/residence';
-import { Client } from '@googlemaps/google-maps-services-js';
-import { locationFromPlaceID, unpackLocation } from '../utils/mapUtils';
+import { GeocodeResult } from '@googlemaps/google-maps-services-js';
+import { unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
 import { ReviewGQL } from '../Review/reviews';
 
@@ -105,12 +105,11 @@ export class postgresHandler extends SQLDataSource {
   // @Residences
   async createResidence(
     input: CreateResidenceInput,
-    client: Client
+    locationFromPlaceID: (
+      place_id: string
+    ) => Promise<GeocodeResult | FieldError>
   ): Promise<ResidenceResponse> {
-    const locationResult = await locationFromPlaceID(
-      input.google_place_id,
-      client
-    );
+    const locationResult = await locationFromPlaceID(input.google_place_id);
     if (locationResult instanceof FieldError) {
       return { errors: [locationResult] };
     }
@@ -243,7 +242,7 @@ export class postgresHandler extends SQLDataSource {
   }
 
   // @Reviews
-  async writeReview(input: WriteReviewInput): Promise<ReviewResponse> {
+  async writeReview(input: WriteReviewArgs): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     const args = {
       ...input,

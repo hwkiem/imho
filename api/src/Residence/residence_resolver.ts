@@ -8,11 +8,11 @@ export class ResidencyResolver {
   @Mutation(() => ResidenceResponse)
   async createResidency(
     @Arg('options') options: CreateResidenceInput,
-    @Ctx() { dataSources, client }: MyContext
+    @Ctx() { dataSources }: MyContext
   ): Promise<ResidenceResponse> {
     const response = await dataSources.pgHandler.createResidence(
       options,
-      client
+      dataSources.googleMapsHandler.locationFromPlaceID
     );
     return response;
   }

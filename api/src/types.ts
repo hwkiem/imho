@@ -1,6 +1,7 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { Request, Response } from 'express';
 import { ObjectType, Field, InputType, Int } from 'type-graphql';
+import { googleMapsHandler } from './DataSources/mapsAPI';
 import { postgresHandler } from './dataSources/postgres';
 import { ResidenceGQL } from './Residence/residence';
 import { ReviewGQL } from './Review/reviews';
@@ -10,9 +11,14 @@ export type MyContext = {
   req: Request; //& { session: Express.Session };
   res: Response;
   client: Client;
-  dataSources: { pgHandler: postgresHandler };
+  dataSources: {
+    pgHandler: postgresHandler;
+    googleMapsHandler: googleMapsHandler;
+  };
 };
 
+// @GRAPHQL
+// @INPUT
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<UserGQL> {
   @Field({ nullable: true })
@@ -43,32 +49,6 @@ export class PartialResidence implements Partial<ResidenceGQL> {
   route: string;
   @Field({ nullable: true })
   state: string;
-}
-
-// use this for getReviewById?
-// @InputType()
-// export class PickReviewID implements Pick<ReviewGQL, 'res_id' | 'user_id'> {
-//   @Field()
-//   user_id: number;
-//   @Field()
-//   res_id: number;
-// }
-
-@ObjectType()
-export class FieldError {
-  @Field()
-  field: string;
-  @Field()
-  message: string;
-}
-
-@ObjectType()
-export class UserResponse {
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-
-  @Field(() => [UserGQL], { nullable: true })
-  users?: UserGQL[];
 }
 
 @InputType()
@@ -102,17 +82,10 @@ export class CreateResidenceInput {
   @Field()
   google_place_id: string;
 }
-@ObjectType()
-export class ResidenceResponse {
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-
-  @Field(() => [ResidenceGQL], { nullable: true })
-  residences?: ResidenceGQL[];
-}
 
 @InputType()
 export class WriteReviewInput {
+  // input from frontend
   @Field()
   google_place_id: string;
 
@@ -121,10 +94,49 @@ export class WriteReviewInput {
 
   @Field()
   rent: number;
+}
 
-  user_id: number;
-
+export class WriteReviewArgs {
+  // args for backend
   res_id: number;
+  user_id: number;
+  rent: number;
+  rating: number;
+}
+
+// use this for getReviewById?
+// @InputType()
+// export class PickReviewID implements Pick<ReviewGQL, 'res_id' | 'user_id'> {
+//   @Field()
+//   user_id: number;
+//   @Field()
+//   res_id: number;
+// }
+
+@ObjectType()
+export class FieldError {
+  @Field()
+  field: string;
+  @Field()
+  message: string;
+}
+
+@ObjectType()
+export class UserResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => [UserGQL], { nullable: true })
+  users?: UserGQL[];
+}
+
+@ObjectType()
+export class ResidenceResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => [ResidenceGQL], { nullable: true })
+  residences?: ResidenceGQL[];
 }
 
 @ObjectType()

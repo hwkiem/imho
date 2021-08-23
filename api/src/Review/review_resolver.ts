@@ -1,6 +1,11 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { ReviewGQL } from './reviews';
-import { MyContext, PartialReview, ResidenceResponse } from '../types';
+import {
+  MyContext,
+  PartialReview,
+  ResidenceResponse,
+  WriteReviewArgs,
+} from '../types';
 import { ReviewResponse, WriteReviewInput } from '../types';
 
 @Resolver(ReviewGQL)
@@ -8,37 +13,47 @@ export class ReviewResolver {
   @Mutation(() => ReviewResponse)
   async writeReview(
     @Arg('options') options: WriteReviewInput,
-    @Ctx() { dataSources, req, client }: MyContext
+    @Ctx() { dataSources, req }: MyContext
   ): Promise<ReviewResponse> {
     if (!req.session.userId) {
       return { errors: [{ message: 'session', field: 'not logged in' }] };
     }
     // does the residence already exist?
-    const res: ResidenceResponse =
+    const getResponse: ResidenceResponse =
       await dataSources.pgHandler.getResidencesObject({
         google_place_id: options.google_place_id,
       });
-    if (res.errors || !res.residences) {
-      return { errors: res.errors };
+    if (getResponse.errors || !getResponse.residences) {
+      return { errors: getResponse.errors };
     }
-    if (res.residences.length == 0) {
+    let args: WriteReviewArgs;
+    if (getResponse.residences.length == 0) {
       // residence does not exist, create
-      const response = await dataSources.pgHandler.createResidence(
+      const createResponse = await dataSources.pgHandler.createResidence(
         {
           google_place_id: options.google_place_id,
         },
-        client
+        dataSources.googleMapsHandler.locationFromPlaceID
       );
-      if (response.errors || !response.residences) {
-        return { errors: response.errors };
+      if (createResponse.errors || !createResponse.residences) {
+        return { errors: createResponse.errors };
       }
-      options.res_id = response.residences[0].res_id;
+      args = {
+        rating: options.rating,
+        rent: options.rent,
+        user_id: req.session.userId,
+        res_id: createResponse.residences[0].res_id,
+      };
     } else {
-      options.res_id = res.residences[0].res_id;
+      // residence exists
+      args = {
+        rating: options.rating,
+        rent: options.rent,
+        user_id: req.session.userId,
+        res_id: getResponse.residences[0].res_id,
+      };
     }
-    // residence exists and user is logged in, add their review
-    options.user_id = req.session.userId;
-    const response = await dataSources.pgHandler.writeReview(options);
+    const response = await dataSources.pgHandler.writeReview(args);
     return response;
   }
 
