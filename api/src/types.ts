@@ -155,3 +155,12 @@ export class Coords {
   @Field()
   lng: number;
 }
+
+@ObjectType()
+export class PlaceIDResponse {
+  @Field(() => FieldError, { nullable: true })
+  errors?: FieldError;
+
+  @Field({ nullable: true })
+  place_id?: string;
+}

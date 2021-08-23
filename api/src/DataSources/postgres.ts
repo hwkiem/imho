@@ -188,13 +188,18 @@ export class postgresHandler extends SQLDataSource {
     });
     s = s.substring(0, s.length - 5); // remove final 'AND'
     let r: ResidenceResponse = {};
-    const x = await this.knex.raw(
-      `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
+    const x = await this.knex
+      .raw(
+        `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat,
     AVG(rating) AS avg_rating, AVG(rent) AS avg_rent, residences.created_at, residences.updated_at
     FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id
     WHERE ${s}
     GROUP BY residences.res_id`
-    );
+      )
+      .catch((e) => {
+        console.log(e);
+        return { errors: { field: 'catch', message: 'catch' } };
+      });
     if (!x.rows) {
       r.errors = [
         { field: 'select residences', message: 'no residences with those ids' },

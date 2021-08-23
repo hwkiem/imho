@@ -1,6 +1,6 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { ResidenceGQL } from './residence';
-import { MyContext } from '../types';
+import { MyContext, PlaceIDResponse } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 
 @Resolver(ResidenceGQL)
@@ -42,5 +42,14 @@ export class ResidencyResolver {
     return await dataSources.pgHandler.getResidencesObject({
       google_place_id: place_id,
     });
+  }
+
+  // just for dev
+  @Query(() => PlaceIDResponse)
+  async placeIdFromAddress(
+    @Arg('address', () => String) address: string,
+    @Ctx() { dataSources }: MyContext
+  ): Promise<PlaceIDResponse> {
+    return await dataSources.googleMapsHandler.placeIdFromAddress(address);
   }
 }
