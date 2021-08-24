@@ -21,6 +21,13 @@
     "jsx": "preserve"
   },
   "references": [{ "path": "../entities" }],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/lib/apollo.js",
+    "src/lib/apollo.js",
+    "src/lib/apollo.js"
+  ],
   "exclude": ["node_modules"]
 }
