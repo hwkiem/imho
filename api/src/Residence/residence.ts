@@ -14,6 +14,7 @@ export class ResidenceGQL implements Residence {
   @Field()
   res_id: number;
 
+  @Field()
   google_place_id: string;
 
   @Field()
