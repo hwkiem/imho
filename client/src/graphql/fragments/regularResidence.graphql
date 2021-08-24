@@ -1,0 +1,10 @@
+fragment RegularResidence on ResidenceGQL {
+    res_id
+    full_address
+    coords {
+        lat
+        lng
+    }
+    avg_rating
+    avg_rent
+}

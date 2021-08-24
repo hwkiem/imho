@@ -209,6 +209,10 @@ export type WriteReviewInput = {
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
+export type RegularResidenceFragment = { __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } };
+
+export type RegularResidenceResponseFragment = { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> };
+
 export type RegularReviewFragment = { __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string };
 
 export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> };
@@ -243,6 +247,13 @@ export type WriteReviewMutationVariables = Exact<{
 
 export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> } };
 
+export type GetResidencesLimitQueryVariables = Exact<{
+  limit: Scalars['Int'];
+}>;
+
+
+export type GetResidencesLimitQuery = { __typename?: 'Query', getResidencesLimit: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -254,6 +265,29 @@ export const RegularErrorFragmentDoc = gql`
   message
 }
     `;
+export const RegularResidenceFragmentDoc = gql`
+    fragment RegularResidence on ResidenceGQL {
+  res_id
+  full_address
+  coords {
+    lat
+    lng
+  }
+  avg_rating
+  avg_rent
+}
+    `;
+export const RegularResidenceResponseFragmentDoc = gql`
+    fragment RegularResidenceResponse on ResidenceResponse {
+  errors {
+    ...RegularError
+  }
+  residences {
+    ...RegularResidence
+  }
+}
+    ${RegularErrorFragmentDoc}
+${RegularResidenceFragmentDoc}`;
 export const RegularReviewFragmentDoc = gql`
     fragment RegularReview on ReviewGQL {
   res_id
@@ -427,6 +461,41 @@ export function useWriteReviewMutation(baseOptions?: Apollo.MutationHookOptions<
 export type WriteReviewMutationHookResult = ReturnType<typeof useWriteReviewMutation>;
 export type WriteReviewMutationResult = Apollo.MutationResult<WriteReviewMutation>;
 export type WriteReviewMutationOptions = Apollo.BaseMutationOptions<WriteReviewMutation, WriteReviewMutationVariables>;
+export const GetResidencesLimitDocument = gql`
+    query GetResidencesLimit($limit: Int!) {
+  getResidencesLimit(limit: $limit) {
+    ...RegularResidenceResponse
+  }
+}
+    ${RegularResidenceResponseFragmentDoc}`;
+
+/**
+ * __useGetResidencesLimitQuery__
+ *
+ * To run a query within a React component, call `useGetResidencesLimitQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetResidencesLimitQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetResidencesLimitQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetResidencesLimitQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>(GetResidencesLimitDocument, options);
+      }
+export function useGetResidencesLimitLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>(GetResidencesLimitDocument, options);
+        }
+export type GetResidencesLimitQueryHookResult = ReturnType<typeof useGetResidencesLimitQuery>;
+export type GetResidencesLimitLazyQueryHookResult = ReturnType<typeof useGetResidencesLimitLazyQuery>;
+export type GetResidencesLimitQueryResult = Apollo.QueryResult<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
