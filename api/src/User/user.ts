@@ -1,25 +1,25 @@
-import { ObjectType, Field } from 'type-graphql'
-import { User } from 'entities'
+import { ObjectType, Field } from 'type-graphql';
+import { User } from 'entities';
 
 @ObjectType()
 export class UserGQL implements User {
-    @Field()
-    user_id: number
+  @Field()
+  user_id: number;
 
-    @Field()
-    first_name: string
+  @Field()
+  first_name: string;
 
-    @Field()
-    last_name: string
+  @Field()
+  last_name: string;
 
-    @Field()
-    email: string
+  @Field()
+  email: string;
 
-    password: string
+  password: string;
 
-    @Field(() => String)
-    created_at = new Date()
+  @Field(() => String)
+  created_at = new Date();
 
-    @Field(() => String)
-    updated_at = new Date()
+  @Field(() => String)
+  updated_at = new Date();
 }
