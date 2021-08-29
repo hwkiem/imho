@@ -1,7 +1,7 @@
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql'
-import { ResidenceGQL } from './residence'
-import { MyContext, PartialResidence, PlaceIDResponse } from '../types'
-import { CreateResidenceInput, ResidenceResponse } from '../types'
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { ResidenceGQL } from './residence';
+import { MyContext, PartialResidence, PlaceIDResponse } from '../types';
+import { CreateResidenceInput, ResidenceResponse } from '../types';
 
 @Resolver(ResidenceGQL)
 export class ResidencyResolver {
@@ -13,8 +13,9 @@ export class ResidencyResolver {
         const response = await dataSources.pgHandler.createResidence(
             options,
             dataSources.googleMapsHandler.locationFromPlaceID
-        )
-        return response
+        );
+        console.log(response);
+        return response;
     }
 
     @Query(() => ResidenceResponse)
@@ -22,7 +23,7 @@ export class ResidencyResolver {
         @Arg('res_ids', () => [Int]) ids: [number],
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesById(ids)
+        return await dataSources.pgHandler.getResidencesById(ids);
     }
 
     @Query(() => ResidenceResponse)
@@ -30,7 +31,7 @@ export class ResidencyResolver {
         @Arg('limit', () => Int) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesLimit(limit)
+        return await dataSources.pgHandler.getResidencesLimit(limit);
     }
 
     // get by placeID
@@ -41,7 +42,7 @@ export class ResidencyResolver {
     ): Promise<ResidenceResponse> {
         return await dataSources.pgHandler.getResidencesObject({
             google_place_id: place_id,
-        })
+        });
     }
 
     @Query(() => ResidenceResponse) // return number of rows returned? everywhere?
@@ -49,7 +50,7 @@ export class ResidencyResolver {
         @Arg('obj') obj: PartialResidence,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesObject(obj)
+        return await dataSources.pgHandler.getResidencesObject(obj);
     }
 
     // just for dev
@@ -58,7 +59,7 @@ export class ResidencyResolver {
         @Arg('address', () => String) address: string,
         @Ctx() { dataSources }: MyContext
     ): Promise<PlaceIDResponse> {
-        return await dataSources.googleMapsHandler.placeIdFromAddress(address)
+        return await dataSources.googleMapsHandler.placeIdFromAddress(address);
     }
 
     // // get by placeID

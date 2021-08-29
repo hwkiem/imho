@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
         table.increments('res_id');
         table.string('google_place_id').unique();
         table.string('full_address');
-        table.string('apt_num');
+        table.string('apt_num').nullable();
         table.string('street_num');
         table.string('route');
         table.string('city');
@@ -28,7 +28,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema.createTable('reviews', (table: Knex.TableBuilder) => {
         table.integer('res_id').references('res_id').inTable('residences');
-        table.integer('user_id').references('res_id').inTable('residences');
+        table.integer('user_id').references('user_id').inTable('users');
         table.unique(['user_id', 'res_id'], 'userResTuple');
         table.integer('rating');
         table.integer('rent');

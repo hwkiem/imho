@@ -184,7 +184,7 @@ export type ResidenceGql = {
   res_id: Scalars['Float'];
   google_place_id: Scalars['String'];
   full_address: Scalars['String'];
-  apt_num: Scalars['String'];
+  apt_num?: Maybe<Scalars['String']>;
   street_num: Scalars['String'];
   route: Scalars['String'];
   city: Scalars['String'];
@@ -207,8 +207,8 @@ export type ReviewGql = {
   __typename?: 'ReviewGQL';
   res_id: Scalars['Int'];
   user_id: Scalars['Float'];
-  rating: Scalars['Float'];
-  rent: Scalars['Float'];
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -237,8 +237,8 @@ export type UserResponse = {
 
 export type WriteReviewInput = {
   google_place_id: Scalars['String'];
-  rating: Scalars['Float'];
-  rent: Scalars['Float'];
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
 };
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
@@ -247,9 +247,9 @@ export type RegularResidenceFragment = { __typename?: 'ResidenceGQL', res_id: nu
 
 export type RegularResidenceResponseFragment = { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> };
 
-export type RegularReviewFragment = { __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string };
+export type RegularReviewFragment = { __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string };
 
-export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> };
+export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> };
 
 export type RegularUserFragment = { __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
 
@@ -279,7 +279,7 @@ export type WriteReviewMutationVariables = Exact<{
 }>;
 
 
-export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating: number, rent: number, created_at: string, updated_at: string }>> } };
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> } };
 
 export type GetResidencesLimitQueryVariables = Exact<{
   limit: Scalars['Int'];

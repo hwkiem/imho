@@ -80,16 +80,16 @@ export class postgresHandler extends SQLDataSource {
             // updated_at: this.knex.fn.now(),
         };
 
-        console.log(args);
         await this.knex<UserGQL>('users')
             .insert(args)
             .returning('*')
-            .then((users) => (r.users = users))
+            .then((users) => {
+                r.users = users;
+            })
             .catch((e) => {
                 if (e.code === '23505') {
                     r.errors = [{ message: 'email taken', field: 'email' }];
                 } else {
-                    console.log(e);
                     r.errors = [{ field: 'insert user', message: e.message }];
                 }
             });
@@ -134,9 +134,8 @@ export class postgresHandler extends SQLDataSource {
                     locationResult.geometry.location.lng +
                     ')'
             ),
-            created_at: this.knex.fn.now(),
-            updated_at: this.knex.fn.now(),
         };
+        console.log(args);
 
         let r: ResidenceResponse = {};
         await this.knex<ResidenceGQL>('residences')
@@ -290,9 +289,8 @@ export class postgresHandler extends SQLDataSource {
         let r: ReviewResponse = {};
         const args = {
             ...input,
-            created_at: this.knex.fn.now(),
-            updated_at: this.knex.fn.now(),
         };
+        console.log(args);
         await this.knex<ReviewGQL>('reviews')
             .insert(args)
             .returning('*')
