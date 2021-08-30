@@ -6,13 +6,13 @@ import { geoToData } from '../utils/mapUtils';
 export class googleMapsHandler extends DataSource {
     #client: Client;
     #apiKey: string;
-    constructor(client: Client) {
+    constructor() {
         super();
         if (!process.env.GOOGLE_MAPS_API_KEY) {
             throw Error('NO GCP API KEY');
         }
         this.#apiKey = process.env.GOOGLE_MAPS_API_KEY;
-        this.#client = client;
+        this.#client = new Client({});
     }
 
     locationFromPlaceID = async (

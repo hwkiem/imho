@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import dotenv from 'dotenv';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import cors from 'cors';
@@ -7,8 +6,6 @@ import { buildSchema } from 'type-graphql';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import { __prod__ } from './constants';
-import { Client } from '@googlemaps/google-maps-services-js';
 import { UserResolver } from './User/user_resolver';
 import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
@@ -17,11 +14,7 @@ import { ReviewResolver } from './Review/review_resolver';
 import { googleMapsHandler } from './DataSources/mapsAPI';
 
 const main = async () => {
-    dotenv.config();
     const app = express();
-
-    // Google Maps client
-    const client = new Client({});
 
     // Redis Cookies / Sessions
     const RedisStore = connectRedis(session);
@@ -44,9 +37,8 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
                 httpOnly: true,
-                sameSite: 'lax', // csrf
-                secure: false, // cookie only works in https
-                // domain: __prod__ ? '.codeponder.com' : undefined,
+                sameSite: 'lax',
+                secure: false,
             },
             saveUninitialized: false,
             secret: process.env.SESSION_SECRET!,
@@ -64,12 +56,11 @@ const main = async () => {
         context: ({ req, res }) => ({
             req,
             res,
-            client,
         }),
         dataSources: () => {
             return {
                 pgHandler: new postgresHandler(),
-                googleMapsHandler: new googleMapsHandler(client),
+                googleMapsHandler: new googleMapsHandler(),
             };
         },
     });
