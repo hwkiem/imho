@@ -3,55 +3,55 @@ import { Residence } from 'entities';
 
 @ObjectType()
 class Coords {
-  @Field()
-  lat: number;
-  @Field()
-  lng: number;
+    @Field()
+    lat: number;
+    @Field()
+    lng: number;
 }
 
 @ObjectType()
 export class ResidenceGQL implements Residence {
-  @Field()
-  res_id: number;
+    @Field()
+    res_id: number;
 
-  @Field()
-  google_place_id: string;
+    @Field()
+    google_place_id: string;
 
-  @Field()
-  full_address: string;
+    @Field()
+    full_address: string;
 
-  @Field()
-  apt_num: string;
+    @Field({ nullable: true })
+    apt_num?: string;
 
-  @Field()
-  street_num: string;
+    @Field()
+    street_num: string;
 
-  @Field()
-  route: string;
+    @Field()
+    route: string;
 
-  @Field()
-  city: string;
+    @Field()
+    city: string;
 
-  @Field()
-  state: string;
+    @Field()
+    state: string;
 
-  @Field()
-  postal_code: string;
+    @Field()
+    postal_code: string;
 
-  @Field(() => Coords)
-  coords: Coords;
+    @Field(() => Coords)
+    coords: Coords;
 
-  geog: any;
+    geog: any;
 
-  @Field(() => Float, { nullable: true })
-  avg_rating?: number;
+    @Field(() => Float, { nullable: true })
+    avg_rating?: number;
 
-  @Field({ nullable: true })
-  avg_rent?: number;
+    @Field({ nullable: true })
+    avg_rent?: number;
 
-  @Field(() => String)
-  created_at = new Date();
+    @Field(() => String)
+    created_at = new Date();
 
-  @Field(() => String)
-  updated_at = new Date();
+    @Field(() => String)
+    updated_at = new Date();
 }

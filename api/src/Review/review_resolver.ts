@@ -15,6 +15,7 @@ export class ReviewResolver {
         @Arg('options') options: WriteReviewInput,
         @Ctx() { dataSources, req }: MyContext
     ): Promise<ReviewResponse> {
+        console.log(options);
         if (!req.session.userId) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
