@@ -1,5 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { ReviewGQL } from './reviews';
+import { Review } from './reviews';
 import {
     MyContext,
     PartialReview,
@@ -8,7 +8,7 @@ import {
 } from '../types';
 import { ReviewResponse, WriteReviewInput } from '../types';
 
-@Resolver(ReviewGQL)
+@Resolver(Review)
 export class ReviewResolver {
     @Mutation(() => ReviewResponse)
     async writeReview(

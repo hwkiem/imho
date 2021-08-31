@@ -1,9 +1,9 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { ResidenceGQL } from './residence';
+import { Residence } from './residence';
 import { MyContext, PartialResidence, PlaceIDResponse } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 
-@Resolver(ResidenceGQL)
+@Resolver(Residence)
 export class ResidencyResolver {
     @Mutation(() => ResidenceResponse)
     async createResidency(

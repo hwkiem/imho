@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
-import { UserGQL } from './user';
+import { User } from './user';
 import { validateRegister } from '../utils/validateRegister';
 import {
     UserResponse,
@@ -17,7 +17,7 @@ declare module 'express-session' {
     }
 }
 
-@Resolver(UserGQL)
+@Resolver(User)
 export class UserResolver {
     // Me Query
     @Query(() => UserResponse)

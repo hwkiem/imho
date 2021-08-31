@@ -3,9 +3,9 @@ import { Request, Response } from 'express';
 import { ObjectType, Field, InputType, Int } from 'type-graphql';
 import { googleMapsHandler } from './DataSources/mapsAPI';
 import { postgresHandler } from './dataSources/postgres';
-import { ResidenceGQL } from './Residence/residence';
-import { ReviewGQL } from './Review/reviews';
-import { UserGQL } from './User/user';
+import { Residence } from './Residence/residence';
+import { Review } from './Review/reviews';
+import { User } from './User/user';
 
 export type MyContext = {
     req: Request; //& { session: Express.Session };
@@ -20,7 +20,7 @@ export type MyContext = {
 // @GRAPHQL
 // @INPUT
 @InputType() // subset of User used as filter values
-export class PartialUser implements Partial<UserGQL> {
+export class PartialUser implements Partial<User> {
     @Field({ nullable: true })
     first_name?: string;
     @Field({ nullable: true })
@@ -28,7 +28,7 @@ export class PartialUser implements Partial<UserGQL> {
 }
 
 @InputType()
-export class PartialReview implements Partial<ReviewGQL> {
+export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     rating: number;
 
@@ -37,7 +37,7 @@ export class PartialReview implements Partial<ReviewGQL> {
 }
 
 @InputType()
-export class PartialResidence implements Partial<ResidenceGQL> {
+export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
     apt_num: string;
     @Field({ nullable: true })
@@ -129,8 +129,8 @@ export class UserResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [UserGQL], { nullable: true })
-    users?: UserGQL[];
+    @Field(() => [User], { nullable: true })
+    users?: User[];
 }
 
 @ObjectType()
@@ -138,8 +138,8 @@ export class ResidenceResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [ResidenceGQL], { nullable: true })
-    residences?: ResidenceGQL[];
+    @Field(() => [Residence], { nullable: true })
+    residences?: Residence[];
 }
 
 @ObjectType()
@@ -147,8 +147,8 @@ export class ReviewResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [ReviewGQL], { nullable: true })
-    reviews?: ReviewGQL[];
+    @Field(() => [Review], { nullable: true })
+    reviews?: Review[];
 }
 
 @ObjectType()

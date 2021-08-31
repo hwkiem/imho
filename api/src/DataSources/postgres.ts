@@ -10,12 +10,12 @@ import {
     WriteReviewArgs,
 } from '../types';
 import argon2 from 'argon2';
-import { UserGQL } from '../User/user';
-import { ResidenceGQL } from '../Residence/residence';
+import { User } from '../User/user';
+import { Residence } from '../Residence/residence';
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import KnexPostgis from 'knex-postgis';
-import { ReviewGQL } from '../Review/reviews';
+import { Review } from '../Review/reviews';
 import knexConfig from '../database/knexfile';
 
 export class postgresHandler extends SQLDataSource {
@@ -28,7 +28,7 @@ export class postgresHandler extends SQLDataSource {
     // @Users
     async getUsersById(ids: [number]): Promise<UserResponse> {
         let r: UserResponse = {};
-        await this.knex<UserGQL>('users')
+        await this.knex<User>('users')
             .select('*')
             .where('user_id', 'in', ids)
             .then((users) => (r.users = users))
@@ -43,7 +43,7 @@ export class postgresHandler extends SQLDataSource {
 
     async getUsersLimit(limit: number): Promise<UserResponse> {
         let r: UserResponse = {};
-        await this.knex<UserGQL>('users')
+        await this.knex<User>('users')
             .select('*')
             .limit(limit)
             .then((users) => (r.users = users))
@@ -56,9 +56,9 @@ export class postgresHandler extends SQLDataSource {
         return r;
     }
 
-    async getUsersObject(obj: Partial<UserGQL>): Promise<UserResponse> {
+    async getUsersObject(obj: Partial<User>): Promise<UserResponse> {
         let r: UserResponse = {};
-        await this.knex<UserGQL>('users')
+        await this.knex<User>('users')
             .select('*')
             .where(obj)
             .then((users) => (r.users = users))
@@ -80,7 +80,7 @@ export class postgresHandler extends SQLDataSource {
             // updated_at: this.knex.fn.now(),
         };
 
-        await this.knex<UserGQL>('users')
+        await this.knex<User>('users')
             .insert(args)
             .returning('*')
             .then((users) => {
@@ -98,7 +98,7 @@ export class postgresHandler extends SQLDataSource {
 
     async deleteUser(id: number): Promise<UserResponse> {
         let r: UserResponse = {};
-        await this.knex<UserGQL>('users')
+        await this.knex<User>('users')
             .where('user_id', '=', id)
             .del()
             .returning('*')
@@ -138,7 +138,7 @@ export class postgresHandler extends SQLDataSource {
         console.log(args);
 
         let r: ResidenceResponse = {};
-        await this.knex<ResidenceGQL>('residences')
+        await this.knex<Residence>('residences')
             .insert(args)
             .returning('res_id')
             .then(async (ids) => {
@@ -169,7 +169,7 @@ export class postgresHandler extends SQLDataSource {
     async getResidencesById(ids: number[]): Promise<ResidenceResponse> {
         let r: ResidenceResponse = {};
 
-        await this.knex<ResidenceGQL>('residences')
+        await this.knex<Residence>('residences')
             .select([
                 'residences.res_id',
                 'google_place_id',
@@ -205,10 +205,10 @@ export class postgresHandler extends SQLDataSource {
     }
 
     async getResidencesObject(
-        obj: Partial<ResidenceGQL>
+        obj: Partial<Residence>
     ): Promise<ResidenceResponse> {
         let r: ResidenceResponse = {};
-        await this.knex<ResidenceGQL>('residences')
+        await this.knex<Residence>('residences')
             .select([
                 'residences.res_id',
                 'google_place_id',
@@ -243,7 +243,7 @@ export class postgresHandler extends SQLDataSource {
 
     async getResidencesLimit(limit: number): Promise<ResidenceResponse> {
         let r: ResidenceResponse = {};
-        await this.knex<ResidenceGQL>('residences')
+        await this.knex<Residence>('residences')
             .select([
                 'residences.res_id',
                 'google_place_id',
@@ -291,7 +291,7 @@ export class postgresHandler extends SQLDataSource {
             ...input,
         };
         console.log(args);
-        await this.knex<ReviewGQL>('reviews')
+        await this.knex<Review>('reviews')
             .insert(args)
             .returning('*')
             .then((reviews) => (r.reviews = reviews))
@@ -315,7 +315,7 @@ export class postgresHandler extends SQLDataSource {
 
     async getReviewsByUserId(ids: [number]): Promise<ReviewResponse> {
         let r: ReviewResponse = {};
-        await this.knex<ReviewGQL>('reviews')
+        await this.knex<Review>('reviews')
             .select('*')
             .where('user_id', 'in', ids)
             .then((reviews) => (r.reviews = reviews))
@@ -330,7 +330,7 @@ export class postgresHandler extends SQLDataSource {
 
     async getReviewsByResidenceId(ids: [number]): Promise<ReviewResponse> {
         let r: ReviewResponse = {};
-        await this.knex<ReviewGQL>('reviews')
+        await this.knex<Review>('reviews')
             .select('*')
             .where('res_id', 'in', ids)
             .then((reviews) => (r.reviews = reviews))
@@ -345,7 +345,7 @@ export class postgresHandler extends SQLDataSource {
 
     async getReviewsLimit(limit: number): Promise<ReviewResponse> {
         let r: ReviewResponse = {};
-        await this.knex<ReviewGQL>('reviews')
+        await this.knex<Review>('reviews')
             .select('*')
             .limit(limit)
             .then((reviews) => (r.reviews = reviews))
@@ -358,9 +358,9 @@ export class postgresHandler extends SQLDataSource {
         return r;
     }
 
-    async getReviewsObject(obj: Partial<ReviewGQL>): Promise<ReviewResponse> {
+    async getReviewsObject(obj: Partial<Review>): Promise<ReviewResponse> {
         let r: ReviewResponse = {};
-        await this.knex<ReviewGQL>('reviews')
+        await this.knex<Review>('reviews')
             .select('*')
             .where(obj)
             .then((reviews) => (r.reviews = reviews))
