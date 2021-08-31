@@ -1,5 +1,16 @@
-import { Box, Center, Input } from '@chakra-ui/react'
+import {
+    chakra,
+    Box,
+    Center,
+    Input,
+    InputGroup,
+    InputLeftElement,
+    Icon,
+} from '@chakra-ui/react'
 import { Fragment, useEffect } from 'react'
+import { RiHomeSmileFill } from 'react-icons/ri'
+
+const HomeIcon = chakra(RiHomeSmileFill)
 
 interface SearchBarProps {
     options: google.maps.places.AutocompleteOptions
@@ -18,10 +29,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({ options }) => {
     }, [options.bounds])
 
     return (
-        <Center zIndex={2}>
-            <Box bg={'white'}>
-                <Input variant={'flushed'} ref={setInputRef} />
-            </Box>
-        </Center>
+        <Box w={'100%'} position={'absolute'} zIndex={'2'} top={20}>
+            <Center>
+                <Box bg={'white'} rounded={'md'} p={2} w={'30%'}>
+                    <InputGroup>
+                        <InputLeftElement>
+                            <Icon as={HomeIcon} />
+                        </InputLeftElement>
+                        <Input
+                            variant={'flushed'}
+                            ref={setInputRef}
+                            size={'sm'}
+                            padding={6}
+                        />
+                    </InputGroup>
+                </Box>
+            </Center>
+        </Box>
     )
 }
