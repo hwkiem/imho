@@ -1,9 +1,8 @@
-import { ObjectType, Field, Int, Float } from 'type-graphql';
-import { Review } from 'entities';
+import { ObjectType, Field, Float } from 'type-graphql';
 
 @ObjectType()
-export class ReviewGQL implements Review {
-    @Field(() => Int)
+export class Review {
+    @Field()
     res_id: number;
 
     @Field()
