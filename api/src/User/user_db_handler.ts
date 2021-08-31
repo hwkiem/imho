@@ -54,14 +54,8 @@ export async function createUser(
 ): Promise<UserResponse> {
     let r: UserResponse = {};
     input.password = await argon2.hash(input.password);
-    const args = {
-        ...input,
-        // created_at: this.knex.fn.now(),
-        // updated_at: this.knex.fn.now(),
-    };
-
     await this.knex<User>('users')
-        .insert(args)
+        .insert(input)
         .returning('*')
         .then((users) => {
             r.users = users;
@@ -92,4 +86,3 @@ export async function deleteUser(
         );
     return r;
 }
-

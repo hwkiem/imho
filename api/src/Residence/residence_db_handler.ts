@@ -15,7 +15,6 @@ export async function createResidence(
     if (locationResult instanceof FieldError) {
         return { errors: [locationResult] };
     }
-
     const args = {
         ...input,
         ...unpackLocation(locationResult),

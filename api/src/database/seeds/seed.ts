@@ -13,8 +13,6 @@ export async function seed(knex: Knex): Promise<void> {
     await knex('reviews').del();
     await knex('users').del();
     await knex('residences').del();
-    // await knex.raw("select setval('users_user_id_seq', 1) from users");
-    // await knex.raw("select setval('', 1) from reviews");
 
     // every password is cenacena
     await knex<User>('users').insert([
