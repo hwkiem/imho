@@ -86,3 +86,22 @@ export async function deleteUser(
         );
     return r;
 }
+
+export async function changePassword(
+    this: postgresHandler,
+    new_password: string,
+    user_id: number
+): Promise<UserResponse> {
+    let r: UserResponse = {};
+
+    await this.knex<User>('users')
+        .where('user_id', '=', user_id)
+        .update({ password: new_password })
+        .returning('*')
+        .then((users) => (r.users = users))
+        .catch(
+            (e) =>
+                (r.errors = [{ field: 'update user', message: e.toString() }])
+        );
+    return r;
+}

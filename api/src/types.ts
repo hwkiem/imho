@@ -71,6 +71,16 @@ export class LoginInput {
 }
 
 @InputType()
+export class ChangePasswordInput {
+    @Field()
+    email: string;
+    @Field()
+    old_password: string;
+    @Field()
+    new_password: string;
+}
+
+@InputType()
 export class ReviewQueryInput {
     @Field(() => [Int], { nullable: true })
     reviews?: [number];

@@ -23,7 +23,10 @@ export class ReviewResolver {
             await dataSources.pgHandler.getResidencesObject({
                 google_place_id: options.google_place_id,
             });
-        if (getResponse.errors || !getResponse.residences) {
+        if (
+            getResponse.errors !== undefined ||
+            getResponse.residences === undefined
+        ) {
             return { errors: getResponse.errors };
         }
         let args: WriteReviewArgs;
