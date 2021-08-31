@@ -1,25 +1,44 @@
-import { ObjectType, Field } from 'type-graphql';
-import { User } from 'entities';
+import { ObjectType, Field, Ctx } from 'type-graphql';
+import { Review } from '../Review/reviews';
+import { MyContext } from '../types';
 
 @ObjectType()
-export class UserGQL implements User {
-  @Field()
-  user_id: number;
+export class User {
+    @Field()
+    user_id: number;
 
-  @Field()
-  first_name: string;
+    @Field()
+    first_name: string;
 
-  @Field()
-  last_name: string;
+    @Field()
+    last_name: string;
 
-  @Field()
-  email: string;
+    @Field()
+    email: string;
 
-  password: string;
+    @Field({ nullable: true })
+    profession: string;
 
-  @Field(() => String)
-  created_at = new Date();
+    password: string;
 
-  @Field(() => String)
-  updated_at = new Date();
+    @Field(() => [Review], { nullable: true })
+    async myReviews(
+        @Ctx() { req, dataSources }: MyContext
+    ): Promise<Review[] | undefined> {
+        const uid = req.session.userId;
+        if (uid === undefined) {
+            return;
+        }
+        const res = await dataSources.pgHandler.getReviewsByUserId([uid]);
+        if (res.errors === undefined && res.reviews !== undefined) {
+            return res.reviews;
+        }
+        return;
+    }
+
+    @Field(() => String)
+    created_at = new Date();
+
+    @Field(() => String)
+    updated_at = new Date();
 }

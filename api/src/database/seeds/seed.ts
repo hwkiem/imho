@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
-import { ResidenceGQL } from '../../Residence/residence';
-import { ReviewGQL } from '../../Review/reviews';
-import { UserGQL } from '../../User/user';
+import { Residence } from '../../Residence/residence';
+import { Review } from '../../Review/reviews';
+import { User } from '../../User/user';
 import KnexPostgis from 'knex-postgis';
 import knexConfig from '../knexfile';
 
@@ -13,11 +13,9 @@ export async function seed(knex: Knex): Promise<void> {
     await knex('reviews').del();
     await knex('users').del();
     await knex('residences').del();
-    // await knex.raw("select setval('users_user_id_seq', 1) from users");
-    // await knex.raw("select setval('', 1) from reviews");
 
     // every password is cenacena
-    await knex<UserGQL>('users').insert([
+    await knex<User>('users').insert([
         {
             email: 'james@gmail.com',
             first_name: 'Jim',
@@ -55,7 +53,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
     ]);
 
-    await knex<ResidenceGQL>('residences').insert([
+    await knex<Residence>('residences').insert([
         {
             google_place_id:
                 'EioxMiBXIDEwNHRoIFN0ICMzZSwgTmV3IFlvcmssIE5ZIDEwMDI1LCBVU0EiHhocChYKFAoSCXmD2y4i9sKJEeQeYveWll2lEgIzZQ',
@@ -117,13 +115,7 @@ export async function seed(knex: Knex): Promise<void> {
     const resStart = (await knex.raw('select min(res_id) from residences'))
         .rows[0].min;
 
-    // console.log({
-    //     user_id: userStart,
-    //     res_id: resStart,
-    //     rent: 4000,
-    //     rating: 5,
-    // });
-    await knex<ReviewGQL>('reviews').insert([
+    await knex<Review>('reviews').insert([
         { user_id: userStart, res_id: resStart, rent: 4000, rating: 5 },
         { user_id: userStart + 1, res_id: resStart, rent: 4200, rating: 4 },
         { user_id: userStart + 1, res_id: resStart + 1 },

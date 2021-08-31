@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
-import { UserGQL } from './user';
+import { User } from './user';
 import { validateRegister } from '../utils/validateRegister';
 import {
     UserResponse,
@@ -17,13 +17,13 @@ declare module 'express-session' {
     }
 }
 
-@Resolver(UserGQL)
+@Resolver(User)
 export class UserResolver {
     // Me Query
     @Query(() => UserResponse)
     async me(@Ctx() { req, dataSources }: MyContext): Promise<UserResponse> {
         const userId = req.session.userId;
-        if (!userId) {
+        if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         const response = await dataSources.pgHandler.getUsersById([userId]);
@@ -58,7 +58,7 @@ export class UserResolver {
         @Ctx() { dataSources, req }: MyContext
     ): Promise<UserResponse> {
         const userId = req.session.userId;
-        if (!userId) {
+        if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         const response = await dataSources.pgHandler.getUsersById([userId]);
