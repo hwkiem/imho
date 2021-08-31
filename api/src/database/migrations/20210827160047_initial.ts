@@ -1,6 +1,18 @@
 import * as Knex from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
+    // https://stackoverflow.com/questions/36728899/knex-js-auto-update-trigger
+    const ON_UPDATE_TIMESTAMP = `
+    CREATE OR REPLACE FUNCTION on_update_timestamp()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql AS
+        $$ BEGIN
+        NEW.updated_at := current_timestamp;
+        RETURN NEW;
+        END; $$;
+    `;
+    const DROP_ON_UPDATE_TIMESTAMP = `DROP FUNCTION on_update_timestamp`;
+
     await knex.schema.createTable('users', (table: Knex.TableBuilder) => {
         table.increments('user_id').primary();
         table.string('first_name');
