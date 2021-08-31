@@ -48,14 +48,14 @@ type AutoCompleteProps =
           searchTypes?: never
       }
     | {
-          withAutoComplete?: true
+          withAutoComplete: true
           withSearchBar?: never
-          searchTypes?: SearchTypes[]
+          searchTypes: SearchTypes[]
       }
     | {
           withAutoComplete?: never
-          withSearchBar?: true
-          searchTypes?: SearchTypes[]
+          withSearchBar: true
+          searchTypes: SearchTypes[]
       }
 
 type MapProps = CommonMapProps & ResidenceProps & AutoCompleteProps
@@ -145,4 +145,3 @@ export const Map: React.FC<MapProps> = ({
         </Fragment>
     )
 }
-;<Map searchTypes={['geocode']}></Map>

@@ -5,7 +5,7 @@ import { Page } from '../types/page'
 const MapPage: Page = () => {
     return (
         <Box h={'100vh'} w={'100vw'}>
-            <Map withSearchBar />
+            <Map withSearchBar searchTypes={['geocode']} />
         </Box>
     )
 }
