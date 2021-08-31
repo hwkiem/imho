@@ -1,4 +1,4 @@
-import { Box, Input } from '@chakra-ui/react'
+import { Box, Center, Input } from '@chakra-ui/react'
 import { Fragment, useEffect } from 'react'
 
 interface SearchBarProps {
@@ -18,8 +18,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ options }) => {
     }, [options.bounds])
 
     return (
-        <Box>
-            <Input variant={'flushed'} ref={setInputRef} />
-        </Box>
+        <Center zIndex={2}>
+            <Box bg={'white'}>
+                <Input variant={'flushed'} ref={setInputRef} />
+            </Box>
+        </Center>
     )
 }

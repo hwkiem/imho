@@ -127,6 +127,7 @@ export const Map: React.FC<MapProps> = ({
                 center={center}
                 zoom={zoom}
                 options={() => ({
+                    draggable: !fixed,
                     panControl: false,
                     fullscreenControl: false,
                     zoomControl: false,
