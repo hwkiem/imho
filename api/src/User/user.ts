@@ -1,4 +1,4 @@
-import { ObjectType, Field, Arg, Ctx } from 'type-graphql';
+import { ObjectType, Field, Ctx } from 'type-graphql';
 import { Review } from '../Review/reviews';
 import { MyContext } from '../types';
 
@@ -23,11 +23,13 @@ export class User {
 
     @Field(() => [Review], { nullable: true })
     async myReviews(
-        @Arg('id') id: number,
-        @Ctx() { dataSources }: MyContext
+        @Ctx() { req, dataSources }: MyContext
     ): Promise<Review[] | undefined> {
-        // validate their context matches their request?
-        const res = await dataSources.pgHandler.getReviewsByUserId([id]);
+        const uid = req.session.userId;
+        if (!uid) {
+            return;
+        }
+        const res = await dataSources.pgHandler.getReviewsByUserId([uid]);
         if (!res.errors && res.reviews) {
             return res.reviews;
         }
