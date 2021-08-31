@@ -7,6 +7,7 @@ import {
     MyContext,
     LoginInput,
     PartialUser,
+    ChangePasswordInput,
 } from '../types';
 import argon2 from 'argon2';
 
@@ -55,27 +56,35 @@ export class UserResolver {
     // Logout User
     @Mutation(() => UserResponse)
     async logout(
-        @Ctx() { dataSources, req }: MyContext
+        @Ctx() { dataSources, req, res }: MyContext
     ): Promise<UserResponse> {
-        const userId = req.session.userId;
-        if (userId === undefined) {
-            return { errors: [{ field: 'session', message: 'not logged in' }] };
-        }
-        const response = await dataSources.pgHandler.getUsersById([userId]);
-        if (response.users) {
-            if (response.users.length == 0) {
-                return {
-                    errors: [
-                        {
-                            field: 'user_id',
-                            message: 'this user does not exist',
-                        },
-                    ],
-                };
+        return new Promise(async (resolve) => {
+            const userId = req.session.userId;
+            if (userId === undefined) {
+                resolve({
+                    errors: [{ field: 'session', message: 'not logged in' }],
+                });
             }
-            req.session.destroy((err) => console.log(err));
-        }
-        return response;
+            const response = await dataSources.pgHandler.getUsersById([userId]);
+            if (response.users) {
+                req.session.destroy((err) => {
+                    res.clearCookie('oreo');
+                    if (err) {
+                        console.log(err);
+                        resolve({
+                            errors: [
+                                {
+                                    field: 'session',
+                                    message: 'unable to destroy session.',
+                                },
+                            ],
+                        });
+                        return;
+                    }
+                    resolve({ users: response.users });
+                });
+            }
+        });
     }
 
     // Login User
@@ -115,6 +124,64 @@ export class UserResolver {
             }
             req.session.userId = response.users[0].user_id;
         }
+        return response;
+    }
+
+    // Change Password
+
+    @Mutation(() => UserResponse)
+    async changeMyPassword(
+        @Arg('args') args: ChangePasswordInput,
+        @Ctx() { dataSources, req }: MyContext
+    ): Promise<UserResponse> {
+        // ensure logged in
+        const userId = req.session.userId;
+        if (userId === undefined) {
+            return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        const response = await dataSources.pgHandler.getUsersById([userId]);
+        // type guards, ensure users
+        if (response.errors !== undefined || response.users === undefined) {
+            return {
+                errors: [
+                    { field: 'fetch user', message: 'user does not exist' },
+                ],
+            };
+        }
+
+        // check password correct
+        if (
+            !(await argon2.verify(
+                // force bc checked above
+                response.users[0].password,
+                args.old_password
+            ))
+        ) {
+            return {
+                errors: [
+                    {
+                        field: 'password',
+                        message: 'wrong password',
+                    },
+                ],
+            };
+        }
+        const newPass = await argon2.hash(args.new_password);
+        const res = await dataSources.pgHandler.changePassword(
+            newPass,
+            response.users[0].user_id
+        );
+        if (res.errors !== undefined || res.users === undefined) {
+            return {
+                errors: [
+                    {
+                        field: 'update user',
+                        message: 'failed to change password',
+                    },
+                ],
+            };
+        }
+        response.users[0].password = newPass;
         return response;
     }
 

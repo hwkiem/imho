@@ -2,6 +2,7 @@ import { SQLDataSource } from 'datasource-sql';
 import KnexPostgis from 'knex-postgis';
 import knexConfig from '../database/knexfile';
 import {
+    changePassword,
     createUser,
     deleteUser,
     getUsersById,
@@ -40,6 +41,8 @@ export class postgresHandler extends SQLDataSource {
     public createUser = createUser;
 
     public deleteUser = deleteUser;
+
+    public changePassword = changePassword;
 
     // Residences
     public createResidence = createResidence;
