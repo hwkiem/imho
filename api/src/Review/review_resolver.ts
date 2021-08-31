@@ -15,8 +15,7 @@ export class ReviewResolver {
         @Arg('options') options: WriteReviewInput,
         @Ctx() { dataSources, req }: MyContext
     ): Promise<ReviewResponse> {
-        console.log(options);
-        if (!req.session.userId) {
+        if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         // does the residence already exist?
@@ -40,31 +39,22 @@ export class ReviewResolver {
                 return { errors: createResponse.errors };
             }
             args = {
-                // rating: options.rating?,
-                // rent: options.rent,
                 user_id: req.session.userId,
                 res_id: createResponse.residences[0].res_id,
             };
-            if (options.rent) {
-                args.rent = options.rent;
-            }
-            if (options.rating) {
-                args.rent = options.rating;
-            }
         } else {
             // residence exists
             args = {
-                // rating: options.rating,
-                // rent: options.rent,
                 user_id: req.session.userId,
                 res_id: getResponse.residences[0].res_id,
             };
-            if (options.rent) {
-                args.rent = options.rent;
-            }
-            if (options.rating) {
-                args.rating = options.rating;
-            }
+        }
+        // fill optional args
+        if (options.rating !== undefined) {
+            args.rating = options.rating;
+        }
+        if (options.rent !== undefined) {
+            args.rent = options.rent;
         }
         const response = await dataSources.pgHandler.writeReview(args);
         return response;

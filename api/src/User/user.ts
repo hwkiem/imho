@@ -26,11 +26,11 @@ export class User {
         @Ctx() { req, dataSources }: MyContext
     ): Promise<Review[] | undefined> {
         const uid = req.session.userId;
-        if (!uid) {
+        if (uid === undefined) {
             return;
         }
         const res = await dataSources.pgHandler.getReviewsByUserId([uid]);
-        if (!res.errors && res.reviews) {
+        if (res.errors === undefined && res.reviews !== undefined) {
             return res.reviews;
         }
         return;

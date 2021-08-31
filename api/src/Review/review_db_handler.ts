@@ -7,11 +7,8 @@ export async function writeReview(
     input: WriteReviewArgs
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
-    const args = {
-        ...input,
-    };
     await this.knex<Review>('reviews')
-        .insert(args)
+        .insert(input)
         .returning('*')
         .then((reviews) => (r.reviews = reviews))
         .catch((e) => {

@@ -1,6 +1,5 @@
-import { Client } from '@googlemaps/google-maps-services-js';
 import { Request, Response } from 'express';
-import { ObjectType, Field, InputType, Int } from 'type-graphql';
+import { ObjectType, Field, InputType, Int, Float } from 'type-graphql';
 import { googleMapsHandler } from './DataSources/mapsAPI';
 import { postgresHandler } from './dataSources/postgres';
 import { Residence } from './Residence/residence';
@@ -10,7 +9,6 @@ import { User } from './User/user';
 export type MyContext = {
     req: Request; //& { session: Express.Session };
     res: Response;
-    client: Client;
     dataSources: {
         pgHandler: postgresHandler;
         googleMapsHandler: googleMapsHandler;
@@ -90,7 +88,7 @@ export class WriteReviewInput {
     @Field()
     google_place_id: string;
 
-    @Field({ nullable: true })
+    @Field(() => Float, { nullable: true })
     rating?: number;
 
     @Field({ nullable: true })
@@ -106,15 +104,6 @@ export class WriteReviewArgs {
     rent?: number;
     rating?: number;
 }
-
-// use this for getReviewById?
-// @InputType()
-// export class PickReviewID implements Pick<ReviewGQL, 'res_id' | 'user_id'> {
-//   @Field()
-//   user_id: number;
-//   @Field()
-//   res_id: number;
-// }
 
 @ObjectType()
 export class FieldError {

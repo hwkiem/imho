@@ -23,7 +23,7 @@ export class UserResolver {
     @Query(() => UserResponse)
     async me(@Ctx() { req, dataSources }: MyContext): Promise<UserResponse> {
         const userId = req.session.userId;
-        if (!userId) {
+        if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         const response = await dataSources.pgHandler.getUsersById([userId]);
@@ -58,7 +58,7 @@ export class UserResolver {
         @Ctx() { dataSources, req }: MyContext
     ): Promise<UserResponse> {
         const userId = req.session.userId;
-        if (!userId) {
+        if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         const response = await dataSources.pgHandler.getUsersById([userId]);

@@ -53,8 +53,8 @@ export class Residence {
     avg_rent?: number;
 
     // Features
-    @Field()
-    bed_count: number;
+    // @Field()
+    // bed_count: number;
 
     @Field(() => [Review], { nullable: true })
     async myReviews(
