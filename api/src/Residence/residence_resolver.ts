@@ -14,7 +14,6 @@ export class ResidencyResolver {
             options,
             dataSources.googleMapsHandler.locationFromPlaceID
         );
-        console.log(response);
         return response;
     }
 

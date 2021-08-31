@@ -55,57 +55,55 @@ export async function seed(knex: Knex): Promise<void> {
 
     await knex<Residence>('residences').insert([
         {
-            google_place_id:
-                'EioxMiBXIDEwNHRoIFN0ICMzZSwgTmV3IFlvcmssIE5ZIDEwMDI1LCBVU0EiHhocChYKFAoSCXmD2y4i9sKJEeQeYveWll2lEgIzZQ',
-            full_address: '12 W 104th St #3e, New York, NY 10025, USA',
-            apt_num: '3e',
-            street_num: '12',
-            route: 'West 104th Street',
-            city: 'New York',
-            state: 'New York',
-            postal_code: '10025',
+            google_place_id: 'ChIJ5z8sO3gphYARfxI717FQgtI',
+            full_address: '1737 Pomona Dr, Davis, CA 95616, USA',
+            street_num: '1737',
+            route: 'Pomona Drive',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 40.7969087 + ' ' + -73.96190469999999 + ')'
+                'Point(' + 38.5503238 + ' ' + -58.269744900000006 + ')'
             ),
         },
         {
             google_place_id:
-                'EisyMTUgVyAxMDh0aCBTdCAjMmIsIE5ldyBZb3JrLCBOWSAxMDAyNSwgVVNBIh4aHAoWChQKEgl_yZdWO_bCiRGVBO8JPah21BICMmI',
-            full_address: '215 W 108th St #2b, New York, NY 10025, USA',
-            apt_num: '2b',
-            street_num: '215',
-            route: 'West 108th Street',
-            city: 'New York',
-            state: 'New York',
-            postal_code: '10025',
+                'Eik2MTQgU3ljYW1vcmUgTG4gIzFhLCBEYXZpcywgQ0EgOTU2MTYsIFVTQSIeGhwKFgoUChIJYxBDa6wphYARlcQYVmKInAwSAjFh',
+            full_address: '614 Sycamore Ln #1a, Davis, CA 95616, USA',
+            apt_num: '1a',
+            street_num: '614',
+            route: 'Sycamore Lane',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 40.80236499999999 + ' ' + -73.9656429 + ')'
+                'Point(' + 38.5483489 + ' ' + -58.239092600000006 + ')'
             ),
         },
         {
             google_place_id:
-                'Ei43MzQgQW1zdGVyZGFtIEF2ZSAjNmgsIE5ldyBZb3JrLCBOWSAxMDAyNSwgVVNBIh4aHAoWChQKEgnzXGvnJ_bCiRHhgo26YWXF6BICNmg',
-            full_address: '734 Amsterdam Ave #6h, New York, NY 10025, USA',
-            apt_num: '6h',
-            street_num: '734',
-            route: 'Amsterdam Avenue',
-            city: 'New York',
-            state: 'New York',
-            postal_code: '10025',
+                'Eio5MjAgQ3JhbmJyb29rIEN0ICMzZiwgRGF2aXMsIENBIDk1NjE2LCBVU0EiHhocChYKFAoSCXugiI6XKYWAEcRojVAXUfgbEgIzZg',
+            full_address: '920 Cranbrook Ct #3f, Davis, CA 95616, USA',
+            apt_num: '3f',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 40.7940122 + ' ' + -73.9707385 + ')'
+                'Point(' + 38.5585907 + ' ' + -58.259437500000004 + ')'
             ),
         },
         {
-            google_place_id: 'ChIJITunjlZ7wokRAT22KTdm2a0',
-            full_address: '17 Roosevelt Pl, Rockville Centre, NY 11570, USA',
-            street_num: '17',
-            route: 'Roosevelt Place',
-            city: 'Rockville Centre',
-            state: 'New York',
-            postal_code: '11570',
+            google_place_id: 'ChIJa4E1i7AphYAROy3Ai_nYWhA',
+            full_address: '1162 Villaverde Ln, Davis, CA 95618, USA',
+            street_num: '1162',
+            route: 'Villaverde Lane',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95618',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 40.6644586 + ' ' + -73.6466074 + ')'
+                'Point(' + 38.5560044 + ' ' + -58.287240499999996 + ')'
             ),
         },
     ]);

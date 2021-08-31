@@ -46,12 +46,20 @@ export async function createResidence(
                         ])
                 );
         })
-        .catch(
-            (e) =>
-                (r.errors = [
+        .catch((e) => {
+            if (e.code == 23505) {
+                r.errors = [
+                    {
+                        field: 'create residence',
+                        message: 'this residence already exists',
+                    },
+                ];
+            } else {
+                r.errors = [
                     { field: 'create residence', message: e.toString() },
-                ])
-        );
+                ];
+            }
+        });
 
     return r;
 }
