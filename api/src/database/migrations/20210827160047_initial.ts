@@ -52,8 +52,8 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
     await knex.schema.dropTable('reviews');
     await knex.schema.dropTable('users');
     await knex.schema.dropTable('residences');
+    await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }
