@@ -1,6 +1,11 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Residence } from './residence';
-import { MyContext, PartialResidence, PlaceIDResponse } from '../types';
+import {
+    GeoBoundaryInput,
+    MyContext,
+    PartialResidence,
+    PlaceIDResponse,
+} from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 
 @Resolver(Residence)
@@ -23,6 +28,21 @@ export class ResidencyResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         return await dataSources.pgHandler.getResidencesById(ids);
+    }
+
+    @Query(() => ResidenceResponse)
+    async getResidencesBoundingBox(
+        @Arg('perimeter') perimeter: GeoBoundaryInput,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        console.log(perimeter);
+        if (
+            perimeter.xMax < perimeter.xMin ||
+            perimeter.yMax < perimeter.yMin
+        ) {
+            return { errors: [{ field: 'input', message: 'malformed query' }] };
+        }
+        return await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
     }
 
     @Query(() => ResidenceResponse)

@@ -38,6 +38,6 @@ export const unpackLocation = (location: GeocodeResult): Partial<Residence> => {
 export const assembleResidence = (raw: any): Residence[] => {
     return raw.map((r: any) => {
         const { st_x, st_y, ...res } = r;
-        return { coords: { lat: st_x, lng: st_y }, ...res };
+        return { coords: { lat: st_y, lng: st_x }, ...res };
     });
 };

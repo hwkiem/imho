@@ -71,6 +71,18 @@ export class LoginInput {
 }
 
 @InputType()
+export class GeoBoundaryInput {
+    @Field()
+    xMax: number;
+    @Field()
+    xMin: number;
+    @Field()
+    yMax: number;
+    @Field()
+    yMin: number;
+}
+
+@InputType()
 export class ChangePasswordInput {
     @Field()
     email: string;
