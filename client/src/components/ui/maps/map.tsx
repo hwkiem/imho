@@ -17,6 +17,7 @@
  *
  */
 
+import { Box, Icon } from '@chakra-ui/react'
 import GoogleMap from 'google-map-react'
 import { useState, Fragment, useEffect } from 'react'
 import {
@@ -24,37 +25,46 @@ import {
     ResidenceGql,
     useGetResidencesLimitQuery,
 } from '../../../generated/graphql'
-import { MarkerList } from './markerlist'
+import { Marker } from './marker'
 import { SearchBar } from './searchbar'
 import { SideBar } from './sidebar'
+import { RiHomeSmileFill } from 'react-icons/ri'
 
 type SearchTypes = 'geocode' | 'full_address'
 
 interface CommonMapProps {
     fixed?: boolean
+    variant?: 'small' | 'large'
+    valueHook?: (place: google.maps.places.PlaceResult) => void
 }
 
 type ResidenceProps =
     | {
-          withResidences: false
+          withResidences?: false
           withSideBar?: never
       }
-    | { withResidences?: boolean; withSideBar?: boolean }
+    | {
+          withResidences: true
+          withSideBar?: boolean
+      }
 
 type AutoCompleteProps =
     | {
           withAutoComplete?: false
           withSearchBar?: false
           searchTypes?: never
+          ref?: never
       }
     | {
           withAutoComplete: true
+          ref: HTMLInputElement | null
           withSearchBar?: never
           searchTypes: SearchTypes[]
       }
     | {
           withAutoComplete?: never
           withSearchBar: true
+          ref?: never
           searchTypes: SearchTypes[]
       }
 
@@ -64,12 +74,13 @@ const DAVIS_CENTER: GoogleMap.Coords = { lat: 38.5449, lng: -121.7405 }
 const DEFAULT_ZOOM = 14
 
 export const Map: React.FC<MapProps> = ({
-    withAutoComplete,
     withResidences,
     withSearchBar,
     searchTypes,
+    valueHook,
     withSideBar,
     fixed,
+    variant,
 }) => {
     // Used for panning the map to target residence or search res
     const [center, setCenter] = useState(DAVIS_CENTER)
@@ -79,28 +90,31 @@ export const Map: React.FC<MapProps> = ({
     const [centerMarker, setCenterMarker] = useState(false)
     // Used to render components that need API conditionally
     const [apiFlag, setApiFlag] = useState(false)
-    // Residence management
+
     const [residences, setResidences] = useState<RegularResidenceFragment[]>([])
 
+    const { loading, data, error } = useGetResidencesLimitQuery({
+        variables: { limit: 10 },
+    })
+
     useEffect(() => {
-        if (withResidences) {
-            const { data, loading, error } = useGetResidencesLimitQuery({
-                variables: { limit: 10 },
-            })
-            if (!loading && data?.getResidencesLimit.residences) {
-                setResidences(data.getResidencesLimit.residences)
-            } else if (!loading && data?.getResidencesLimit.errors) {
-                console.log('Error fetching residences...')
-            } else {
-                console.log('loading...')
-            }
-        } else {
-            setResidences([]) // wipe residences
+        if (data?.getResidencesLimit.residences)
+            setResidences(data?.getResidencesLimit.residences)
+    }, [data])
+
+    const searchHandler = (place: google.maps.places.PlaceResult) => {
+        if (valueHook) valueHook(place)
+        const loc = place.geometry?.location
+        if (loc) {
+            setCenter({ lat: loc.lat(), lng: loc.lng() })
+            setCenterMarker(true)
         }
-    }, [withResidences])
+    }
+
+    const [hover, setHover] = useState(-1)
 
     return (
-        <Fragment>
+        <Box w={'100%'} h={'100%'} position="relative">
             {apiFlag && withSearchBar && (
                 <SearchBar
                     options={{
@@ -114,11 +128,20 @@ export const Map: React.FC<MapProps> = ({
                         // Constant
                         componentRestrictions: { country: 'us' },
                         types: searchTypes,
-                        fields: ['place_id'],
+                        fields: ['place_id', 'geometry'],
                     }}
+                    searchHandler={searchHandler}
+                    variant={variant}
                 />
             )}
-            {withSideBar && <SideBar residences={residences} />}
+            {withSideBar && residences && (
+                <SideBar
+                    residences={residences}
+                    hover={hover}
+                    setHover={setHover}
+                    setCenter={setCenter}
+                />
+            )}
             <GoogleMap
                 bootstrapURLKeys={{
                     key: process.env.NEXT_PUBLIC_MAPS_API_KEY,
@@ -139,9 +162,39 @@ export const Map: React.FC<MapProps> = ({
                 onGoogleApiLoaded={() => {
                     setApiFlag(true)
                 }}
+                onChange={(value) => {
+                    console.log(value.bounds)
+                }}
             >
-                {withResidences && <MarkerList residences={residences} />}
+                {withResidences &&
+                    residences &&
+                    residences.map((res) => {
+                        console.log('!')
+                        return (
+                            <Marker
+                                res_id={res.res_id}
+                                lat={res.coords.lat}
+                                lng={res.coords.lng}
+                                address={res.full_address}
+                                hover={hover == res.res_id}
+                                setHover={setHover}
+                                onClick={() => {
+                                    setCenter(res.coords)
+                                }}
+                            />
+                        )
+                    })}
+                {centerMarker && residences.length == 0 && (
+                    <Icon
+                        {...center}
+                        as={RiHomeSmileFill}
+                        color={'orange.400'}
+                        style={{ transform: 'translate(-50%, -100%)' }}
+                        w={8}
+                        h={8}
+                    />
+                )}
             </GoogleMap>
-        </Fragment>
+        </Box>
     )
 }

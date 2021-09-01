@@ -2,7 +2,7 @@ import { Residence } from 'entities'
 import { GetServerSidePropsContext } from 'next'
 import { Layout } from '../components/layout/layout'
 import SimpleSidebar from '../components/section/sidebar'
-import { Map } from '../components/ui/map'
+import { Map } from '../components/ui/maps/map'
 import { ResidenceCard } from '../components/ui/residenceCard'
 import {
     GetResidencesLimitDocument,
@@ -21,52 +21,16 @@ interface DiverProps {
     residences: RegularResidenceFragment[]
 }
 
-const Diver: Page<DiverProps> = ({ residences }) => {
+const Diver: Page<DiverProps> = () => {
     useIsAuth()
-    let [center, setCenter] = useState({
-        lat: 40.7969087,
-        lng: -73.96190469999999,
-    })
-    let [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setCenter({
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude,
-                })
-                setLoading(false)
-            },
-            (err) => {
-                console.log(err)
-                setLoading(false)
-            }
-        )
-    }, [])
-
-    const [hover, setHover] = useState(-1)
     return (
-        <>
-            <SimpleSidebar>
-                {residences.map((res) => (
-                    <ResidenceCard
-                        key={res.res_id}
-                        residence={res}
-                        hover={res.res_id == hover}
-                        setHover={setHover}
-                    />
-                ))}
-            </SimpleSidebar>
-            {!loading && (
-                <Map
-                    residences={residences}
-                    center={center}
-                    hover={hover}
-                    setHover={setHover}
-                />
-            )}
-        </>
+        <Map
+            withResidences
+            withSideBar
+            variant="large"
+            withSearchBar
+            searchTypes={['geocode']}
+        />
     )
 }
 

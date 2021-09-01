@@ -6,7 +6,6 @@ import {
     Input,
     InputGroup,
     InputLeftElement,
-    Icon,
 } from '@chakra-ui/react'
 import { Fragment, useEffect } from 'react'
 import { RiHomeSmileFill } from 'react-icons/ri'
@@ -15,45 +14,39 @@ const HomeIcon = chakra(RiHomeSmileFill)
 
 interface SearchBarProps {
     options: google.maps.places.AutocompleteOptions
+    searchHandler: (place: google.maps.places.PlaceResult) => void
+    variant?: 'small' | 'large'
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ options }) => {
-    let auto: google.maps.places.Autocomplete
-
-    const eventHandler = () => {
-        console.log('!')
-    }
-
+export const SearchBar: React.FC<SearchBarProps> = ({
+    options,
+    searchHandler,
+    variant,
+}) => {
     const setInputRef = (node: HTMLInputElement) => {
-        auto = new google.maps.places.Autocomplete(node, options)
-        auto.addListener('places_changed', () => {
-            console.log('!')
+        const auto = new google.maps.places.Autocomplete(node, options)
+        auto.addListener('place_changed', () => {
+            searchHandler(auto.getPlace())
         })
     }
 
-    // Update the bounds of the autocomplete
-    useEffect(() => {
-        auto.setBounds(options.bounds)
-    }, [options.bounds])
-
     return (
-        <Box w={'100%'} position={'absolute'} zIndex={'2'} top={20}>
-            <Center>
-                <InputGroup
-                    mt={20}
-                    bg={'gray.100'}
-                    px={4}
-                    boxShadow={'2xl'}
-                    rounded={'md'}
-                    zIndex={2}
-                    w={'30%'}
-                >
-                    <InputLeftElement pointerEvents="none">
-                        <SearchIcon color="gray.300" />
-                    </InputLeftElement>
-                    <Input variant={'flushed'} as={'input'} ref={setInputRef} />
-                </InputGroup>
-            </Center>
-        </Box>
+        <InputGroup
+            position={'absolute'}
+            zIndex={2}
+            left={'50%'}
+            style={{ transform: 'translate(-50%, -50%)' }}
+            mt={variant == 'small' ? '5%' : '10%'}
+            bg={'gray.100'}
+            px={4}
+            boxShadow={'2xl'}
+            rounded={'md'}
+            w={variant == 'small' ? '80%' : '30%'}
+        >
+            <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.300" />
+            </InputLeftElement>
+            <Input variant={'flushed'} as={'input'} ref={setInputRef} />
+        </InputGroup>
     )
 }
