@@ -1,27 +1,31 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { MeDocument, MeQuery } from '../generated/graphql';
+import { Layout } from '../components/layout/layout';
+import { MeDocument, MeQuery, RegularUserFragment } from '../generated/graphql';
 import { initializeApollo } from '../lib/apollo';
 import { Page } from '../types/page';
 import { useIsAuth } from '../utils/useIsAuth';
 
-const Index: Page = () => {
+interface ProfileProps {
+    me: RegularUserFragment;
+}
+
+const Profile: Page<ProfileProps> = ({ me }) => {
     useIsAuth();
-    return <div>loading...</div>;
+    return <div>Hello {me.first_name}!</div>;
 };
 
 export const getServerSideProps = async ({
     req,
     res,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<{}>> => {
+}: GetServerSidePropsContext): Promise<
+    GetServerSidePropsResult<ProfileProps>
+> => {
     const apollo = initializeApollo({
         headers: req.headers,
     });
     const meQuery = await apollo.query<MeQuery>({
         query: MeDocument,
     });
-
-    console.log(meQuery.data.me);
-
     if (meQuery.data.me.errors) {
         return {
             redirect: {
@@ -29,14 +33,22 @@ export const getServerSideProps = async ({
                 destination: '/login',
             },
         };
+    } else if (meQuery.data.me.users) {
+        return {
+            props: {
+                me: meQuery.data.me.users[0],
+            },
+        };
     } else {
         return {
             redirect: {
                 permanent: false,
-                destination: '/diver',
+                destination: '/error',
             },
         };
     }
 };
 
-export default Index;
+Profile.layout = Layout;
+
+export default Profile;

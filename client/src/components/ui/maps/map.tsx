@@ -142,6 +142,7 @@ export const Map: React.FC<MapProps> = ({
                     setApiFlag(true);
                 }}
                 onChange={(value) => {
+                    console.log(value.bounds);
                     if (!initialBounds) {
                         setInitialBounds(value.bounds);
                     } else if (initialBounds !== value.bounds) {
