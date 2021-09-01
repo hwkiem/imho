@@ -64,7 +64,7 @@ export const NavBar: React.FC = () => {
         user = data.me.users[0]
     }
     return (
-        <Center>
+        <Center zIndex={10}>
             <Box
                 mt={20}
                 bg={'gray.100'}
@@ -116,6 +116,7 @@ export const NavBar: React.FC = () => {
                             mr={4}
                             ref={btnRef}
                             onClick={async () => {
+                                console.log('!')
                                 await logout()
                                 await client.clearStore()
                                 router.push('/login')
