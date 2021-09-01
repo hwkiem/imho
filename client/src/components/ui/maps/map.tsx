@@ -22,7 +22,7 @@ import GoogleMap from 'google-map-react';
 import { useState, Fragment, useEffect } from 'react';
 import {
     RegularResidenceFragment,
-    ResidenceGql,
+    Residence,
     useGetResidencesLimitQuery,
 } from '../../../generated/graphql';
 import { Marker } from './marker';
@@ -171,7 +171,6 @@ export const Map: React.FC<MapProps> = ({
                 {withResidences &&
                     residences &&
                     residences.map((res) => {
-                        console.log('!');
                         return (
                             <Marker
                                 res_id={res.res_id}
