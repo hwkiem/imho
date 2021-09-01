@@ -1,5 +1,5 @@
 mutation Login($input: LoginInput!) {
-  login(input: $input) {
-    ...RegularUserResponse
-  }
+    login(input: $input) {
+        ...RegularUserResponse
+    }
 }

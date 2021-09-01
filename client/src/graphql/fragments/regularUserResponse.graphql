@@ -1,8 +1,8 @@
 fragment RegularUserResponse on UserResponse {
-  errors {
-    ...RegularError
-  }
-  users {
-    ...RegularUser
-  }
+    errors {
+        ...RegularError
+    }
+    users {
+        ...RegularUser
+    }
 }

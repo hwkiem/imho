@@ -35,7 +35,6 @@ export class ResidencyResolver {
         @Arg('perimeter') perimeter: GeoBoundaryInput,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        console.log(perimeter);
         if (
             perimeter.xMax < perimeter.xMin ||
             perimeter.yMax < perimeter.yMin

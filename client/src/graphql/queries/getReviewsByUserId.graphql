@@ -1,0 +1,5 @@
+query GetReviewsByUserId($user_ids: [Int!]!) {
+    getReviewsByUserId(user_ids: $user_ids) {
+        ...RegularReviewResponse
+    }
+}
