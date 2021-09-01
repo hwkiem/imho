@@ -1,5 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { ReviewGQL } from './reviews';
+import { Review } from './reviews';
 import {
     MyContext,
     PartialReview,
@@ -8,15 +8,14 @@ import {
 } from '../types';
 import { ReviewResponse, WriteReviewInput } from '../types';
 
-@Resolver(ReviewGQL)
+@Resolver(Review)
 export class ReviewResolver {
     @Mutation(() => ReviewResponse)
     async writeReview(
         @Arg('options') options: WriteReviewInput,
         @Ctx() { dataSources, req }: MyContext
     ): Promise<ReviewResponse> {
-        console.log(options);
-        if (!req.session.userId) {
+        if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         // does the residence already exist?
@@ -24,7 +23,10 @@ export class ReviewResolver {
             await dataSources.pgHandler.getResidencesObject({
                 google_place_id: options.google_place_id,
             });
-        if (getResponse.errors || !getResponse.residences) {
+        if (
+            getResponse.errors !== undefined ||
+            getResponse.residences === undefined
+        ) {
             return { errors: getResponse.errors };
         }
         let args: WriteReviewArgs;
@@ -40,31 +42,22 @@ export class ReviewResolver {
                 return { errors: createResponse.errors };
             }
             args = {
-                // rating: options.rating?,
-                // rent: options.rent,
                 user_id: req.session.userId,
                 res_id: createResponse.residences[0].res_id,
             };
-            if (options.rent) {
-                args.rent = options.rent;
-            }
-            if (options.rating) {
-                args.rent = options.rating;
-            }
         } else {
             // residence exists
             args = {
-                // rating: options.rating,
-                // rent: options.rent,
                 user_id: req.session.userId,
                 res_id: getResponse.residences[0].res_id,
             };
-            if (options.rent) {
-                args.rent = options.rent;
-            }
-            if (options.rating) {
-                args.rating = options.rating;
-            }
+        }
+        // fill optional args
+        if (options.rating !== undefined) {
+            args.rating = options.rating;
+        }
+        if (options.rent !== undefined) {
+            args.rent = options.rent;
         }
         const response = await dataSources.pgHandler.writeReview(args);
         return response;

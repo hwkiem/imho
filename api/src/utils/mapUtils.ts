@@ -2,16 +2,14 @@ import {
     GeocodeResponse,
     GeocodeResult,
 } from '@googlemaps/google-maps-services-js';
-import { ResidenceGQL } from '../Residence/residence';
+import { Residence } from '../Residence/residence';
 
 export const geoToData = (g: GeocodeResponse) => {
     return g.data.results[0];
 };
 
-export const unpackLocation = (
-    location: GeocodeResult
-): Partial<ResidenceGQL> => {
-    let r: Partial<ResidenceGQL> = {
+export const unpackLocation = (location: GeocodeResult): Partial<Residence> => {
+    let r: Partial<Residence> = {
         full_address: location.formatted_address,
     };
     if (!location.address_components) {
@@ -37,7 +35,7 @@ export const unpackLocation = (
     return r;
 };
 
-export const assembleResidence = (raw: any): ResidenceGQL[] => {
+export const assembleResidence = (raw: any): Residence[] => {
     return raw.map((r: any) => {
         const { st_x, st_y, ...res } = r;
         return { coords: { lat: st_x, lng: st_y }, ...res };

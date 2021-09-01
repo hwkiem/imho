@@ -1,9 +1,9 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { ResidenceGQL } from './residence';
+import { Residence } from './residence';
 import { MyContext, PartialResidence, PlaceIDResponse } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 
-@Resolver(ResidenceGQL)
+@Resolver(Residence)
 export class ResidencyResolver {
     @Mutation(() => ResidenceResponse)
     async createResidency(
@@ -61,20 +61,4 @@ export class ResidencyResolver {
     ): Promise<PlaceIDResponse> {
         return await dataSources.googleMapsHandler.placeIdFromAddress(address);
     }
-
-    // // get by placeID
-    // @Query(() => ResidenceGQL)
-    // async getByPlaceID(
-    //   @Arg('placeId') placeId: string,
-    //   @Ctx() { pool }: MyContext
-    // ): Promise<ResidenceGQL> {
-    //   const pg = await pool.connect();
-    //   const dbRes = await pg.query(
-    //     `SELECT residences.res_id, full_address, apt_num, street_num, route, city, state, postal_code, st_y(geog::geometry) AS lng, st_x(geog::geometry) AS lat, AVG(rating) AS avgRating, residences.created_at, residences.updated_at
-    //   FROM residences LEFT OUTER JOIN reviews on residences.res_id = reviews.res_id WHERE google_place_id = $1 GROUP BY residences.res_id`,
-    //     [placeId]
-    //   );
-    //   pg.release();
-    //   return rowsToResidences(dbRes)[0];
-    // }
 }

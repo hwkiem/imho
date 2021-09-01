@@ -1,16 +1,14 @@
-import { Client } from '@googlemaps/google-maps-services-js';
 import { Request, Response } from 'express';
-import { ObjectType, Field, InputType, Int } from 'type-graphql';
+import { ObjectType, Field, InputType, Int, Float } from 'type-graphql';
 import { googleMapsHandler } from './DataSources/mapsAPI';
 import { postgresHandler } from './dataSources/postgres';
-import { ResidenceGQL } from './Residence/residence';
-import { ReviewGQL } from './Review/reviews';
-import { UserGQL } from './User/user';
+import { Residence } from './Residence/residence';
+import { Review } from './Review/reviews';
+import { User } from './User/user';
 
 export type MyContext = {
     req: Request; //& { session: Express.Session };
     res: Response;
-    client: Client;
     dataSources: {
         pgHandler: postgresHandler;
         googleMapsHandler: googleMapsHandler;
@@ -20,7 +18,7 @@ export type MyContext = {
 // @GRAPHQL
 // @INPUT
 @InputType() // subset of User used as filter values
-export class PartialUser implements Partial<UserGQL> {
+export class PartialUser implements Partial<User> {
     @Field({ nullable: true })
     first_name?: string;
     @Field({ nullable: true })
@@ -28,7 +26,7 @@ export class PartialUser implements Partial<UserGQL> {
 }
 
 @InputType()
-export class PartialReview implements Partial<ReviewGQL> {
+export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     rating: number;
 
@@ -37,7 +35,7 @@ export class PartialReview implements Partial<ReviewGQL> {
 }
 
 @InputType()
-export class PartialResidence implements Partial<ResidenceGQL> {
+export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
     apt_num: string;
     @Field({ nullable: true })
@@ -73,6 +71,16 @@ export class LoginInput {
 }
 
 @InputType()
+export class ChangePasswordInput {
+    @Field()
+    email: string;
+    @Field()
+    old_password: string;
+    @Field()
+    new_password: string;
+}
+
+@InputType()
 export class ReviewQueryInput {
     @Field(() => [Int], { nullable: true })
     reviews?: [number];
@@ -90,7 +98,7 @@ export class WriteReviewInput {
     @Field()
     google_place_id: string;
 
-    @Field({ nullable: true })
+    @Field(() => Float, { nullable: true })
     rating?: number;
 
     @Field({ nullable: true })
@@ -107,15 +115,6 @@ export class WriteReviewArgs {
     rating?: number;
 }
 
-// use this for getReviewById?
-// @InputType()
-// export class PickReviewID implements Pick<ReviewGQL, 'res_id' | 'user_id'> {
-//   @Field()
-//   user_id: number;
-//   @Field()
-//   res_id: number;
-// }
-
 @ObjectType()
 export class FieldError {
     @Field()
@@ -129,8 +128,8 @@ export class UserResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [UserGQL], { nullable: true })
-    users?: UserGQL[];
+    @Field(() => [User], { nullable: true })
+    users?: User[];
 }
 
 @ObjectType()
@@ -138,8 +137,8 @@ export class ResidenceResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [ResidenceGQL], { nullable: true })
-    residences?: ResidenceGQL[];
+    @Field(() => [Residence], { nullable: true })
+    residences?: Residence[];
 }
 
 @ObjectType()
@@ -147,8 +146,8 @@ export class ReviewResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field(() => [ReviewGQL], { nullable: true })
-    reviews?: ReviewGQL[];
+    @Field(() => [Review], { nullable: true })
+    reviews?: Review[];
 }
 
 @ObjectType()
