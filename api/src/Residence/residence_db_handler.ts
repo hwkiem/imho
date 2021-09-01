@@ -149,18 +149,6 @@ export async function getResidencesBoundingBox(
     this: postgresHandler,
     perimeter: GeoBoundaryInput
 ): Promise<ResidenceResponse> {
-    console.log(
-        this.knexPostgis.boundingBoxContains(
-            this.knexPostgis.makeEnvelope(
-                perimeter.xMin,
-                perimeter.yMin,
-                perimeter.xMax,
-                perimeter.yMax,
-                4326
-            ),
-            this.knexPostgis.geometry('geog')
-        )
-    );
     let r: ResidenceResponse = {};
 
     await this.knex<Residence>('residences')
@@ -196,7 +184,6 @@ export async function getResidencesBoundingBox(
         )
         .groupBy('residences.res_id')
         .then((residences: any) => {
-            console.log(residences);
             r.residences = assembleResidence(residences);
         })
         .catch(

@@ -1,10 +1,11 @@
 import { Box, Button, Icon } from '@chakra-ui/react';
 import GoogleMap from 'google-map-react';
-import { useState, Fragment, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     RegularResidenceFragment,
-    Residence,
     useGetResidencesLimitQuery,
+    useGetResidencesBoundingBoxQuery,
+    GeoBoundaryInput,
 } from '../../../generated/graphql';
 import { Marker } from './marker';
 import { SearchBar } from './searchbar';
@@ -64,17 +65,32 @@ export const Map: React.FC<MapProps> = ({
 
     const [showRefresh, setShowRefresh] = useState(false);
 
+    const [initialBounds, setInitialBounds] = useState<GoogleMap.Bounds | null>(
+        null
+    );
+
+    const [currentBounds, setCurrentBounds] = useState<GoogleMap.Bounds | null>(
+        null
+    );
+
     const [residences, setResidences] = useState<RegularResidenceFragment[]>(
         []
     );
 
-    const { loading, data, error } = useGetResidencesLimitQuery({
-        variables: { limit: 10 },
+    const { loading, data, error, refetch } = useGetResidencesBoundingBoxQuery({
+        variables: {
+            perimeter: {
+                xMin: initialBounds ? initialBounds.nw.lng : -180,
+                xMax: initialBounds ? initialBounds.ne.lng : 180,
+                yMin: initialBounds ? initialBounds.se.lat : -180,
+                yMax: initialBounds ? initialBounds.ne.lat : 180,
+            },
+        },
     });
 
     useEffect(() => {
-        if (data?.getResidencesLimit.residences)
-            setResidences(data?.getResidencesLimit.residences);
+        if (data?.getResidencesBoundingBox.residences)
+            setResidences(data?.getResidencesBoundingBox.residences);
     }, [data]);
 
     const searchHandler = (place: google.maps.places.PlaceResult) => {
@@ -85,10 +101,6 @@ export const Map: React.FC<MapProps> = ({
             setCenterMarker(true);
         }
     };
-
-    let [initialBounds, setInitialBounds] = useState<GoogleMap.Bounds | null>(
-        null
-    );
 
     const [hover, setHover] = useState(-1);
 
@@ -143,10 +155,11 @@ export const Map: React.FC<MapProps> = ({
                 }}
                 onChange={(value) => {
                     console.log(value.bounds);
+                    setCurrentBounds(value.bounds);
                     if (!initialBounds) {
                         setInitialBounds(value.bounds);
-                    } else if (initialBounds !== value.bounds) {
-                        setShowRefresh(true);
+                    } else {
+                        setShowRefresh(initialBounds !== value.bounds);
                     }
                     setCenter(value.center);
                 }}
@@ -166,6 +179,7 @@ export const Map: React.FC<MapProps> = ({
                                     console.log(center);
                                     console.log(res.coords);
                                     setCenter(res.coords);
+                                    setShowRefresh(false);
                                 }}
                             />
                         );
@@ -188,6 +202,24 @@ export const Map: React.FC<MapProps> = ({
                     right={5}
                     variant={'ghost'}
                     colorScheme={'teal'}
+                    onClick={() => {
+                        refetch({
+                            perimeter: {
+                                xMin: currentBounds
+                                    ? currentBounds.nw.lng
+                                    : -180,
+                                xMax: currentBounds
+                                    ? currentBounds.ne.lng
+                                    : 180,
+                                yMin: currentBounds
+                                    ? currentBounds.se.lat
+                                    : -180,
+                                yMax: currentBounds
+                                    ? currentBounds.ne.lat
+                                    : 180,
+                            },
+                        });
+                    }}
                 >
                     Search this area
                 </Button>
