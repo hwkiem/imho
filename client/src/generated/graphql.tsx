@@ -14,6 +14,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type ChangePasswordInput = {
+  email: Scalars['String'];
+  old_password: Scalars['String'];
+  new_password: Scalars['String'];
+};
+
 export type Coords = {
   __typename?: 'Coords';
   lat: Scalars['Float'];
@@ -40,6 +46,7 @@ export type Mutation = {
   register: UserResponse;
   logout: UserResponse;
   login: UserResponse;
+  changeMyPassword: UserResponse;
   deleteUser: UserResponse;
   createResidency: ResidenceResponse;
   writeReview: ReviewResponse;
@@ -53,6 +60,11 @@ export type MutationRegisterArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInput;
+};
+
+
+export type MutationChangeMyPasswordArgs = {
+  args: ChangePasswordInput;
 };
 
 
@@ -179,8 +191,8 @@ export type RegisterInput = {
   password: Scalars['String'];
 };
 
-export type ResidenceGql = {
-  __typename?: 'ResidenceGQL';
+export type Residence = {
+  __typename?: 'Residence';
   res_id: Scalars['Float'];
   google_place_id: Scalars['String'];
   full_address: Scalars['String'];
@@ -193,6 +205,7 @@ export type ResidenceGql = {
   coords: Coords;
   avg_rating?: Maybe<Scalars['Float']>;
   avg_rent?: Maybe<Scalars['Float']>;
+  myReviews?: Maybe<Array<Review>>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -200,12 +213,12 @@ export type ResidenceGql = {
 export type ResidenceResponse = {
   __typename?: 'ResidenceResponse';
   errors?: Maybe<Array<FieldError>>;
-  residences?: Maybe<Array<ResidenceGql>>;
+  residences?: Maybe<Array<Residence>>;
 };
 
-export type ReviewGql = {
-  __typename?: 'ReviewGQL';
-  res_id: Scalars['Int'];
+export type Review = {
+  __typename?: 'Review';
+  res_id: Scalars['Float'];
   user_id: Scalars['Float'];
   rating?: Maybe<Scalars['Float']>;
   rent?: Maybe<Scalars['Float']>;
@@ -216,15 +229,17 @@ export type ReviewGql = {
 export type ReviewResponse = {
   __typename?: 'ReviewResponse';
   errors?: Maybe<Array<FieldError>>;
-  reviews?: Maybe<Array<ReviewGql>>;
+  reviews?: Maybe<Array<Review>>;
 };
 
-export type UserGql = {
-  __typename?: 'UserGQL';
+export type User = {
+  __typename?: 'User';
   user_id: Scalars['Float'];
   first_name: Scalars['String'];
   last_name: Scalars['String'];
   email: Scalars['String'];
+  profession?: Maybe<Scalars['String']>;
+  myReviews?: Maybe<Array<Review>>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
 };
@@ -232,7 +247,7 @@ export type UserGql = {
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
-  users?: Maybe<Array<UserGql>>;
+  users?: Maybe<Array<User>>;
 };
 
 export type WriteReviewInput = {
@@ -243,55 +258,55 @@ export type WriteReviewInput = {
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type RegularResidenceFragment = { __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } };
+export type RegularResidenceFragment = { __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } };
 
-export type RegularResidenceResponseFragment = { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> };
+export type RegularResidenceResponseFragment = { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> };
 
-export type RegularReviewFragment = { __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string };
+export type RegularReviewFragment = { __typename?: 'Review', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string };
 
-export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> };
+export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> };
 
-export type RegularUserFragment = { __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
+export type RegularUserFragment = { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
 
-export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> };
+export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type RegisterMutationVariables = Exact<{
   options: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type WriteReviewMutationVariables = Exact<{
   options: WriteReviewInput;
 }>;
 
 
-export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'ReviewGQL', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> } };
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rating?: Maybe<number>, rent?: Maybe<number>, created_at: string, updated_at: string }>> } };
 
 export type GetResidencesLimitQueryVariables = Exact<{
   limit: Scalars['Int'];
 }>;
 
 
-export type GetResidencesLimitQuery = { __typename?: 'Query', getResidencesLimit: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'ResidenceGQL', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
+export type GetResidencesLimitQuery = { __typename?: 'Query', getResidencesLimit: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'UserGQL', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
@@ -300,7 +315,7 @@ export const RegularErrorFragmentDoc = gql`
 }
     `;
 export const RegularResidenceFragmentDoc = gql`
-    fragment RegularResidence on ResidenceGQL {
+    fragment RegularResidence on Residence {
   res_id
   full_address
   coords {
@@ -323,7 +338,7 @@ export const RegularResidenceResponseFragmentDoc = gql`
     ${RegularErrorFragmentDoc}
 ${RegularResidenceFragmentDoc}`;
 export const RegularReviewFragmentDoc = gql`
-    fragment RegularReview on ReviewGQL {
+    fragment RegularReview on Review {
   res_id
   user_id
   rating
@@ -344,7 +359,7 @@ export const RegularReviewResponseFragmentDoc = gql`
     ${RegularErrorFragmentDoc}
 ${RegularReviewFragmentDoc}`;
 export const RegularUserFragmentDoc = gql`
-    fragment RegularUser on UserGQL {
+    fragment RegularUser on User {
   user_id
   first_name
   last_name

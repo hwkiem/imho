@@ -1,4 +1,4 @@
-fragment RegularResidence on ResidenceGQL {
+fragment RegularResidence on Residence {
     res_id
     full_address
     coords {
