@@ -11,6 +11,7 @@ import {
 } from '../User/user_db_handler';
 import {
     createResidence,
+    getResidencesBoundingBox,
     getResidencesById,
     getResidencesLimit,
     getResidencesObject,
@@ -52,6 +53,8 @@ export class postgresHandler extends SQLDataSource {
     public getResidencesObject = getResidencesObject;
 
     public getResidencesLimit = getResidencesLimit;
+
+    public getResidencesBoundingBox = getResidencesBoundingBox;
 
     // Reviews
     public writeReview = writeReview;

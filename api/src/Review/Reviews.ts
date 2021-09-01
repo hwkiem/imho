@@ -1,4 +1,6 @@
-import { ObjectType, Field, Float } from 'type-graphql';
+import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
+import { Residence } from '../Residence/residence';
+import { MyContext } from '../types';
 
 @ObjectType()
 export class Review {
@@ -13,6 +15,20 @@ export class Review {
 
     @Field({ nullable: true })
     rent?: number;
+
+    @Field(() => Residence, { nullable: true })
+    async residence(
+        @Root() review: Review,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<Residence | undefined> {
+        const res = await dataSources.pgHandler.getResidencesById([
+            review.res_id,
+        ]);
+        if (res.errors === undefined && res.residences !== undefined) {
+            return res.residences[0];
+        }
+        return;
+    }
 
     @Field(() => String)
     created_at = new Date();

@@ -1,6 +1,11 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { postgresHandler } from '../dataSources/postgres';
-import { CreateResidenceInput, FieldError, ResidenceResponse } from '../types';
+import {
+    CreateResidenceInput,
+    FieldError,
+    GeoBoundaryInput,
+    ResidenceResponse,
+} from '../types';
 import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import { Residence } from './residence';
 
@@ -20,9 +25,9 @@ export async function createResidence(
         ...unpackLocation(locationResult),
         geog: this.knexPostgis.geographyFromText(
             'Point(' +
-                locationResult.geometry.location.lat +
-                ' ' +
                 locationResult.geometry.location.lng +
+                ' ' +
+                locationResult.geometry.location.lat +
                 ')'
         ),
     };
@@ -46,12 +51,20 @@ export async function createResidence(
                         ])
                 );
         })
-        .catch(
-            (e) =>
-                (r.errors = [
+        .catch((e) => {
+            if (e.code == 23505) {
+                r.errors = [
+                    {
+                        field: 'create residence',
+                        message: 'this residence already exists',
+                    },
+                ];
+            } else {
+                r.errors = [
                     { field: 'create residence', message: e.toString() },
-                ])
-        );
+                ];
+            }
+        });
 
     return r;
 }
@@ -124,6 +137,66 @@ export async function getResidencesObject(
         .where(obj)
         .groupBy('residences.res_id')
         .then((residences: any) => {
+            r.residences = assembleResidence(residences);
+        })
+        .catch(
+            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+        );
+    return r;
+}
+
+export async function getResidencesBoundingBox(
+    this: postgresHandler,
+    perimeter: GeoBoundaryInput
+): Promise<ResidenceResponse> {
+    console.log(
+        this.knexPostgis.boundingBoxContains(
+            this.knexPostgis.makeEnvelope(
+                perimeter.xMin,
+                perimeter.yMin,
+                perimeter.xMax,
+                perimeter.yMax,
+                4326
+            ),
+            this.knexPostgis.geometry('geog')
+        )
+    );
+    let r: ResidenceResponse = {};
+
+    await this.knex<Residence>('residences')
+        .select([
+            'residences.res_id',
+            'google_place_id',
+            'full_address',
+            'apt_num',
+            'street_num',
+            'route',
+            'city',
+            'state',
+            'postal_code',
+            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
+            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
+            this.knex.raw('AVG(rating) as avg_rating'),
+            this.knex.raw('AVG(rent) as avg_rent'),
+            'residences.created_at',
+            'residences.updated_at',
+        ])
+        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+        .where(
+            this.knexPostgis.boundingBoxContains(
+                this.knexPostgis.makeEnvelope(
+                    perimeter.xMin,
+                    perimeter.yMin,
+                    perimeter.xMax,
+                    perimeter.yMax,
+                    4326
+                ),
+                this.knexPostgis.geometry('geog')
+            )
+        )
+        .groupBy('residences.res_id')
+        .then((residences: any) => {
+            console.log(residences);
             r.residences = assembleResidence(residences);
         })
         .catch(
