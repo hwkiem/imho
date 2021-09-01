@@ -63,7 +63,7 @@ export async function seed(knex: Knex): Promise<void> {
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 38.5503238 + ' ' + -121.7302551 + ')'
+                'Point(' + -121.7302551 + ' ' + 38.5503238 + ')'
             ),
         },
         {
@@ -77,7 +77,7 @@ export async function seed(knex: Knex): Promise<void> {
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 38.5483489 + ' ' + -121.7609074 + ')'
+                'Point(' + -121.7609074 + ' ' + 38.5483489 + ')'
             ),
         },
         {
@@ -91,7 +91,7 @@ export async function seed(knex: Knex): Promise<void> {
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 38.5585907 + ' ' + -121.7405625 + ')'
+                'Point(' + -121.7405625 + ' ' + 38.5585907 + ')'
             ),
         },
         {
@@ -103,7 +103,7 @@ export async function seed(knex: Knex): Promise<void> {
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + 38.5560044 + ' ' + -121.7551427 + ')'
+                'Point(' + -121.7551427 + ' ' + 38.5560044 + ')'
             ),
         },
     ]);
