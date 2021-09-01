@@ -6,6 +6,8 @@ import {
     MeQuery,
     RegularReviewFragment,
     RegularUserFragment,
+    GetReviewsByUserIdQuery,
+    GetReviewsByUserIdDocument,
 } from '../generated/graphql';
 import { initializeApollo } from '../lib/apollo';
 import { Page } from '../types/page';
@@ -13,10 +15,10 @@ import { useIsAuth } from '../utils/useIsAuth';
 
 interface ProfileProps {
     me: RegularUserFragment;
-    reviews: RegularReviewFragment;
+    reviews?: RegularReviewFragment[];
 }
 
-const Profile: Page<ProfileProps> = ({ me }) => {
+const Profile: Page<ProfileProps> = ({ me, reviews }) => {
     useIsAuth();
     return (
         <Flex minH={'100vh'} bg={'gray.50'}>
@@ -37,7 +39,14 @@ const Profile: Page<ProfileProps> = ({ me }) => {
                         Welcome Home!
                     </Heading>
                 </Box>
-                <Stack></Stack>
+                <Stack direction={'row'} spacing={10} p={2}>
+                    {reviews &&
+                        reviews.map((review) => (
+                            <Box bg={'lightblue'} h={'200px'} w={'200px'}>
+                                Review ID: {review.res_id}
+                            </Box>
+                        ))}
+                </Stack>
             </Stack>
         </Flex>
     );
@@ -63,11 +72,28 @@ export const getServerSideProps = async ({
             },
         };
     } else if (meQuery.data.me.users) {
-        return {
+        const me = meQuery.data.me.users[0];
+        const reviewQuery = apollo.query<GetReviewsByUserIdQuery>({
+            query: GetReviewsByUserIdDocument,
+            variables: { user_ids: [me.user_id] },
+        });
+        const props: GetServerSidePropsResult<ProfileProps> = {
             props: {
-                me: meQuery.data.me.users[0],
+                me: me,
             },
         };
+        const resp = (await reviewQuery).data.getReviewsByUserId;
+        if (resp) {
+            if (resp.reviews) {
+                props.props.reviews = resp.reviews;
+                return props;
+            }
+            if (resp.errors) console.log(resp.errors);
+            return props;
+        } else {
+            console.log(resp);
+            return props;
+        }
     } else {
         return {
             redirect: {

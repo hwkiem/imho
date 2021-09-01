@@ -1,8 +1,8 @@
-fragment RegularReview on ReviewGQL {
-  res_id
-  user_id
-  rating
-  rent
-  created_at
-  updated_at
+fragment RegularReview on Review {
+    res_id
+    user_id
+    rating
+    rent
+    created_at
+    updated_at
 }
