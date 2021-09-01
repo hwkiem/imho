@@ -43,7 +43,7 @@ export async function up(knex: Knex): Promise<void> {
             table.integer('res_id').references('res_id').inTable('residences');
             table.integer('user_id').references('user_id').inTable('users');
             table.unique(['user_id', 'res_id'], 'userResTuple');
-            table.integer('rating');
+            table.float('rating');
             table.integer('rent');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());

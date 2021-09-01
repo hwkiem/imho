@@ -7,13 +7,29 @@ import { Review } from './Review/reviews';
 import { User } from './User/user';
 
 export type MyContext = {
-    req: Request; //& { session: Express.Session };
+    req: Request;
     res: Response;
     dataSources: {
         pgHandler: postgresHandler;
         googleMapsHandler: googleMapsHandler;
     };
 };
+
+@ObjectType()
+export class Coords {
+    @Field()
+    lat: number;
+    @Field()
+    lng: number;
+}
+
+@InputType()
+export class InputCoords {
+    @Field()
+    lat: number;
+    @Field()
+    lng: number;
+}
 
 // @GRAPHQL
 // @INPUT
@@ -23,6 +39,14 @@ export class PartialUser implements Partial<User> {
     first_name?: string;
     @Field({ nullable: true })
     last_name?: string;
+}
+
+@InputType()
+export class AreaSearchInput {
+    @Field(() => InputCoords)
+    ne: InputCoords;
+    @Field(() => InputCoords)
+    sw: InputCoords;
 }
 
 @InputType()
@@ -37,9 +61,11 @@ export class PartialReview implements Partial<Review> {
 @InputType()
 export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
-    apt_num: string;
+    res_id: number;
     @Field({ nullable: true })
-    avg_rent: number;
+    google_place_id: string;
+    @Field({ nullable: true })
+    apt_num: string;
     @Field({ nullable: true })
     city: string;
     @Field({ nullable: true })
@@ -48,6 +74,10 @@ export class PartialResidence implements Partial<Residence> {
     route: string;
     @Field({ nullable: true })
     state: string;
+    @Field({ nullable: true })
+    avg_rent: number;
+    @Field(() => Float, { nullable: true })
+    avg_rating: number;
 }
 
 @InputType()
@@ -160,14 +190,6 @@ export class ReviewResponse {
 
     @Field(() => [Review], { nullable: true })
     reviews?: Review[];
-}
-
-@ObjectType()
-export class Coords {
-    @Field()
-    lat: number;
-    @Field()
-    lng: number;
 }
 
 @ObjectType()

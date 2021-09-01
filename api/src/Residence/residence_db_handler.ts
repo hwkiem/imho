@@ -11,12 +11,9 @@ import { Residence } from './residence';
 
 export async function createResidence(
     this: postgresHandler,
-    input: CreateResidenceInput,
-    locationFromPlaceID: (
-        place_id: string
-    ) => Promise<GeocodeResult | FieldError>
+    locationResult: GeocodeResult | FieldError,
+    input: CreateResidenceInput
 ): Promise<ResidenceResponse> {
-    const locationResult = await locationFromPlaceID(input.google_place_id);
     if (locationResult instanceof FieldError) {
         return { errors: [locationResult] };
     }
@@ -93,7 +90,6 @@ export async function getResidencesById(
             'residences.created_at',
             'residences.updated_at',
         ])
-        // .from('residences')
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where('residences.res_id', 'in', ids)
         .groupBy('residences.res_id')
@@ -112,7 +108,8 @@ export async function getResidencesById(
 
 export async function getResidencesObject(
     this: postgresHandler,
-    obj: Partial<Residence>
+    obj: Partial<Residence>,
+    limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
@@ -136,6 +133,71 @@ export async function getResidencesObject(
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(obj)
         .groupBy('residences.res_id')
+        .limit(limit)
+        .then((residences: any) => {
+            r.residences = assembleResidence(residences);
+        })
+        .catch(
+            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+        );
+    return r;
+}
+
+export async function getResidencesNearArea(
+    this: postgresHandler,
+    obj: Partial<Residence>,
+    locationResult: GeocodeResult,
+    limit: number = 10
+): Promise<ResidenceResponse> {
+    this.knexPostgis.distance(
+        this.knexPostgis.geometry('geog'),
+        this.knexPostgis.point(
+            locationResult.geometry.location.lng,
+            locationResult.geometry.location.lat
+        )
+    );
+
+    let r: ResidenceResponse = {};
+    await this.knex<Residence>('residences')
+        .select([
+            'residences.res_id',
+            'google_place_id',
+            'full_address',
+            'apt_num',
+            'street_num',
+            'route',
+            'city',
+            'state',
+            'postal_code',
+            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
+            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
+            this.knex.raw('AVG(rating) as avg_rating'),
+            this.knex.raw('AVG(rent) as avg_rent'),
+            'residences.created_at',
+            'residences.updated_at',
+        ])
+        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+        .where(obj)
+        .groupBy('residences.res_id')
+        .orderByRaw(
+            "residences.geog <-> 'POINT(" +
+                locationResult.geometry.location.lng +
+                ' ' +
+                locationResult.geometry.location.lat +
+                ")'::geometry"
+        )
+        // .orderByRaw(this.knexPostgis.asText(this.knexPostgis.distance(this.knexPostgis.geometry('geog'), this.knexPostgis.point(locationResult.geometry.location.lng, locationResult.geometry.location.lat))))
+        // this.knex.raw(
+        //     this.knexPostgis.distance()
+        //     this.knexPostgis.asText(this.knexPostgis.geometry('geog')) +
+        //         this.knexPostgis.asText(
+        //             this.knexPostgis.point(
+        //                 locationResult.geometry.location.lng,
+        //                 locationResult.geometry.location.lat
+        //             )
+        //         )
+        // )
+        .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);
         })

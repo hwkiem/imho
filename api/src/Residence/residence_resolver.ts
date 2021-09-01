@@ -1,12 +1,14 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Residence } from './residence';
 import {
-    GeoBoundaryInput,
+    AreaSearchInput,
+    FieldError,
     MyContext,
     PartialResidence,
     PlaceIDResponse,
 } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
+import { unpackLocation } from '../utils/mapUtils';
 
 @Resolver(Residence)
 export class ResidencyResolver {
@@ -16,8 +18,10 @@ export class ResidencyResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         const response = await dataSources.pgHandler.createResidence(
-            options,
-            dataSources.googleMapsHandler.locationFromPlaceID
+            await dataSources.googleMapsHandler.locationFromPlaceID(
+                options.google_place_id
+            ),
+            options
         );
         return response;
     }
@@ -32,17 +36,35 @@ export class ResidencyResolver {
 
     @Query(() => ResidenceResponse)
     async getResidencesBoundingBox(
-        @Arg('perimeter') perimeter: GeoBoundaryInput,
+        @Arg('corners') corners: AreaSearchInput,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        console.log(perimeter);
-        if (
-            perimeter.xMax < perimeter.xMin ||
-            perimeter.yMax < perimeter.yMin
-        ) {
-            return { errors: [{ field: 'input', message: 'malformed query' }] };
+        return await dataSources.pgHandler.getResidencesBoundingBox({
+            xMax: corners.ne.lng,
+            xMin: corners.sw.lng,
+            yMax: corners.ne.lat,
+            yMin: corners.sw.lat,
+        });
+    }
+
+    @Query(() => ResidenceResponse)
+    async getResidencesByGeoScope(
+        @Arg('place_id') place_id: string,
+        @Arg('limit', { nullable: true }) limit: number,
+        @Ctx()
+        { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        const locationResult =
+            await dataSources.googleMapsHandler.locationFromPlaceID(place_id);
+        if (locationResult instanceof FieldError) {
+            return { errors: [locationResult] };
         }
-        return await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
+        const { full_address, ...args } = unpackLocation(locationResult);
+        return await dataSources.pgHandler.getResidencesNearArea(
+            args,
+            locationResult,
+            limit
+        );
     }
 
     @Query(() => ResidenceResponse)
@@ -64,7 +86,7 @@ export class ResidencyResolver {
         });
     }
 
-    @Query(() => ResidenceResponse) // return number of rows returned? everywhere?
+    @Query(() => ResidenceResponse)
     async getResidencesObjectFilter(
         @Arg('obj') obj: PartialResidence,
         @Ctx() { dataSources }: MyContext

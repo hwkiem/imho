@@ -14,6 +14,7 @@ import {
     getResidencesBoundingBox,
     getResidencesById,
     getResidencesLimit,
+    getResidencesNearArea,
     getResidencesObject,
 } from '../Residence/residence_db_handler';
 import {
@@ -55,6 +56,8 @@ export class postgresHandler extends SQLDataSource {
     public getResidencesLimit = getResidencesLimit;
 
     public getResidencesBoundingBox = getResidencesBoundingBox;
+
+    public getResidencesNearArea = getResidencesNearArea;
 
     // Reviews
     public writeReview = writeReview;
