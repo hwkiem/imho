@@ -96,12 +96,12 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             google_place_id: 'ChIJa4E1i7AphYAROy3Ai_nYWhA',
-            full_address: '1162 Villaverde Ln, Davis, CA 95618, USA',
-            street_num: '1162',
-            route: 'Villaverde Lane',
+            full_address: '539 Villanova Dr, Davis, CA 95616, USA',
+            street_num: '539',
+            route: 'Villanova Drive',
             city: 'Davis',
             state: 'California',
-            postal_code: '95618',
+            postal_code: '95616',
             geog: knexPostgis.geographyFromText(
                 'Point(' + 38.5560044 + ' ' + -121.7551427 + ')'
             ),
