@@ -3,6 +3,7 @@ fragment RegularReview on Review {
     user_id
     rating
     rent
+    place_id
     created_at
     updated_at
 }
