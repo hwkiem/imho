@@ -6,6 +6,7 @@ import {
     MyContext,
     PartialResidence,
     PlaceIDResponse,
+    ResidenceSortByInput,
 } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
 import { unpackLocation } from '../utils/mapUtils';
@@ -68,14 +69,6 @@ export class ResidencyResolver {
         );
     }
 
-    @Query(() => ResidenceResponse)
-    async getResidencesLimit(
-        @Arg('limit', () => Int) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesLimit(limit);
-    }
-
     // get by placeID
     @Query(() => ResidenceResponse)
     async getResidencesFromPlaceId(
@@ -88,11 +81,39 @@ export class ResidencyResolver {
     }
 
     @Query(() => ResidenceResponse)
-    async getResidencesObjectFilter(
+    async getResidencesSortBy(
         @Arg('obj') obj: PartialResidence,
+        @Arg('sort_params', { nullable: true }) params: ResidenceSortByInput,
+        @Arg('limit', { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesObject(obj);
+        const a = ['avg_rent', 'avg_rating'];
+        const b = ['asc', 'desc'];
+        if (!a.includes(params.attribute) || !b.includes(params.sort)) {
+            return {
+                errors: [
+                    {
+                        field: 'sort_params',
+                        message:
+                            'attribute one of ' + a + ' and sort one of ' + b,
+                    },
+                ],
+            };
+        }
+        return await dataSources.pgHandler.getResidencesSortBy(
+            obj,
+            params,
+            limit
+        );
+    }
+
+    @Query(() => ResidenceResponse)
+    async getResidencesObjectFilter(
+        @Arg('obj') obj: PartialResidence,
+        @Arg('limit', { nullable: true }) limit: number,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        return await dataSources.pgHandler.getResidencesObject(obj, limit);
     }
 
     // just for dev

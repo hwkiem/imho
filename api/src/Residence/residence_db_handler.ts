@@ -5,6 +5,7 @@ import {
     FieldError,
     GeoBoundaryInput,
     ResidenceResponse,
+    ResidenceSortByInput,
 } from '../types';
 import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import { Residence } from './residence';
@@ -85,8 +86,8 @@ export async function getResidencesById(
             'postal_code',
             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
+            this.knex.avg('rating').as('avg_rating'),
+            this.knex.avg('rent').as('avg_rent'),
             'residences.created_at',
             'residences.updated_at',
         ])
@@ -125,8 +126,8 @@ export async function getResidencesObject(
             'postal_code',
             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
+            this.knex.avg('rating').as('avg_rating'),
+            this.knex.avg('rent').as('avg_rent'),
             'residences.created_at',
             'residences.updated_at',
         ])
@@ -163,8 +164,8 @@ export async function getResidencesNearArea(
             'postal_code',
             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
+            this.knex.avg('rating').as('avg_rating'),
+            this.knex.avg('rent').as('avg_rent'),
             'residences.created_at',
             'residences.updated_at',
         ])
@@ -190,7 +191,8 @@ export async function getResidencesNearArea(
 
 export async function getResidencesBoundingBox(
     this: postgresHandler,
-    perimeter: GeoBoundaryInput
+    perimeter: GeoBoundaryInput,
+    limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
 
@@ -207,8 +209,8 @@ export async function getResidencesBoundingBox(
             'postal_code',
             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
+            this.knex.avg('rating').as('avg_rating'),
+            this.knex.avg('rent').as('avg_rent'),
             'residences.created_at',
             'residences.updated_at',
         ])
@@ -226,6 +228,7 @@ export async function getResidencesBoundingBox(
             )
         )
         .groupBy('residences.res_id')
+        .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);
         })
@@ -235,9 +238,11 @@ export async function getResidencesBoundingBox(
     return r;
 }
 
-export async function getResidencesLimit(
+export async function getResidencesSortBy(
     this: postgresHandler,
-    limit: number
+    obj: Partial<Residence>,
+    params: ResidenceSortByInput,
+    limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
@@ -253,13 +258,16 @@ export async function getResidencesLimit(
             'postal_code',
             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
+            this.knex.avg('rating').as('avg_rating'),
+            this.knex.avg('rent').as('avg_rent'),
             'residences.created_at',
             'residences.updated_at',
         ])
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+        .where(obj)
+        .whereNotNull(params.attribute == 'avg_rent' ? 'rent' : 'rating')
         .groupBy('residences.res_id')
+        .orderBy(params.attribute, params.sort)
         .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);

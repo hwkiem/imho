@@ -43,6 +43,14 @@ export class PartialReview implements Partial<Review> {
 }
 
 @InputType()
+export class ResidenceSortByInput {
+    @Field()
+    attribute: string;
+    @Field()
+    sort: string;
+}
+
+@InputType()
 export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
     res_id: number;
@@ -51,11 +59,13 @@ export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
     apt_num: string;
     @Field({ nullable: true })
+    street_num: string;
+    @Field({ nullable: true })
+    route: string;
+    @Field({ nullable: true })
     city: string;
     @Field({ nullable: true })
     postal_code: string;
-    @Field({ nullable: true })
-    route: string;
     @Field({ nullable: true })
     state: string;
     @Field({ nullable: true })

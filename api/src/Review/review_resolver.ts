@@ -89,19 +89,12 @@ export class ReviewResolver {
         return await dataSources.pgHandler.getReviewsByResidenceId(ids);
     }
 
-    @Query(() => ReviewResponse)
-    async getReviewsLimit(
-        @Arg('limit', () => Int) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ReviewResponse> {
-        return await dataSources.pgHandler.getReviewsLimit(limit);
-    }
-
     @Query(() => ReviewResponse) // return number of rows returned? everywhere?
     async getReviewsObjFilter(
         @Arg('obj') obj: PartialReview,
+        @Arg('limit', { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
-        return await dataSources.pgHandler.getReviewsObject(obj);
+        return await dataSources.pgHandler.getReviewsObject(obj, limit);
     }
 }

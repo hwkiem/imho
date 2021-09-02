@@ -7,9 +7,9 @@ for i in $(cat ../../../.env); do
 export $i;
 done;
 sleep 5;
-echo rollback
+echo ... rollback
 yarn run migrate:rollback
-echo rollforward
+echo ... migrate
 yarn run migrate:latest
-echo seed
+echo ... seeding
 yarn run seed:run
