@@ -186,65 +186,7 @@ export async function getResidencesNearArea(
                 locationResult.geometry.location.lat +
                 ")'::geometry"
         )
-        // .orderByRaw(this.knexPostgis.asText(this.knexPostgis.distance(this.knexPostgis.geometry('geog'), this.knexPostgis.point(locationResult.geometry.location.lng, locationResult.geometry.location.lat))))
-        // this.knex.raw(
-        //     this.knexPostgis.distance()
-        //     this.knexPostgis.asText(this.knexPostgis.geometry('geog')) +
-        //         this.knexPostgis.asText(
-        //             this.knexPostgis.point(
-        //                 locationResult.geometry.location.lng,
-        //                 locationResult.geometry.location.lat
-        //             )
-        //         )
-        // )
         .limit(limit)
-        .then((residences: any) => {
-            r.residences = assembleResidence(residences);
-        })
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
-    return r;
-}
-
-export async function getResidencesBoundingBox(
-    this: postgresHandler,
-    perimeter: GeoBoundaryInput
-): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
-
-    await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.raw('AVG(rating) as avg_rating'),
-            this.knex.raw('AVG(rent) as avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
-        .where(
-            this.knexPostgis.boundingBoxContains(
-                this.knexPostgis.makeEnvelope(
-                    perimeter.xMin,
-                    perimeter.yMin,
-                    perimeter.xMax,
-                    perimeter.yMax,
-                    4326
-                ),
-                this.knexPostgis.geometry('geog')
-            )
-        )
-        .groupBy('residences.res_id')
         .then((residences: any) => {
             r.residences = assembleResidence(residences);
         })
