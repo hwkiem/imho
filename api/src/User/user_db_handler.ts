@@ -35,12 +35,14 @@ export async function getUsersLimit(
 
 export async function getUsersObject(
     this: postgresHandler,
-    obj: Partial<User>
+    obj: Partial<User>,
+    limit: number = 10
 ): Promise<UserResponse> {
     let r: UserResponse = {};
     await this.knex<User>('users')
         .select('*')
         .where(obj)
+        .limit(limit)
         .then((users) => (r.users = users))
         .catch(
             (e) => (r.errors = [{ field: 'query user', message: e.toString() }])

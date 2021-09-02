@@ -13,13 +13,13 @@ import {
     createResidence,
     getResidencesBoundingBox,
     getResidencesById,
-    getResidencesLimit,
+    getResidencesNearArea,
     getResidencesObject,
+    getResidencesSortBy,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByResidenceId,
     getReviewsByUserId,
-    getReviewsLimit,
     getReviewsObject,
     writeReview,
 } from '../Review/review_db_handler';
@@ -52,9 +52,11 @@ export class postgresHandler extends SQLDataSource {
 
     public getResidencesObject = getResidencesObject;
 
-    public getResidencesLimit = getResidencesLimit;
-
     public getResidencesBoundingBox = getResidencesBoundingBox;
+
+    public getResidencesNearArea = getResidencesNearArea;
+
+    public getResidencesSortBy = getResidencesSortBy;
 
     // Reviews
     public writeReview = writeReview;
@@ -62,8 +64,6 @@ export class postgresHandler extends SQLDataSource {
     public getReviewsByUserId = getReviewsByUserId;
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
-
-    public getReviewsLimit = getReviewsLimit;
 
     public getReviewsObject = getReviewsObject;
 }

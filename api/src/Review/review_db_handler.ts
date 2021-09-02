@@ -61,30 +61,16 @@ export async function getReviewsByResidenceId(
     return r;
 }
 
-export async function getReviewsLimit(
-    this: postgresHandler,
-    limit: number
-): Promise<ReviewResponse> {
-    let r: ReviewResponse = {};
-    await this.knex<Review>('reviews')
-        .select('*')
-        .limit(limit)
-        .then((reviews) => (r.reviews = reviews))
-        .catch(
-            (e) =>
-                (r.errors = [{ field: 'query review', message: e.toString() }])
-        );
-    return r;
-}
-
 export async function getReviewsObject(
     this: postgresHandler,
-    obj: Partial<Review>
+    obj: Partial<Review>,
+    limit: number = 10
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select('*')
         .where(obj)
+        .limit(limit)
         .then((reviews) => (r.reviews = reviews))
         .catch(
             (e) =>

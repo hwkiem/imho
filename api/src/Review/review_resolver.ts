@@ -1,6 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Review } from './reviews';
 import {
+    FieldError,
     MyContext,
     PartialReview,
     ResidenceResponse,
@@ -32,11 +33,18 @@ export class ReviewResolver {
         let args: WriteReviewArgs;
         if (getResponse.residences.length == 0) {
             // residence does not exist, create
+            const locationResult =
+                await dataSources.googleMapsHandler.locationFromPlaceID(
+                    options.google_place_id
+                );
+            if (locationResult instanceof FieldError) {
+                return { errors: [locationResult] };
+            }
             const createResponse = await dataSources.pgHandler.createResidence(
+                locationResult,
                 {
                     google_place_id: options.google_place_id,
-                },
-                dataSources.googleMapsHandler.locationFromPlaceID
+                }
             );
             if (createResponse.errors || !createResponse.residences) {
                 return { errors: createResponse.errors };
@@ -81,19 +89,12 @@ export class ReviewResolver {
         return await dataSources.pgHandler.getReviewsByResidenceId(ids);
     }
 
-    @Query(() => ReviewResponse)
-    async getReviewsLimit(
-        @Arg('limit', () => Int) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ReviewResponse> {
-        return await dataSources.pgHandler.getReviewsLimit(limit);
-    }
-
     @Query(() => ReviewResponse) // return number of rows returned? everywhere?
     async getReviewsObjFilter(
         @Arg('obj') obj: PartialReview,
+        @Arg('limit', { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
-        return await dataSources.pgHandler.getReviewsObject(obj);
+        return await dataSources.pgHandler.getReviewsObject(obj, limit);
     }
 }

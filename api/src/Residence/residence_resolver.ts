@@ -1,12 +1,15 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Residence } from './residence';
 import {
+    FieldError,
     GeoBoundaryInput,
     MyContext,
     PartialResidence,
     PlaceIDResponse,
+    ResidenceSortByInput,
 } from '../types';
 import { CreateResidenceInput, ResidenceResponse } from '../types';
+import { unpackLocation } from '../utils/mapUtils';
 
 @Resolver(Residence)
 export class ResidencyResolver {
@@ -16,8 +19,10 @@ export class ResidencyResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         const response = await dataSources.pgHandler.createResidence(
-            options,
-            dataSources.googleMapsHandler.locationFromPlaceID
+            await dataSources.googleMapsHandler.locationFromPlaceID(
+                options.google_place_id
+            ),
+            options
         );
         return response;
     }
@@ -45,11 +50,23 @@ export class ResidencyResolver {
     }
 
     @Query(() => ResidenceResponse)
-    async getResidencesLimit(
-        @Arg('limit', () => Int) limit: number,
-        @Ctx() { dataSources }: MyContext
+    async getResidencesByGeoScope(
+        @Arg('place_id') place_id: string,
+        @Arg('limit', { nullable: true }) limit: number,
+        @Ctx()
+        { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesLimit(limit);
+        const locationResult =
+            await dataSources.googleMapsHandler.locationFromPlaceID(place_id);
+        if (locationResult instanceof FieldError) {
+            return { errors: [locationResult] };
+        }
+        const { full_address, ...args } = unpackLocation(locationResult);
+        return await dataSources.pgHandler.getResidencesNearArea(
+            args,
+            locationResult,
+            limit
+        );
     }
 
     // get by placeID
@@ -63,12 +80,40 @@ export class ResidencyResolver {
         });
     }
 
-    @Query(() => ResidenceResponse) // return number of rows returned? everywhere?
-    async getResidencesObjectFilter(
+    @Query(() => ResidenceResponse)
+    async getResidencesSortBy(
         @Arg('obj') obj: PartialResidence,
+        @Arg('sort_params', { nullable: true }) params: ResidenceSortByInput,
+        @Arg('limit', { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesObject(obj);
+        const a = ['avg_rent', 'avg_rating'];
+        const b = ['asc', 'desc'];
+        if (!a.includes(params.attribute) || !b.includes(params.sort)) {
+            return {
+                errors: [
+                    {
+                        field: 'sort_params',
+                        message:
+                            'attribute one of ' + a + ' and sort one of ' + b,
+                    },
+                ],
+            };
+        }
+        return await dataSources.pgHandler.getResidencesSortBy(
+            obj,
+            params,
+            limit
+        );
+    }
+
+    @Query(() => ResidenceResponse)
+    async getResidencesObjectFilter(
+        @Arg('obj') obj: PartialResidence,
+        @Arg('limit', { nullable: true }) limit: number,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        return await dataSources.pgHandler.getResidencesObject(obj, limit);
     }
 
     // just for dev

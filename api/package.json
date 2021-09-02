@@ -10,6 +10,7 @@
         "watch": "tsc -w",
         "start": "dotenv nodemon ./dist/index.js",
         "load": "src/database/scripts/migration-load-env.sh",
+        "migrate:all": "src/database/scripts/migration-reload.sh",
         "migrate:make": "knex --knexfile src/database/knexfile.ts migrate:make -x ts",
         "migrate:latest": "knex --knexfile src/database/knexfile.ts migrate:latest",
         "migrate:rollback": "knex --knexfile src/database/knexfile.ts migrate:rollback",
