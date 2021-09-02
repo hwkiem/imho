@@ -90,12 +90,16 @@ export type MutationWriteReviewArgs = {
 };
 
 export type PartialResidence = {
+  res_id?: Maybe<Scalars['Float']>;
+  google_place_id?: Maybe<Scalars['String']>;
   apt_num?: Maybe<Scalars['String']>;
-  avg_rent?: Maybe<Scalars['Float']>;
+  street_num?: Maybe<Scalars['String']>;
+  route?: Maybe<Scalars['String']>;
   city?: Maybe<Scalars['String']>;
   postal_code?: Maybe<Scalars['String']>;
-  route?: Maybe<Scalars['String']>;
   state?: Maybe<Scalars['String']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  avg_rating?: Maybe<Scalars['Float']>;
 };
 
 export type PartialReview = {
@@ -118,17 +122,16 @@ export type Query = {
   __typename?: 'Query';
   me: UserResponse;
   getUsersbyId: UserResponse;
-  getUsersLimit: UserResponse;
   getUsersObjFilter: UserResponse;
   getResidencesById: ResidenceResponse;
   getResidencesBoundingBox: ResidenceResponse;
-  getResidencesLimit: ResidenceResponse;
+  getResidencesByGeoScope: ResidenceResponse;
   getResidencesFromPlaceId: ResidenceResponse;
+  getResidencesSortBy: ResidenceResponse;
   getResidencesObjectFilter: ResidenceResponse;
   placeIdFromAddress: PlaceIdResponse;
   getReviewsByUserId: ReviewResponse;
   getReviewsByResidenceId: ReviewResponse;
-  getReviewsLimit: ReviewResponse;
   getReviewsObjFilter: ReviewResponse;
 };
 
@@ -138,12 +141,8 @@ export type QueryGetUsersbyIdArgs = {
 };
 
 
-export type QueryGetUsersLimitArgs = {
-  limit: Scalars['Int'];
-};
-
-
 export type QueryGetUsersObjFilterArgs = {
+  limit?: Maybe<Scalars['Float']>;
   obj: PartialUser;
 };
 
@@ -158,8 +157,9 @@ export type QueryGetResidencesBoundingBoxArgs = {
 };
 
 
-export type QueryGetResidencesLimitArgs = {
-  limit: Scalars['Int'];
+export type QueryGetResidencesByGeoScopeArgs = {
+  limit?: Maybe<Scalars['Float']>;
+  place_id: Scalars['String'];
 };
 
 
@@ -168,7 +168,15 @@ export type QueryGetResidencesFromPlaceIdArgs = {
 };
 
 
+export type QueryGetResidencesSortByArgs = {
+  limit?: Maybe<Scalars['Float']>;
+  sort_params?: Maybe<ResidenceSortByInput>;
+  obj: PartialResidence;
+};
+
+
 export type QueryGetResidencesObjectFilterArgs = {
+  limit?: Maybe<Scalars['Float']>;
   obj: PartialResidence;
 };
 
@@ -188,12 +196,8 @@ export type QueryGetReviewsByResidenceIdArgs = {
 };
 
 
-export type QueryGetReviewsLimitArgs = {
-  limit: Scalars['Int'];
-};
-
-
 export type QueryGetReviewsObjFilterArgs = {
+  limit?: Maybe<Scalars['Float']>;
   obj: PartialReview;
 };
 
@@ -227,6 +231,11 @@ export type ResidenceResponse = {
   __typename?: 'ResidenceResponse';
   errors?: Maybe<Array<FieldError>>;
   residences?: Maybe<Array<Residence>>;
+};
+
+export type ResidenceSortByInput = {
+  attribute: Scalars['String'];
+  sort: Scalars['String'];
 };
 
 export type Review = {
@@ -310,19 +319,20 @@ export type WriteReviewMutationVariables = Exact<{
 
 export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number }>> } };
 
-export type GetResidencesLimitQueryVariables = Exact<{
-  limit: Scalars['Int'];
-}>;
-
-
-export type GetResidencesLimitQuery = { __typename?: 'Query', getResidencesLimit: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
-
 export type GetResidencesBoundingBoxQueryVariables = Exact<{
   perimeter: GeoBoundaryInput;
 }>;
 
 
 export type GetResidencesBoundingBoxQuery = { __typename?: 'Query', getResidencesBoundingBox: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
+
+export type GetResidencesByGeoScopeQueryVariables = Exact<{
+  limit?: Maybe<Scalars['Float']>;
+  place_id: Scalars['String'];
+}>;
+
+
+export type GetResidencesByGeoScopeQuery = { __typename?: 'Query', getResidencesByGeoScope: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
 
 export type GetReviewsByUserIdQueryVariables = Exact<{
   user_ids: Array<Scalars['Int']> | Scalars['Int'];
@@ -534,41 +544,6 @@ export function useWriteReviewMutation(baseOptions?: Apollo.MutationHookOptions<
 export type WriteReviewMutationHookResult = ReturnType<typeof useWriteReviewMutation>;
 export type WriteReviewMutationResult = Apollo.MutationResult<WriteReviewMutation>;
 export type WriteReviewMutationOptions = Apollo.BaseMutationOptions<WriteReviewMutation, WriteReviewMutationVariables>;
-export const GetResidencesLimitDocument = gql`
-    query GetResidencesLimit($limit: Int!) {
-  getResidencesLimit(limit: $limit) {
-    ...RegularResidenceResponse
-  }
-}
-    ${RegularResidenceResponseFragmentDoc}`;
-
-/**
- * __useGetResidencesLimitQuery__
- *
- * To run a query within a React component, call `useGetResidencesLimitQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetResidencesLimitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetResidencesLimitQuery({
- *   variables: {
- *      limit: // value for 'limit'
- *   },
- * });
- */
-export function useGetResidencesLimitQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>(GetResidencesLimitDocument, options);
-      }
-export function useGetResidencesLimitLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>(GetResidencesLimitDocument, options);
-        }
-export type GetResidencesLimitQueryHookResult = ReturnType<typeof useGetResidencesLimitQuery>;
-export type GetResidencesLimitLazyQueryHookResult = ReturnType<typeof useGetResidencesLimitLazyQuery>;
-export type GetResidencesLimitQueryResult = Apollo.QueryResult<GetResidencesLimitQuery, GetResidencesLimitQueryVariables>;
 export const GetResidencesBoundingBoxDocument = gql`
     query GetResidencesBoundingBox($perimeter: GeoBoundaryInput!) {
   getResidencesBoundingBox(perimeter: $perimeter) {
@@ -604,6 +579,42 @@ export function useGetResidencesBoundingBoxLazyQuery(baseOptions?: Apollo.LazyQu
 export type GetResidencesBoundingBoxQueryHookResult = ReturnType<typeof useGetResidencesBoundingBoxQuery>;
 export type GetResidencesBoundingBoxLazyQueryHookResult = ReturnType<typeof useGetResidencesBoundingBoxLazyQuery>;
 export type GetResidencesBoundingBoxQueryResult = Apollo.QueryResult<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>;
+export const GetResidencesByGeoScopeDocument = gql`
+    query GetResidencesByGeoScope($limit: Float, $place_id: String!) {
+  getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
+    ...RegularResidenceResponse
+  }
+}
+    ${RegularResidenceResponseFragmentDoc}`;
+
+/**
+ * __useGetResidencesByGeoScopeQuery__
+ *
+ * To run a query within a React component, call `useGetResidencesByGeoScopeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetResidencesByGeoScopeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetResidencesByGeoScopeQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      place_id: // value for 'place_id'
+ *   },
+ * });
+ */
+export function useGetResidencesByGeoScopeQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>(GetResidencesByGeoScopeDocument, options);
+      }
+export function useGetResidencesByGeoScopeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>(GetResidencesByGeoScopeDocument, options);
+        }
+export type GetResidencesByGeoScopeQueryHookResult = ReturnType<typeof useGetResidencesByGeoScopeQuery>;
+export type GetResidencesByGeoScopeLazyQueryHookResult = ReturnType<typeof useGetResidencesByGeoScopeLazyQuery>;
+export type GetResidencesByGeoScopeQueryResult = Apollo.QueryResult<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>;
 export const GetReviewsByUserIdDocument = gql`
     query GetReviewsByUserId($user_ids: [Int!]!) {
   getReviewsByUserId(user_ids: $user_ids) {

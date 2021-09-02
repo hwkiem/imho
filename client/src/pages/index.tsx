@@ -20,7 +20,7 @@ export const getServerSideProps = async ({
         query: MeDocument,
     });
 
-    console.log(meQuery.data.me);
+    console.log(meQuery.data.me.users);
 
     if (meQuery.data.me.errors) {
         return {
