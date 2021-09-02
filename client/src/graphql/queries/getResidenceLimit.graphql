@@ -1,5 +1,0 @@
-query GetResidencesLimit($limit: Int!) {
-    getResidencesLimit(limit: $limit) {
-        ...RegularResidenceResponse
-    }
-}

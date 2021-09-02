@@ -3,3 +3,4 @@ query GetResidencesBoundingBox($perimeter: GeoBoundaryInput!) {
         ...RegularResidenceResponse
     }
 }
+#
