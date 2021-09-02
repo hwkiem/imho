@@ -1,29 +1,11 @@
-/**
- * MAP REFACTOR
- *
- * Props:
- *  withResidences: true | false
- *      Fetches and renders any relevant residences.
- *          true: used for diver to display residences. Searching will update
- *          these residences in sidebar
- *  withAutoComplete: true | false (exclusive w search bar?)
- *      used for referencing autocomplete to map in a different component
- *  withSearchBar: true | false (exclusive w AutoComplete? Restricted to large)
- *      Renders a search bar ON the map
- *  withSideBar: true | false
- *      Renders a sidebar ON the map
- *  fixed: true | false
- *      Established controls - panning/zooming/dragging are disabled when fixed
- *
- */
-
-import { Box, Icon } from '@chakra-ui/react';
+import { Box, Button, Icon } from '@chakra-ui/react';
 import GoogleMap from 'google-map-react';
-import { useState, Fragment, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     RegularResidenceFragment,
-    ResidenceGql,
     useGetResidencesLimitQuery,
+    useGetResidencesBoundingBoxQuery,
+    GeoBoundaryInput,
 } from '../../../generated/graphql';
 import { Marker } from './marker';
 import { SearchBar } from './searchbar';
@@ -50,21 +32,11 @@ type ResidenceProps =
 
 type AutoCompleteProps =
     | {
-          withAutoComplete?: false;
           withSearchBar?: false;
           searchTypes?: never;
-          ref?: never;
       }
     | {
-          withAutoComplete: true;
-          ref: HTMLInputElement | null;
-          withSearchBar?: never;
-          searchTypes: SearchTypes[];
-      }
-    | {
-          withAutoComplete?: never;
           withSearchBar: true;
-          ref?: never;
           searchTypes: SearchTypes[];
       };
 
@@ -91,17 +63,34 @@ export const Map: React.FC<MapProps> = ({
     // Used to render components that need API conditionally
     const [apiFlag, setApiFlag] = useState(false);
 
+    const [showRefresh, setShowRefresh] = useState(false);
+
+    const [initialBounds, setInitialBounds] = useState<GoogleMap.Bounds | null>(
+        null
+    );
+
+    const [currentBounds, setCurrentBounds] = useState<GoogleMap.Bounds | null>(
+        null
+    );
+
     const [residences, setResidences] = useState<RegularResidenceFragment[]>(
         []
     );
 
-    const { loading, data, error } = useGetResidencesLimitQuery({
-        variables: { limit: 10 },
+    const { loading, data, error, refetch } = useGetResidencesBoundingBoxQuery({
+        variables: {
+            perimeter: {
+                xMin: initialBounds ? initialBounds.nw.lng : -180,
+                xMax: initialBounds ? initialBounds.ne.lng : 180,
+                yMin: initialBounds ? initialBounds.se.lat : -180,
+                yMax: initialBounds ? initialBounds.ne.lat : 180,
+            },
+        },
     });
 
     useEffect(() => {
-        if (data?.getResidencesLimit.residences)
-            setResidences(data?.getResidencesLimit.residences);
+        if (data?.getResidencesBoundingBox.residences)
+            setResidences(data?.getResidencesBoundingBox.residences);
     }, [data]);
 
     const searchHandler = (place: google.maps.places.PlaceResult) => {
@@ -166,12 +155,18 @@ export const Map: React.FC<MapProps> = ({
                 }}
                 onChange={(value) => {
                     console.log(value.bounds);
+                    setCurrentBounds(value.bounds);
+                    if (!initialBounds) {
+                        setInitialBounds(value.bounds);
+                    } else {
+                        setShowRefresh(initialBounds !== value.bounds);
+                    }
+                    setCenter(value.center);
                 }}
             >
                 {withResidences &&
                     residences &&
                     residences.map((res) => {
-                        console.log('!');
                         return (
                             <Marker
                                 res_id={res.res_id}
@@ -181,7 +176,10 @@ export const Map: React.FC<MapProps> = ({
                                 hover={hover == res.res_id}
                                 setHover={setHover}
                                 onClick={() => {
+                                    console.log(center);
+                                    console.log(res.coords);
                                     setCenter(res.coords);
+                                    setShowRefresh(false);
                                 }}
                             />
                         );
@@ -197,6 +195,35 @@ export const Map: React.FC<MapProps> = ({
                     />
                 )}
             </GoogleMap>
+            {showRefresh && (
+                <Button
+                    position={'absolute'}
+                    bottom={5}
+                    right={5}
+                    variant={'ghost'}
+                    colorScheme={'teal'}
+                    onClick={() => {
+                        refetch({
+                            perimeter: {
+                                xMin: currentBounds
+                                    ? currentBounds.nw.lng
+                                    : -180,
+                                xMax: currentBounds
+                                    ? currentBounds.ne.lng
+                                    : 180,
+                                yMin: currentBounds
+                                    ? currentBounds.se.lat
+                                    : -180,
+                                yMax: currentBounds
+                                    ? currentBounds.ne.lat
+                                    : 180,
+                            },
+                        });
+                    }}
+                >
+                    Search this area
+                </Button>
+            )}
         </Box>
     );
 };

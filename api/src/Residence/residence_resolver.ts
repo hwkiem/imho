@@ -36,7 +36,7 @@ export class ResidencyResolver {
 
     @Query(() => ResidenceResponse)
     async getResidencesBoundingBox(
-        @Arg('corners') perimeter: GeoBoundaryInput,
+        @Arg('perimeter') perimeter: GeoBoundaryInput,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         if (

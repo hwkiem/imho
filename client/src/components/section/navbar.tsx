@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from 'react'
+import { ReactNode, useRef } from 'react';
 import {
     Box,
     Flex,
@@ -17,21 +17,21 @@ import {
     Tabs,
     Tab,
     TabList,
-} from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
-import { RiHomeSmileFill } from 'react-icons/ri'
-import { useMeQuery, useLogoutMutation } from '../../generated/graphql'
-import { useRouter } from 'next/router'
-import { useApolloClient } from '@apollo/client'
-import NextLink from 'next/link'
+} from '@chakra-ui/react';
+import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { RiHomeSmileFill } from 'react-icons/ri';
+import { useMeQuery, useLogoutMutation } from '../../generated/graphql';
+import { useRouter } from 'next/router';
+import { useApolloClient } from '@apollo/client';
+import NextLink from 'next/link';
 
-const CRiHomeSmile = chakra(RiHomeSmileFill)
+const CRiHomeSmile = chakra(RiHomeSmileFill);
 
-const LINKS = ['diver', 'about', 'profile']
+const LINKS = ['diver', 'about', 'profile'];
 
 interface NavLinkProps {
-    children: ReactNode
-    path: string
+    children: ReactNode;
+    path: string;
 }
 const NavLink: React.FC<NavLinkProps> = ({ children, path }) => {
     return (
@@ -48,20 +48,20 @@ const NavLink: React.FC<NavLinkProps> = ({ children, path }) => {
         >
             {children}
         </Link>
-    )
-}
+    );
+};
 
 export const NavBar: React.FC = () => {
-    const btnRef = useRef<HTMLButtonElement>(null)
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const router = useRouter()
-    const { data, loading } = useMeQuery()
-    const [logout] = useLogoutMutation()
-    const client = useApolloClient()
+    const btnRef = useRef<HTMLButtonElement>(null);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const router = useRouter();
+    const { data, loading } = useMeQuery();
+    const [logout] = useLogoutMutation();
+    const client = useApolloClient();
 
-    let user = null
+    let user = null;
     if (data?.me.users) {
-        user = data.me.users[0]
+        user = data.me.users[0];
     }
     return (
         <Center zIndex={10}>
@@ -96,7 +96,13 @@ export const NavBar: React.FC = () => {
                                 color={'teal'}
                             />
                         </Box>
-                        <Tabs variant="line" colorScheme="teal">
+                        <Tabs
+                            variant="line"
+                            colorScheme="teal"
+                            defaultIndex={LINKS.indexOf(
+                                router.pathname.substring(1)
+                            )}
+                        >
                             <TabList>
                                 {LINKS.map((link) => (
                                     <Tab key={link}>
@@ -116,10 +122,10 @@ export const NavBar: React.FC = () => {
                             mr={4}
                             ref={btnRef}
                             onClick={async () => {
-                                console.log('!')
-                                await logout()
-                                await client.clearStore()
-                                router.push('/login')
+                                console.log('!');
+                                await logout();
+                                await client.clearStore();
+                                router.push('/login');
                             }}
                         >
                             Logout
@@ -153,5 +159,5 @@ export const NavBar: React.FC = () => {
                 ) : null}
             </Box>
         </Center>
-    )
-}
+    );
+};
