@@ -1,8 +1,8 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Residence } from './residence';
 import {
-    AreaSearchInput,
     FieldError,
+    GeoBoundaryInput,
     MyContext,
     PartialResidence,
     PlaceIDResponse,
@@ -36,15 +36,16 @@ export class ResidencyResolver {
 
     @Query(() => ResidenceResponse)
     async getResidencesBoundingBox(
-        @Arg('corners') corners: AreaSearchInput,
+        @Arg('corners') perimeter: GeoBoundaryInput,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesBoundingBox({
-            xMax: corners.ne.lng,
-            xMin: corners.sw.lng,
-            yMax: corners.ne.lat,
-            yMin: corners.sw.lat,
-        });
+        if (
+            perimeter.xMax < perimeter.xMin ||
+            perimeter.yMax < perimeter.yMin
+        ) {
+            return { errors: [{ field: 'input', message: 'malformed query' }] };
+        }
+        return await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
     }
 
     @Query(() => ResidenceResponse)

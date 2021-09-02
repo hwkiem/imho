@@ -23,14 +23,6 @@ export class Coords {
     lng: number;
 }
 
-@InputType()
-export class InputCoords {
-    @Field()
-    lat: number;
-    @Field()
-    lng: number;
-}
-
 // @GRAPHQL
 // @INPUT
 @InputType() // subset of User used as filter values
@@ -39,14 +31,6 @@ export class PartialUser implements Partial<User> {
     first_name?: string;
     @Field({ nullable: true })
     last_name?: string;
-}
-
-@InputType()
-export class AreaSearchInput {
-    @Field(() => InputCoords)
-    ne: InputCoords;
-    @Field(() => InputCoords)
-    sw: InputCoords;
 }
 
 @InputType()
