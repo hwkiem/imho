@@ -149,14 +149,6 @@ export async function getResidencesNearArea(
     locationResult: GeocodeResult,
     limit: number = 10
 ): Promise<ResidenceResponse> {
-    this.knexPostgis.distance(
-        this.knexPostgis.geometry('geog'),
-        this.knexPostgis.point(
-            locationResult.geometry.location.lng,
-            locationResult.geometry.location.lat
-        )
-    );
-
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
         .select([
