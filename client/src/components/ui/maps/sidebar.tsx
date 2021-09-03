@@ -6,17 +6,17 @@ import {
     Icon,
     Stack,
     VStack,
-} from '@chakra-ui/react'
-import { Dispatch, SetStateAction } from 'react'
-import { RegularResidenceFragment } from '../../../generated/graphql'
-import { ResidenceCard } from './rescard'
-import GoogleMap from 'google-map-react'
+} from '@chakra-ui/react';
+import { Dispatch, SetStateAction } from 'react';
+import { RegularResidenceFragment } from '../../../generated/graphql';
+import { ResidenceCard } from './rescard';
+import GoogleMap from 'google-map-react';
 
 interface SideBarProps extends ChakraProps {
-    residences: RegularResidenceFragment[]
-    hover: number
-    setHover: Dispatch<SetStateAction<number>> // updating the hovered id
-    setCenter: Dispatch<SetStateAction<GoogleMap.Coords>>
+    residences: RegularResidenceFragment[];
+    hover: number;
+    setHover: Dispatch<SetStateAction<number>>; // updating the hovered id
+    setCenter: Dispatch<SetStateAction<GoogleMap.Coords>>;
 }
 
 export const SideBar: React.FC<SideBarProps> = ({
@@ -48,13 +48,13 @@ export const SideBar: React.FC<SideBarProps> = ({
                         hover={res.res_id == hover}
                         setHover={setHover}
                         onClick={() => {
-                            setCenter({ ...res.coords })
+                            setCenter({ ...res.coords });
                         }}
                     />
                 ))}
             </VStack>
         </Box>
-    )
-}
+    );
+};
 
-export default SideBar
+export default SideBar;

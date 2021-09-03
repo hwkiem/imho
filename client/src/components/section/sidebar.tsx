@@ -1,8 +1,8 @@
-import { Box, Heading, Button, Icon } from '@chakra-ui/react'
-import { RiRefreshLine } from 'react-icons/ri'
-import { chakra } from '@chakra-ui/react'
+import { Box, Heading, Button, Icon } from '@chakra-ui/react';
+import { RiRefreshLine } from 'react-icons/ri';
+import { chakra } from '@chakra-ui/react';
 
-const CRiRefreshLine = chakra(RiRefreshLine)
+const CRiRefreshLine = chakra(RiRefreshLine);
 
 const Sidebar: React.FC = ({ children }) => {
     return (
@@ -31,7 +31,7 @@ const Sidebar: React.FC = ({ children }) => {
                 Refresh
             </Button>
         </Box>
-    )
-}
+    );
+};
 
-export default Sidebar
+export default Sidebar;

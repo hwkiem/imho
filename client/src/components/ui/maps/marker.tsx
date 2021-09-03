@@ -1,16 +1,16 @@
-import { Icon } from '@chakra-ui/react'
-import GoogleMap from 'google-map-react'
-import { Dispatch, SetStateAction } from 'react'
-import { RiHomeSmile2Fill, RiHomeSmile2Line } from 'react-icons/ri'
+import { Icon } from '@chakra-ui/react';
+import GoogleMap from 'google-map-react';
+import { Dispatch, SetStateAction } from 'react';
+import { RiHomeSmile2Fill, RiHomeSmile2Line } from 'react-icons/ri';
 
 interface MarkerProps {
-    res_id: number
-    lat: number
-    lng: number
-    address: string
-    hover: boolean
-    setHover: Dispatch<SetStateAction<number>> // updating the hovered id
-    onClick: () => void
+    res_id: number;
+    lat: number;
+    lng: number;
+    address: string;
+    hover: boolean;
+    setHover: Dispatch<SetStateAction<number>>; // updating the hovered id
+    onClick: () => void;
 }
 
 export const Marker: React.FC<MarkerProps> = ({
@@ -26,12 +26,12 @@ export const Marker: React.FC<MarkerProps> = ({
         style={{ transform: 'translate(-50%, -100%)' }}
         color={'teal'}
         onMouseEnter={() => {
-            setHover(res_id)
+            setHover(res_id);
         }}
         onMouseLeave={() => {
-            setHover(-1)
+            setHover(-1);
         }}
         onClick={onClick}
         cursor={'pointer'}
     />
-)
+);

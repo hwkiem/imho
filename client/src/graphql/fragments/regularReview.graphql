@@ -1,4 +1,9 @@
 fragment RegularReview on Review {
     res_id
     user_id
+    rent
+    rating
+    residence {
+        full_address
+    }
 }

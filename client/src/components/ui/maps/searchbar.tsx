@@ -25,7 +25,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
     const setInputRef = (node: HTMLInputElement) => {
         const auto = new google.maps.places.Autocomplete(node, options);
-        console.log(auto);
         auto.addListener('place_changed', () => {
             searchHandler(auto.getPlace());
         });

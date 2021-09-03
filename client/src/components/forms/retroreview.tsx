@@ -40,6 +40,8 @@ export const RetroReview: React.FC = () => {
                 variables: {
                     options: {
                         google_place_id: formik.values.google_place_id,
+                        rating: formik.values.rating,
+                        rent: formik.values.rent,
                     },
                 },
             });
