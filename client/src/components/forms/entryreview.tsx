@@ -26,7 +26,6 @@ export const EntryReview: React.FC = () => {
                     options: { google_place_id: formik.values.address },
                 },
             });
-            console.log(res.data?.writeReview.reviews);
             router.push('/diver');
         },
     });
@@ -63,7 +62,7 @@ export const EntryReview: React.FC = () => {
                                             );
                                     }}
                                     variant="small"
-                                    searchTypes={['geocode']}
+                                    searchTypes={['address']}
                                 />
                             </Box>
 

@@ -17,28 +17,28 @@ import {
     DrawerContent,
     DrawerOverlay,
     useDisclosure,
-} from '@chakra-ui/react'
-import { Form, Formik, Field, useFormik } from 'formik'
-import React, { useState } from 'react'
+} from '@chakra-ui/react';
+import { Form, Formik, Field, useFormik } from 'formik';
+import React, { useState } from 'react';
 import {
     useRegisterMutation,
     RegisterMutationVariables,
     RegisterInput,
     MeDocument,
     MeQuery,
-} from '../../generated/graphql'
-import * as yup from 'yup'
-import { EntryReview } from './entryreview'
+} from '../../generated/graphql';
+import * as yup from 'yup';
+import { EntryReview } from './entryreview';
 
 interface LoginFormProps {
-    variant?: string
+    variant?: string;
 }
 
 export const RegisterForm: React.FC<LoginFormProps> = () => {
-    const [stepNum, setstepNum] = useState(0)
+    const [stepNum, setstepNum] = useState(0);
 
     // Use the codegen register mutation and data state
-    const [register, { loading, data, error }] = useRegisterMutation()
+    const [register, { loading, data, error }] = useRegisterMutation();
 
     // Define validation schema for login form using Yup
     const validationSchema: yup.SchemaOf<
@@ -57,17 +57,17 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
             .oneOf([yup.ref('password'), null], 'Passwords must match'),
         first_name: yup.string().required('First name is required'),
         last_name: yup.string().required('Last name is required'),
-    })
+    });
 
     const init: RegisterMutationVariables['options'] & {
-        confirm: string | undefined
+        confirm: string | undefined;
     } = {
         email: '',
         password: '',
         confirm: '',
         first_name: '',
         last_name: '',
-    }
+    };
 
     const formik = useFormik({
         initialValues: init,
@@ -76,7 +76,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
             { email, first_name, last_name, password },
             actions
         ) => {
-            actions.setSubmitting(true)
+            actions.setSubmitting(true);
             const res = await register({
                 variables: {
                     options: { email, first_name, last_name, password },
@@ -88,19 +88,19 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                             data: {
                                 me: data?.register,
                             },
-                        })
+                        });
                 },
-            })
+            });
 
             if (res.data?.register.users) {
-                setstepNum(1)
+                setstepNum(1);
             } else if (res.data?.register.errors) {
-                console.log(res.data.register.errors)
+                console.log(res.data.register.errors);
             } else if (error) {
-                console.log(error)
+                console.log(error);
             }
         },
-    })
+    });
 
     return (
         <>
@@ -252,5 +252,5 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
             )}
             {stepNum == 1 && <EntryReview />}
         </>
-    )
-}
+    );
+};

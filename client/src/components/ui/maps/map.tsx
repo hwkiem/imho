@@ -11,7 +11,7 @@ import { SearchBar } from './searchbar';
 import { SideBar } from './sidebar';
 import { RiHomeSmileFill } from 'react-icons/ri';
 
-type SearchTypes = 'geocode' | 'full_address';
+type SearchTypes = 'geocode' | 'address';
 
 interface CommonMapProps {
     fixed?: boolean;
