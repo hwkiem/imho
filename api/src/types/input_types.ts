@@ -1,30 +1,9 @@
-import { Request, Response } from 'express';
-import { ObjectType, Field, InputType, Int, Float } from 'type-graphql';
-import { googleMapsHandler } from './DataSources/mapsAPI';
-import { postgresHandler } from './dataSources/postgres';
-import { Residence } from './Residence/residence';
-import { Review } from './Review/reviews';
-import { User } from './User/user';
+import { Field, Float, InputType, Int } from 'type-graphql';
+import { Residence } from '../Residence/residence';
+import { Review } from '../Review/reviews';
+import { User } from '../User/user';
+import { StoveType } from './enum_types';
 
-export type MyContext = {
-    req: Request;
-    res: Response;
-    dataSources: {
-        pgHandler: postgresHandler;
-        googleMapsHandler: googleMapsHandler;
-    };
-};
-
-@ObjectType()
-export class Coords {
-    @Field()
-    lat: number;
-    @Field()
-    lng: number;
-}
-
-// @GRAPHQL
-// @INPUT
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
     @Field({ nullable: true })
@@ -34,12 +13,50 @@ export class PartialUser implements Partial<User> {
 }
 
 @InputType()
+export class DateRangeInput {
+    @Field(() => Date)
+    start_date: Date;
+    @Field(() => Date)
+    end_date: Date;
+}
+
+@InputType()
 export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     rating: number;
 
     @Field({ nullable: true })
     rent: number;
+
+    @Field({ nullable: true })
+    air_conditioning?: boolean;
+
+    @Field({ nullable: true })
+    heat?: boolean;
+
+    @Field(() => StoveType, { nullable: true })
+    stove?: StoveType;
+
+    @Field({ nullable: true })
+    pool?: boolean;
+
+    @Field({ nullable: true })
+    gym?: boolean;
+
+    @Field({ nullable: true })
+    garbage_disposal?: boolean;
+
+    @Field({ nullable: true })
+    dishwasher?: boolean;
+
+    @Field({ nullable: true })
+    parking?: boolean;
+
+    @Field({ nullable: true })
+    doorman?: boolean;
+
+    @Field(() => DateRangeInput, { nullable: true })
+    lease_term?: DateRangeInput;
 }
 
 @InputType()
@@ -49,6 +66,14 @@ export class ResidenceSortByInput {
     @Field()
     sort: string;
 }
+
+// @InputType()
+// export class ResidenceSortByInput {
+//     @Field()
+//     attribute: string;
+//     @Field()
+//     sort: string;
+// }
 
 @InputType()
 export class PartialResidence implements Partial<Residence> {
@@ -140,57 +165,40 @@ export class WriteReviewInput {
     @Field({ nullable: true })
     rent?: number;
 
-    user_id: number;
-}
-
-export class WriteReviewArgs {
-    // args for backend
-    res_id: number;
-    user_id: number;
-    rent?: number;
-    rating?: number;
-}
-
-@ObjectType()
-export class FieldError {
-    @Field()
-    field: string;
-    @Field()
-    message: string;
-}
-
-@ObjectType()
-export class UserResponse {
-    @Field(() => [FieldError], { nullable: true })
-    errors?: FieldError[];
-
-    @Field(() => [User], { nullable: true })
-    users?: User[];
-}
-
-@ObjectType()
-export class ResidenceResponse {
-    @Field(() => [FieldError], { nullable: true })
-    errors?: FieldError[];
-
-    @Field(() => [Residence], { nullable: true })
-    residences?: Residence[];
-}
-
-@ObjectType()
-export class ReviewResponse {
-    @Field(() => [FieldError], { nullable: true })
-    errors?: FieldError[];
-
-    @Field(() => [Review], { nullable: true })
-    reviews?: Review[];
-}
-
-@ObjectType()
-export class PlaceIDResponse {
-    @Field(() => FieldError, { nullable: true })
-    errors?: FieldError;
+    @Field({ nullable: true })
+    air_conditioning?: boolean;
 
     @Field({ nullable: true })
-    place_id?: string;
+    heat?: boolean;
+
+    @Field(() => StoveType, { nullable: true })
+    stove?: StoveType;
+
+    @Field({ nullable: true })
+    pool?: boolean;
+
+    @Field({ nullable: true })
+    gym?: boolean;
+
+    @Field({ nullable: true })
+    garbage_disposal?: boolean;
+
+    @Field({ nullable: true })
+    dishwasher?: boolean;
+
+    @Field({ nullable: true })
+    parking?: boolean;
+
+    @Field({ nullable: true })
+    doorman?: boolean;
+
+    @Field(() => DateRangeInput, { nullable: true })
+    lease_term?: DateRangeInput;
+
+    // for db
+    lease_term_?: Range;
+
+    user_id?: number;
+
+    res_id?: number;
 }

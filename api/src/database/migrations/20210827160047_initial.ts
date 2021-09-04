@@ -45,6 +45,18 @@ export async function up(knex: Knex): Promise<void> {
             table.unique(['user_id', 'res_id'], 'userResTuple');
             table.float('rating');
             table.integer('rent');
+            // new
+            table.boolean('air_conditioning');
+            table.boolean('heat');
+            table.enum('stove', ['GAS', 'ELECTRIC']);
+            table.boolean('pool');
+            table.boolean('gym');
+            table.boolean('garbage_disposal');
+            table.boolean('dishwasher');
+            table.boolean('parking');
+            table.boolean('doorman');
+            table.specificType('lease_term_', 'tsrange');
+
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })

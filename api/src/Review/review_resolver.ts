@@ -1,13 +1,12 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { Review } from './reviews';
+import { PartialReview, WriteReviewInput } from '../types/input_types';
 import {
     FieldError,
-    MyContext,
-    PartialReview,
     ResidenceResponse,
-    WriteReviewArgs,
-} from '../types';
-import { ReviewResponse, WriteReviewInput } from '../types';
+    ReviewResponse,
+} from '../types/object_types';
+import { MyContext } from '../types/types';
+import { Review } from './reviews';
 
 @Resolver(Review)
 export class ReviewResolver {
@@ -30,7 +29,7 @@ export class ReviewResolver {
         ) {
             return { errors: getResponse.errors };
         }
-        let args: WriteReviewArgs;
+        // let args: WriteReviewArgs;
         if (getResponse.residences.length == 0) {
             // residence does not exist, create
             const locationResult =
@@ -49,25 +48,15 @@ export class ReviewResolver {
             if (createResponse.errors || !createResponse.residences) {
                 return { errors: createResponse.errors };
             }
-            args = {
-                user_id: req.session.userId,
-                res_id: createResponse.residences[0].res_id,
-            };
+            options.user_id = req.session.userId;
+            options.res_id = createResponse.residences[0].res_id;
         } else {
             // residence exists
-            args = {
-                user_id: req.session.userId,
-                res_id: getResponse.residences[0].res_id,
-            };
+            options.user_id = req.session.userId;
+            options.res_id = getResponse.residences[0].res_id;
         }
-        // fill optional args
-        if (options.rating !== undefined) {
-            args.rating = options.rating;
-        }
-        if (options.rent !== undefined) {
-            args.rent = options.rent;
-        }
-        const response = await dataSources.pgHandler.writeReview(args);
+
+        const response = await dataSources.pgHandler.writeReview(options);
         return response;
     }
 

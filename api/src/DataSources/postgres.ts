@@ -18,6 +18,7 @@ import {
     getResidencesSortBy,
 } from '../Residence/residence_db_handler';
 import {
+    getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
     getReviewsByUserId,
     getReviewsObject,
@@ -64,6 +65,8 @@ export class postgresHandler extends SQLDataSource {
     public getReviewsByUserId = getReviewsByUserId;
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
+
+    public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
 
     public getReviewsObject = getReviewsObject;
 }

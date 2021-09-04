@@ -33,6 +33,7 @@
         "ioredis": "^4.27.7",
         "knex-postgis": "^0.14.1",
         "pg": "^8.7.1",
+        "pg-range": "^1.1.0",
         "reflect-metadata": "^0.1.13",
         "type-graphql": "^1.1.1"
     },

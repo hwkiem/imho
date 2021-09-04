@@ -5647,6 +5647,11 @@ lodash.once@^4.0.0:
   resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
   integrity sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=
 
+lodash.partial@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/lodash.partial/-/lodash.partial-4.2.1.tgz#49f3d8cfdaa3bff8b3a91d127e923245418961d4"
+  integrity sha1-SfPYz9qjv/izqR0SfpIyRUGJYdQ=
+
 lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
@@ -6525,6 +6530,14 @@ pg-protocol@*, pg-protocol@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.5.0.tgz#b5dd452257314565e2d54ab3c132adc46565a6a0"
   integrity sha512-muRttij7H8TqRNu/DxrAJQITO4Ac7RmX3Klyr/9mJEOBeIpgnF8f9jAfRz5d3XwQZl5qBjF9gLsUtMPJE0vezQ==
+
+pg-range@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pg-range/-/pg-range-1.1.0.tgz#417f1ce4c4029efd2199325d83a8e32cae46fbdc"
+  integrity sha512-CwHm7MXEyexL4DM/UZXuhZsPhWzS9kosbaljZTQGA/4cOTfDeE7Nx4VPbOJ9iOhFUemVdLVHgAarUYCtrfveBw==
+  dependencies:
+    lodash.partial "^4.2.1"
+    strange "^1.7.2"
 
 pg-types@^2.1.0, pg-types@^2.2.0:
   version "2.2.0"
@@ -7491,6 +7504,11 @@ static-extend@^0.1.1:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
+
+strange@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/strange/-/strange-1.7.2.tgz#bcefaecc37d7637ccb76c2eb0724b36b4e7014de"
+  integrity sha1-vO+uzDfXY3zLdsLrBySza05wFN4=
 
 stream-browserify@3.0.0:
   version "3.0.0"

@@ -1,6 +1,6 @@
 import { Client, GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { DataSource } from 'apollo-datasource';
-import { FieldError, PlaceIDResponse } from '../types';
+import { FieldError, PlaceIDResponse } from '../types/object_types';
 import { geoToData } from '../utils/mapUtils';
 
 export class googleMapsHandler extends DataSource {

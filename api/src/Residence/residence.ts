@@ -1,6 +1,6 @@
 import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
 import { Review } from '../Review/reviews';
-import { MyContext } from '../types';
+import { MyContext } from '../types/types';
 
 @ObjectType()
 class Coords {
