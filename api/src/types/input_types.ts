@@ -67,6 +67,14 @@ export class ResidenceSortByInput {
     sort: string;
 }
 
+// @InputType()
+// export class ResidenceSortByInput {
+//     @Field()
+//     attribute: string;
+//     @Field()
+//     sort: string;
+// }
+
 @InputType()
 export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })

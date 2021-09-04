@@ -3,16 +3,15 @@ import GoogleMap from 'google-map-react';
 import { useState, useEffect } from 'react';
 import {
     RegularResidenceFragment,
-    useGetResidencesLimitQuery,
     useGetResidencesBoundingBoxQuery,
-    GeoBoundaryInput,
+    useGetResidencesByGeoScopeLazyQuery,
 } from '../../../generated/graphql';
 import { Marker } from './marker';
 import { SearchBar } from './searchbar';
 import { SideBar } from './sidebar';
 import { RiHomeSmileFill } from 'react-icons/ri';
 
-type SearchTypes = 'geocode' | 'full_address';
+type SearchTypes = 'geocode' | 'address';
 
 interface CommonMapProps {
     fixed?: boolean;
@@ -88,14 +87,23 @@ export const Map: React.FC<MapProps> = ({
         },
     });
 
+    const [geoscope, results] = useGetResidencesByGeoScopeLazyQuery();
+
     useEffect(() => {
         if (data?.getResidencesBoundingBox.residences)
             setResidences(data?.getResidencesBoundingBox.residences);
     }, [data]);
 
+    useEffect(() => {
+        if (results.data?.getResidencesByGeoScope.residences)
+            setResidences(results.data.getResidencesByGeoScope.residences);
+    });
+
     const searchHandler = (place: google.maps.places.PlaceResult) => {
         if (valueHook) valueHook(place);
         const loc = place.geometry?.location;
+        const place_id = place.place_id;
+        if (place_id) geoscope({ variables: { place_id: place_id } });
         if (loc) {
             setCenter({ lat: loc.lat(), lng: loc.lng() });
             setCenterMarker(true);
@@ -179,7 +187,6 @@ export const Map: React.FC<MapProps> = ({
                                     console.log(center);
                                     console.log(res.coords);
                                     setCenter(res.coords);
-                                    setShowRefresh(false);
                                 }}
                             />
                         );
@@ -219,6 +226,8 @@ export const Map: React.FC<MapProps> = ({
                                     : 180,
                             },
                         });
+                        setInitialBounds(currentBounds);
+                        setShowRefresh(false);
                     }}
                 >
                     Search this area

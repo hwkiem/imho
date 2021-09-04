@@ -27,7 +27,7 @@ import NextLink from 'next/link';
 
 const CRiHomeSmile = chakra(RiHomeSmileFill);
 
-const LINKS = ['diver', 'about', 'profile'];
+const LINKS = ['diver', 'about', 'profile', 'review'];
 
 interface NavLinkProps {
     children: ReactNode;

@@ -1,4 +1,4 @@
-import { SearchIcon } from '@chakra-ui/icons'
+import { SearchIcon } from '@chakra-ui/icons';
 import {
     chakra,
     Box,
@@ -6,16 +6,16 @@ import {
     Input,
     InputGroup,
     InputLeftElement,
-} from '@chakra-ui/react'
-import { Fragment, useEffect } from 'react'
-import { RiHomeSmileFill } from 'react-icons/ri'
+} from '@chakra-ui/react';
+import { Fragment, useEffect } from 'react';
+import { RiHomeSmileFill } from 'react-icons/ri';
 
-const HomeIcon = chakra(RiHomeSmileFill)
+const HomeIcon = chakra(RiHomeSmileFill);
 
 interface SearchBarProps {
-    options: google.maps.places.AutocompleteOptions
-    searchHandler: (place: google.maps.places.PlaceResult) => void
-    variant?: 'small' | 'large'
+    options: google.maps.places.AutocompleteOptions;
+    searchHandler: (place: google.maps.places.PlaceResult) => void;
+    variant?: 'small' | 'large';
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -24,11 +24,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     variant,
 }) => {
     const setInputRef = (node: HTMLInputElement) => {
-        const auto = new google.maps.places.Autocomplete(node, options)
+        const auto = new google.maps.places.Autocomplete(node, options);
         auto.addListener('place_changed', () => {
-            searchHandler(auto.getPlace())
-        })
-    }
+            searchHandler(auto.getPlace());
+        });
+    };
 
     return (
         <InputGroup
@@ -48,5 +48,5 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             </InputLeftElement>
             <Input variant={'flushed'} as={'input'} ref={setInputRef} />
         </InputGroup>
-    )
-}
+    );
+};

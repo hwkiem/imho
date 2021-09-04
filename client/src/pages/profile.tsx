@@ -44,6 +44,9 @@ const Profile: Page<ProfileProps> = ({ me, reviews }) => {
                         reviews.map((review) => (
                             <Box bg={'lightblue'} h={'200px'} w={'200px'}>
                                 Review ID: {review.res_id}
+                                Rent: {review.rent}
+                                Rating: {review.rating}
+                                Address: {review.residence?.full_address}
                             </Box>
                         ))}
                 </Stack>

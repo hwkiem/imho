@@ -12,23 +12,23 @@ import {
     Stack,
     useColorModeValue,
     FormErrorMessage,
-} from '@chakra-ui/react'
-import { useFormik } from 'formik'
-import React from 'react'
-import { useLoginMutation, LoginInput, MeQuery } from '../../generated/graphql'
-import { object, string, SchemaOf } from 'yup'
-import { useRouter } from 'next/router'
-import { gql } from '@apollo/client'
+} from '@chakra-ui/react';
+import { useFormik } from 'formik';
+import React from 'react';
+import { useLoginMutation, LoginInput, MeQuery } from '../../generated/graphql';
+import { object, string, SchemaOf } from 'yup';
+import { useRouter } from 'next/router';
+import { gql } from '@apollo/client';
 
 interface LoginFormProps {
-    variant?: string
+    variant?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = () => {
-    const router = useRouter()
+    const router = useRouter();
 
     // Use the codegen login mutation and data state
-    const [login, { error }] = useLoginMutation()
+    const [login, { error }] = useLoginMutation();
 
     // Define validation schema for login form using Yup
     const validationSchema: SchemaOf<LoginInput> = object({
@@ -38,18 +38,18 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
         password: string()
             .min(8, 'Password should be of minimum 8 characters length')
             .required('Password is required'),
-    })
+    });
 
     const init: LoginInput = {
         email: '',
         password: '',
-    }
+    };
 
     const formik = useFormik({
         initialValues: init,
         validationSchema: validationSchema,
         onSubmit: async (values, actions) => {
-            actions.setSubmitting(true)
+            actions.setSubmitting(true);
             const res = await login({
                 variables: { input: values },
                 update: (cache, { data }) => {
@@ -74,17 +74,19 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
                             data: {
                                 me: data?.login,
                             },
-                        })
+                        });
                 },
-            })
+            });
 
-            if (res.data) {
-                router.push('/diver')
+            if (res.data?.login.users) {
+                router.push('/diver');
+            } else if (res.data?.login.errors) {
+                console.log(res.data.login.errors);
             } else if (error) {
-                router.push('/error')
+                router.push('/error');
             }
         },
-    })
+    });
 
     return (
         <Flex
@@ -172,5 +174,5 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
                 </Box>
             </Stack>
         </Flex>
-    )
-}
+    );
+};

@@ -7,16 +7,16 @@ import {
     Input,
     Stack,
     Text,
-} from '@chakra-ui/react'
-import { Form, useFormik, yupToFormErrors } from 'formik'
-import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
-import { useWriteReviewMutation } from '../../generated/graphql'
-import { Map } from '../ui/maps/map'
+} from '@chakra-ui/react';
+import { Form, useFormik, yupToFormErrors } from 'formik';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import { useWriteReviewMutation } from '../../generated/graphql';
+import { Map } from '../ui/maps/map';
 
 export const EntryReview: React.FC = () => {
-    const [review, { data }] = useWriteReviewMutation()
-    const router = useRouter()
+    const [review, { data }] = useWriteReviewMutation();
+    const router = useRouter();
 
     const formik = useFormik({
         initialValues: { address: '' },
@@ -25,11 +25,10 @@ export const EntryReview: React.FC = () => {
                 variables: {
                     options: { google_place_id: formik.values.address },
                 },
-            })
-            console.log(res.data?.writeReview.reviews)
-            router.push('/diver')
+            });
+            router.push('/diver');
         },
-    })
+    });
 
     return (
         <Flex minh="100vh" align="center" justify="center" bg="gray.50">
@@ -60,10 +59,10 @@ export const EntryReview: React.FC = () => {
                                             await formik.setFieldValue(
                                                 'address',
                                                 place.place_id
-                                            )
+                                            );
                                     }}
                                     variant="small"
-                                    searchTypes={['geocode']}
+                                    searchTypes={['address']}
                                 />
                             </Box>
 
@@ -72,8 +71,7 @@ export const EntryReview: React.FC = () => {
                                     variant={'solid'}
                                     colorScheme={'teal'}
                                     onClick={() => {
-                                        formik.handleSubmit()
-                                        router
+                                        formik.handleSubmit();
                                     }}
                                 >
                                     Click me!
@@ -84,5 +82,5 @@ export const EntryReview: React.FC = () => {
                 </Center>
             </Stack>
         </Flex>
-    )
-}
+    );
+};
