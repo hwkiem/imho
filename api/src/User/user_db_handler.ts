@@ -1,7 +1,8 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { RegisterInput, UserResponse } from '../types';
 import { User } from './user';
 import argon2 from 'argon2';
+import { UserResponse } from '../types/object_types';
+import { RegisterInput } from '../types/input_types';
 
 export async function getUsersById(
     this: postgresHandler,

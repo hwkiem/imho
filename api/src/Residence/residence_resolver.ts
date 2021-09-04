@@ -1,15 +1,18 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Residence } from './residence';
+import { unpackLocation } from '../utils/mapUtils';
 import {
     FieldError,
-    GeoBoundaryInput,
-    MyContext,
-    PartialResidence,
     PlaceIDResponse,
+    ResidenceResponse,
+} from '../types/object_types';
+import {
+    CreateResidenceInput,
+    GeoBoundaryInput,
+    PartialResidence,
     ResidenceSortByInput,
-} from '../types';
-import { CreateResidenceInput, ResidenceResponse } from '../types';
-import { unpackLocation } from '../utils/mapUtils';
+} from '../types/input_types';
+import { MyContext } from '../types/types';
 
 @Resolver(Residence)
 export class ResidencyResolver {

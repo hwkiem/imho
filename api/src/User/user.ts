@@ -1,6 +1,6 @@
 import { ObjectType, Field, Ctx } from 'type-graphql';
 import { Review } from '../Review/reviews';
-import { MyContext } from '../types';
+import { MyContext } from '../types/types';
 
 @ObjectType()
 export class User {

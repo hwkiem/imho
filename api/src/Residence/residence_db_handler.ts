@@ -2,11 +2,11 @@ import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { postgresHandler } from '../dataSources/postgres';
 import {
     CreateResidenceInput,
-    FieldError,
     GeoBoundaryInput,
-    ResidenceResponse,
     ResidenceSortByInput,
-} from '../types';
+} from '../types/input_types';
+import { FieldError, ResidenceResponse } from '../types/object_types';
+
 import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import { Residence } from './residence';
 

@@ -1,15 +1,15 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
 import { User } from './user';
 import { validateRegister } from '../utils/validateRegister';
+import argon2 from 'argon2';
+import { UserResponse } from '../types/object_types';
+import { MyContext } from '../types/types';
 import {
-    UserResponse,
-    RegisterInput,
-    MyContext,
+    ChangePasswordInput,
     LoginInput,
     PartialUser,
-    ChangePasswordInput,
-} from '../types';
-import argon2 from 'argon2';
+    RegisterInput,
+} from '../types/input_types';
 
 declare module 'express-session' {
     interface Session {
