@@ -81,7 +81,7 @@ export class ReviewResolver {
     @Query(() => ReviewResponse) // return number of rows returned? everywhere?
     async getReviewsObjFilter(
         @Arg('obj') obj: PartialReview,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
         return await dataSources.pgHandler.getReviewsObject(obj, limit);

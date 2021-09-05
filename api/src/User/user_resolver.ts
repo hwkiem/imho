@@ -206,7 +206,7 @@ export class UserResolver {
     @Query(() => UserResponse) // return number of rows returned? everywhere?
     async getUsersObjFilter(
         @Arg('obj') obj: PartialUser,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<UserResponse> {
         return await dataSources.pgHandler.getUsersObject(obj, limit);

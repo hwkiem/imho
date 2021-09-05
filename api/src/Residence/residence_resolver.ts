@@ -55,7 +55,7 @@ export class ResidencyResolver {
     @Query(() => ResidenceResponse)
     async getResidencesByGeoScope(
         @Arg('place_id') place_id: string,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx()
         { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
@@ -87,7 +87,7 @@ export class ResidencyResolver {
     async getResidencesSortBy(
         @Arg('obj') obj: PartialResidence,
         @Arg('sort_params', { nullable: true }) params: ResidenceSortByInput,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         const a = ['avg_rent', 'avg_rating'];
@@ -113,7 +113,7 @@ export class ResidencyResolver {
     @Query(() => ResidenceResponse)
     async getResidencesObjectFilter(
         @Arg('obj') obj: PartialResidence,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         return await dataSources.pgHandler.getResidencesObject(obj, limit);
