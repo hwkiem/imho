@@ -2,7 +2,7 @@ import { Field, Float, InputType, Int } from 'type-graphql';
 import { Residence } from '../Residence/residence';
 import { Review } from '../Review/reviews';
 import { User } from '../User/user';
-import { StoveType } from './enum_types';
+import { LaundryType, StoveType } from './enum_types';
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -194,6 +194,24 @@ export class WriteReviewInput {
 
     @Field(() => DateRangeInput, { nullable: true })
     lease_term?: DateRangeInput;
+
+    @Field({ nullable: true })
+    pet_friendly?: boolean;
+
+    @Field(() => LaundryType, { nullable: true })
+    laundry?: LaundryType;
+
+    @Field({ nullable: true })
+    backyard?: boolean;
+
+    @Field(() => Float, { nullable: true })
+    bath_count?: number;
+
+    @Field(() => Int, { nullable: true })
+    bedroom_count?: number;
+
+    @Field(() => Int, { nullable: true })
+    recommend_score?: number;
 
     // for db
     lease_term_?: Range;

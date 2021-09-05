@@ -1,6 +1,6 @@
 import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
 import { Residence } from '../Residence/residence';
-import { StoveType } from '../types/enum_types';
+import { LaundryType, StoveType } from '../types/enum_types';
 import { DateRange } from '../types/object_types';
 import { MyContext } from '../types/types';
 
@@ -59,6 +59,24 @@ export class Review {
 
     @Field({ nullable: true })
     doorman?: boolean;
+
+    @Field({ nullable: true })
+    pet_friendly?: boolean;
+
+    @Field(() => LaundryType, { nullable: true })
+    laundry?: LaundryType;
+
+    @Field({ nullable: true })
+    backyard?: boolean;
+
+    @Field(() => Float, { nullable: true })
+    bath_count?: number;
+
+    @Field({ nullable: true })
+    bedroom_count?: number;
+
+    @Field({ nullable: true })
+    recommend_score?: number;
 
     @Field(() => DateRange, { nullable: true })
     lease_term?: DateRange;

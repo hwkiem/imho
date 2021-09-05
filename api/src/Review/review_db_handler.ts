@@ -21,22 +21,21 @@ export async function writeReview(
         .insert(args)
         .returning(['res_id', 'user_id'])
         .then(async (ids) => {
+            console.log(ids);
             await this.getReviewsByPrimaryKeyTuple({
                 res_id: ids[0].res_id,
                 user_id: ids[0].user_id,
             })
                 .then((res) => {
-                    r.reviews = res.reviews;
+                    r = res;
                 })
                 .catch((e) => {
-                    return {
-                        errors: [
-                            {
-                                field: 'fetch review',
-                                message: e.toString(),
-                            },
-                        ],
-                    };
+                    r.errors = [
+                        {
+                            field: 'fetch review',
+                            message: e.toString(),
+                        },
+                    ];
                 });
         })
         .catch((e) => {
@@ -65,6 +64,7 @@ export async function getReviewsByPrimaryKeyTuple(
     this: postgresHandler,
     ids: ReviewIdTuple
 ): Promise<ReviewResponse> {
+    console.log('in');
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(
@@ -80,6 +80,12 @@ export async function getReviewsByPrimaryKeyTuple(
             'garbage_disposal',
             'parking',
             'doorman',
+            'laundry',
+            'pet_friendly',
+            'backyard',
+            'bath_count',
+            'bedroom_count',
+            'recommend_score',
             this.knex.raw('lower(lease_term_) as start'),
             this.knex.raw('upper(lease_term_) as end'),
             'created_at',
@@ -115,6 +121,12 @@ export async function getReviewsByUserId(
             'garbage_disposal',
             'parking',
             'doorman',
+            'laundry',
+            'pet_friendly',
+            'backyard',
+            'bath_count',
+            'bedroom_count',
+            'recommend_score',
             this.knex.raw('lower(lease_term_) as start'),
             this.knex.raw('upper(lease_term_) as end'),
             'created_at',
@@ -150,6 +162,12 @@ export async function getReviewsByResidenceId(
             'garbage_disposal',
             'parking',
             'doorman',
+            'laundry',
+            'pet_friendly',
+            'backyard',
+            'bath_count',
+            'bedroom_count',
+            'recommend_score',
             this.knex.raw('lower(lease_term_) as start'),
             this.knex.raw('upper(lease_term_) as end'),
             'created_at',
@@ -186,6 +204,12 @@ export async function getReviewsObject(
             'garbage_disposal',
             'parking',
             'doorman',
+            'laundry',
+            'pet_friendly',
+            'backyard',
+            'bath_count',
+            'bedroom_count',
+            'recommend_score',
             this.knex.raw('lower(lease_term_) as start'),
             this.knex.raw('upper(lease_term_) as end'),
             'created_at',

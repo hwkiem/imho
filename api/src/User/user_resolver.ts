@@ -1,6 +1,6 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
 import { User } from './user';
-import { validateRegister } from '../utils/validateRegister';
+import { validateRegister } from '../utils/validators';
 import argon2 from 'argon2';
 import { UserResponse } from '../types/object_types';
 import { MyContext } from '../types/types';
@@ -206,7 +206,7 @@ export class UserResolver {
     @Query(() => UserResponse) // return number of rows returned? everywhere?
     async getUsersObjFilter(
         @Arg('obj') obj: PartialUser,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<UserResponse> {
         return await dataSources.pgHandler.getUsersObject(obj, limit);

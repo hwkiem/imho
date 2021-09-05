@@ -1,7 +1,6 @@
 import { RegisterInput } from '../types/input_types';
 import { FieldError } from '../types/object_types';
 
-// Ben's, can edit however our form requires
 export const validateRegister = (
     options: RegisterInput
 ): FieldError[] | null => {
@@ -25,3 +24,10 @@ export const validateRegister = (
 
     return null;
 };
+
+// export const validateWriteReviewInput = (
+//     options: WriteReviewInput
+// ): WriteReviewInput | undefined => {
+
+//     return;
+// };

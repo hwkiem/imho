@@ -55,7 +55,13 @@ export class ReviewResolver {
             options.user_id = req.session.userId;
             options.res_id = getResponse.residences[0].res_id;
         }
-
+        if (options.bath_count && options.bath_count % 0.5 != 0) {
+            return {
+                errors: [
+                    { field: 'bath_count', message: 'incremenets of .5!' },
+                ],
+            };
+        }
         const response = await dataSources.pgHandler.writeReview(options);
         return response;
     }
@@ -81,7 +87,7 @@ export class ReviewResolver {
     @Query(() => ReviewResponse) // return number of rows returned? everywhere?
     async getReviewsObjFilter(
         @Arg('obj') obj: PartialReview,
-        @Arg('limit', { nullable: true }) limit: number,
+        @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
         return await dataSources.pgHandler.getReviewsObject(obj, limit);
