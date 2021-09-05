@@ -55,7 +55,6 @@ export class ReviewResolver {
             options.user_id = req.session.userId;
             options.res_id = getResponse.residences[0].res_id;
         }
-
         const response = await dataSources.pgHandler.writeReview(options);
         return response;
     }

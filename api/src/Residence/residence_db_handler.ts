@@ -37,7 +37,7 @@ export async function createResidence(
         .then(async (ids) => {
             await this.getResidencesById(ids)
                 .then((res) => {
-                    r.residences = res.residences;
+                    r = res;
                 })
                 .catch(
                     (e) =>
@@ -72,7 +72,6 @@ export async function getResidencesById(
     ids: number[]
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-
     await this.knex<Residence>('residences')
         .select([
             'residences.res_id',
