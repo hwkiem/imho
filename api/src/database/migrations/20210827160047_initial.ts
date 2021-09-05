@@ -57,7 +57,7 @@ export async function up(knex: Knex): Promise<void> {
             table.boolean('pet_friendly');
             table.boolean('backyard');
             table.integer('bedroom_count');
-            table.integer('bath_count');
+            table.float('bath_count');
             table.integer('recommend_score');
             table.specificType('lease_term_', 'tsrange');
             table.enum('stove', ['GAS', 'ELECTRIC']);
