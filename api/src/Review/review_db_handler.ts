@@ -67,30 +67,7 @@ export async function getReviewsByPrimaryKeyTuple(
     console.log('in');
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
-        .select(
-            'res_id',
-            'user_id',
-            'rating',
-            'rent',
-            'air_conditioning',
-            'heat',
-            'stove',
-            'pool',
-            'gym',
-            'garbage_disposal',
-            'parking',
-            'doorman',
-            'laundry',
-            'pet_friendly',
-            'backyard',
-            'bath_count',
-            'bedroom_count',
-            'recommend_score',
-            this.knex.raw('lower(lease_term_) as start'),
-            this.knex.raw('upper(lease_term_) as end'),
-            'created_at',
-            'updated_at'
-        )
+        .select(this.reviewColumns())
         .where('user_id', '=', ids.user_id)
         .where('res_id', '=', ids.res_id)
         .then((reviews) => {
@@ -108,30 +85,7 @@ export async function getReviewsByUserId(
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
-        .select(
-            'res_id',
-            'user_id',
-            'rating',
-            'rent',
-            'air_conditioning',
-            'heat',
-            'stove',
-            'pool',
-            'gym',
-            'garbage_disposal',
-            'parking',
-            'doorman',
-            'laundry',
-            'pet_friendly',
-            'backyard',
-            'bath_count',
-            'bedroom_count',
-            'recommend_score',
-            this.knex.raw('lower(lease_term_) as start'),
-            this.knex.raw('upper(lease_term_) as end'),
-            'created_at',
-            'updated_at'
-        )
+        .select(this.reviewColumns())
         .where('user_id', 'in', ids)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
@@ -149,30 +103,7 @@ export async function getReviewsByResidenceId(
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
-        .select(
-            'res_id',
-            'user_id',
-            'rating',
-            'rent',
-            'air_conditioning',
-            'heat',
-            'stove',
-            'pool',
-            'gym',
-            'garbage_disposal',
-            'parking',
-            'doorman',
-            'laundry',
-            'pet_friendly',
-            'backyard',
-            'bath_count',
-            'bedroom_count',
-            'recommend_score',
-            this.knex.raw('lower(lease_term_) as start'),
-            this.knex.raw('upper(lease_term_) as end'),
-            'created_at',
-            'updated_at'
-        )
+        .select(this.reviewColumns())
         .where('res_id', 'in', ids)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
@@ -191,30 +122,7 @@ export async function getReviewsObject(
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
-        .select(
-            'res_id',
-            'user_id',
-            'rating',
-            'rent',
-            'air_conditioning',
-            'heat',
-            'stove',
-            'pool',
-            'gym',
-            'garbage_disposal',
-            'parking',
-            'doorman',
-            'laundry',
-            'pet_friendly',
-            'backyard',
-            'bath_count',
-            'bedroom_count',
-            'recommend_score',
-            this.knex.raw('lower(lease_term_) as start'),
-            this.knex.raw('upper(lease_term_) as end'),
-            'created_at',
-            'updated_at'
-        )
+        .select(this.reviewColumns())
         .where(obj)
         .limit(limit)
         .then((reviews) => {

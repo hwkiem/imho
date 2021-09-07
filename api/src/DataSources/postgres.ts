@@ -24,6 +24,7 @@ import {
     getReviewsObject,
     writeReview,
 } from '../Review/review_db_handler';
+import { residenceColumns, reviewColumns } from '../utils/db_helper';
 
 export class postgresHandler extends SQLDataSource {
     protected knexPostgis: KnexPostgis.KnexPostgis;
@@ -69,4 +70,9 @@ export class postgresHandler extends SQLDataSource {
     public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
 
     public getReviewsObject = getReviewsObject;
+
+    // Helpers
+    public reviewColumns = reviewColumns;
+
+    public residenceColumns = residenceColumns;
 }
