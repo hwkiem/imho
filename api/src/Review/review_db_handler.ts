@@ -64,7 +64,6 @@ export async function getReviewsByPrimaryKeyTuple(
     this: postgresHandler,
     ids: ReviewIdTuple
 ): Promise<ReviewResponse> {
-    console.log('in');
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
@@ -131,6 +130,31 @@ export async function getReviewsObject(
         .catch(
             (e) =>
                 (r.errors = [{ field: 'query review', message: e.toString() }])
+        );
+    return r;
+}
+
+export async function updateReviewGeneric(
+    this: postgresHandler,
+    res_id: number,
+    user_id: number,
+    changes: Partial<Review>
+) {
+    let r: ReviewResponse = {};
+    await this.knex<Review>('reviews')
+        .update(changes)
+        .where('res_id', '=', res_id)
+        .where('user_id', '=', user_id)
+        .returning(['user_id', 'res_id'])
+        .then(async (ids) => {
+            r = await this.getReviewsByPrimaryKeyTuple({
+                res_id: ids[0].res_id,
+                user_id: ids[0].user_id,
+            });
+        })
+        .catch(
+            (e) =>
+                (r.errors = [{ field: 'update review', message: e.toString() }])
         );
     return r;
 }

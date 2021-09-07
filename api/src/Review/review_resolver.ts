@@ -66,8 +66,6 @@ export class ReviewResolver {
         return response;
     }
 
-    // write update rating
-
     @Query(() => ReviewResponse)
     async getReviewsByUserId(
         @Arg('user_ids', () => [Int]) ids: [number],
@@ -91,5 +89,21 @@ export class ReviewResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
         return await dataSources.pgHandler.getReviewsObject(obj, limit);
+    }
+
+    @Mutation(() => ReviewResponse)
+    async updateMyReviewGeneric(
+        @Arg('changes') changes: PartialReview,
+        @Arg('res_id') res_id: number,
+        @Ctx() { req, dataSources }: MyContext
+    ) {
+        if (req.session.userId === undefined) {
+            return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        return await dataSources.pgHandler.updateReviewGeneric(
+            res_id,
+            req.session.userId,
+            changes
+        );
     }
 }
