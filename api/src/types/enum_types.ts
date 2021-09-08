@@ -39,7 +39,7 @@ export enum ResidenceSortBy {
 
 registerEnumType(ResidenceSortBy, {
     name: 'ResidenceSortBy',
-    description: 'Field by which to sort query residence results',
+    description: 'Field by which to sort residence query results',
 });
 
 export enum ReviewSortBy {
@@ -50,5 +50,15 @@ export enum ReviewSortBy {
 
 registerEnumType(ReviewSortBy, {
     name: 'ReviewSortBy',
-    description: 'Field by which to sort query review results',
+    description: 'Field by which to sort review query results',
+});
+
+// placeholder for now if we add quant fields
+export enum UserSortBy {
+    ID = 'user_id',
+}
+
+registerEnumType(UserSortBy, {
+    name: 'UserSortBy',
+    description: 'Field by which to sort user query results',
 });

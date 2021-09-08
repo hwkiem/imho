@@ -6,8 +6,7 @@ import {
     createUser,
     deleteUser,
     getUsersById,
-    getUsersLimit,
-    getUsersObject,
+    getUsersGeneric,
 } from '../User/user_db_handler';
 import {
     createResidence,
@@ -37,9 +36,7 @@ export class postgresHandler extends SQLDataSource {
     // Users
     public getUsersById = getUsersById;
 
-    public getUsersLimit = getUsersLimit;
-
-    public getUsersObject = getUsersObject;
+    public getUsersGeneric = getUsersGeneric;
 
     public createUser = createUser;
 

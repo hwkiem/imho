@@ -8,6 +8,7 @@ import {
     ResidenceSortBy,
     ReviewSortBy,
     StoveType,
+    UserSortBy,
 } from './enum_types';
 
 @InputType() // subset of User used as filter values
@@ -124,6 +125,14 @@ export class ReviewSortByInput {
 }
 
 @InputType()
+export class UserSortByInput {
+    @Field(() => UserSortBy)
+    attribute: UserSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
 export class ResidenceQueryOptions {
     @Field(() => Int, { nullable: true })
     limit?: number;
@@ -141,6 +150,16 @@ export class ReviewQueryOptions {
     sort_params?: ReviewSortByInput;
     @Field(() => PartialReview, { nullable: true })
     partial_review?: PartialReview;
+}
+
+@InputType()
+export class UserQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => UserSortByInput, { nullable: true })
+    sort_params?: UserSortByInput;
+    @Field(() => PartialUser, { nullable: true })
+    partial_user?: PartialUser;
 }
 
 @InputType()

@@ -7,8 +7,8 @@ import { MyContext } from '../types/types';
 import {
     ChangePasswordInput,
     LoginInput,
-    PartialUser,
     RegisterInput,
+    UserQueryOptions,
 } from '../types/input_types';
 
 declare module 'express-session' {
@@ -104,7 +104,7 @@ export class UserResolver {
         @Arg('input') input: LoginInput,
         @Ctx() { dataSources, req }: MyContext
     ): Promise<SingleUserResponse> {
-        const response = await dataSources.pgHandler.getUsersObject(
+        const response = await dataSources.pgHandler.getUsersGeneric(
             (({ email }) => ({ email }))(input)
         );
         if (response.users) {
@@ -222,11 +222,16 @@ export class UserResolver {
     }
 
     @Query(() => UserResponse) // return number of rows returned? everywhere?
-    async getUsersObjFilter(
-        @Arg('obj') obj: PartialUser,
-        @Arg('limit', () => Int, { nullable: true }) limit: number,
+    async getUsersGeneric(
+        @Arg('options', { nullable: true }) options: UserQueryOptions,
         @Ctx() { dataSources }: MyContext
     ): Promise<UserResponse> {
-        return await dataSources.pgHandler.getUsersObject(obj, limit);
+        return options
+            ? await dataSources.pgHandler.getUsersGeneric(
+                  options.partial_user ? options.partial_user : undefined,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getUsersGeneric();
     }
 }
