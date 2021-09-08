@@ -91,6 +91,16 @@ export class ResidenceSortByInput {
 }
 
 @InputType()
+export class ResidenceQueryOptions {
+    @Field(() => Int)
+    limit: number;
+    @Field(() => ResidenceSortByInput)
+    sort_params: ResidenceSortByInput;
+    @Field(() => ResidenceSortByInput)
+    partial_residence: PartialResidence;
+}
+
+@InputType()
 export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
     res_id: number;

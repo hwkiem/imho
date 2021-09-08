@@ -11,6 +11,7 @@ import {
     CreateResidenceInput,
     GeoBoundaryInput,
     PartialResidence,
+    ResidenceQueryOptions,
     ResidenceSortByInput,
 } from '../types/input_types';
 import { MyContext } from '../types/types';
@@ -32,16 +33,9 @@ export class ResidencyResolver {
     }
 
     @Query(() => ResidenceResponse)
-    async getResidencesById(
-        @Arg('res_ids', () => [Int]) ids: [number],
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesById(ids);
-    }
-
-    @Query(() => ResidenceResponse)
     async getResidencesBoundingBox(
         @Arg('perimeter') perimeter: GeoBoundaryInput,
+        @Arg('options') options: ResidenceQueryOptions,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         if (
@@ -105,6 +99,15 @@ export class ResidencyResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         return await dataSources.pgHandler.getResidencesObject(obj, limit);
+    }
+
+    // deprecated?
+    @Query(() => ResidenceResponse)
+    async getResidencesById(
+        @Arg('res_ids', () => [Int]) ids: [number],
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        return await dataSources.pgHandler.getResidencesById(ids);
     }
 
     // just for dev
