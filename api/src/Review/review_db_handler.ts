@@ -1,5 +1,6 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { WriteReviewInput } from '../types/input_types';
+import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
+import { ReviewSortByInput, WriteReviewInput } from '../types/input_types';
 import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
 import { ReviewIdTuple } from '../types/types';
 import { assembleReview } from '../utils/db_helper';
@@ -113,15 +114,21 @@ export async function getReviewsByResidenceId(
     return r;
 }
 
-export async function getReviewsObject(
+export async function getReviewsGeneric(
     this: postgresHandler,
-    obj: Partial<Review>,
+    obj: Partial<Review> = {},
+    sort_params: ReviewSortByInput = {
+        attribute: ReviewSortBy.USER_ID,
+        sort: QueryOrderChoice.ASC,
+    },
     limit: number = 10
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where(obj)
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);

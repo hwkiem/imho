@@ -20,7 +20,7 @@ import {
     getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
     getReviewsByUserId,
-    getReviewsObject,
+    getReviewsGeneric,
     updateReviewGeneric,
     writeReview,
 } from '../Review/review_db_handler';
@@ -61,13 +61,13 @@ export class postgresHandler extends SQLDataSource {
     // Reviews
     public writeReview = writeReview;
 
+    public getReviewsGeneric = getReviewsGeneric;
+
     public getReviewsByUserId = getReviewsByUserId;
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
 
     public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
-
-    public getReviewsObject = getReviewsObject;
 
     public updateReviewGeneric = updateReviewGeneric;
 

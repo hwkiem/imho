@@ -6,6 +6,7 @@ import {
     LaundryType,
     QueryOrderChoice,
     ResidenceSortBy,
+    ReviewSortBy,
     StoveType,
 } from './enum_types';
 
@@ -115,6 +116,14 @@ export class ResidenceSortByInput {
 }
 
 @InputType()
+export class ReviewSortByInput {
+    @Field(() => ReviewSortBy)
+    attribute: ReviewSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
 export class ResidenceQueryOptions {
     @Field(() => Int, { nullable: true })
     limit?: number;
@@ -122,6 +131,16 @@ export class ResidenceQueryOptions {
     sort_params?: ResidenceSortByInput;
     @Field(() => PartialResidence, { nullable: true })
     partial_residence?: PartialResidence;
+}
+
+@InputType()
+export class ReviewQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => ReviewSortByInput, { nullable: true })
+    sort_params?: ReviewSortByInput;
+    @Field(() => PartialReview, { nullable: true })
+    partial_review?: PartialReview;
 }
 
 @InputType()

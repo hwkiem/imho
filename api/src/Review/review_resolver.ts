@@ -1,5 +1,9 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { PartialReview, WriteReviewInput } from '../types/input_types';
+import {
+    PartialReview,
+    ReviewQueryOptions,
+    WriteReviewInput,
+} from '../types/input_types';
 import {
     FieldError,
     ResidenceResponse,
@@ -67,6 +71,20 @@ export class ReviewResolver {
         return response;
     }
 
+    @Query(() => ReviewResponse) // return number of rows returned? everywhere?
+    async getReviewsGeneric(
+        @Arg('options', { nullable: true }) options: ReviewQueryOptions,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ReviewResponse> {
+        return options
+            ? await dataSources.pgHandler.getReviewsGeneric(
+                  options.partial_review ? options.partial_review : undefined,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getReviewsGeneric();
+    }
+
     @Query(() => ReviewResponse)
     async getReviewsByUserId(
         @Arg('user_ids', () => [Int]) ids: [number],
@@ -81,15 +99,6 @@ export class ReviewResolver {
         @Ctx() { dataSources }: MyContext
     ): Promise<ReviewResponse> {
         return await dataSources.pgHandler.getReviewsByResidenceId(ids);
-    }
-
-    @Query(() => ReviewResponse) // return number of rows returned? everywhere?
-    async getReviewsObjFilter(
-        @Arg('obj') obj: PartialReview,
-        @Arg('limit', () => Int, { nullable: true }) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ReviewResponse> {
-        return await dataSources.pgHandler.getReviewsObject(obj, limit);
     }
 
     @Mutation(() => SingleReviewResponse)
