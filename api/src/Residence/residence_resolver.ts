@@ -5,6 +5,7 @@ import {
     FieldError,
     PlaceIDResponse,
     ResidenceResponse,
+    SingleResidenceResponse,
 } from '../types/object_types';
 import {
     CreateResidenceInput,
@@ -16,11 +17,11 @@ import { MyContext } from '../types/types';
 
 @Resolver(Residence)
 export class ResidencyResolver {
-    @Mutation(() => ResidenceResponse)
+    @Mutation(() => SingleResidenceResponse)
     async createResidency(
         @Arg('options') options: CreateResidenceInput,
         @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
+    ): Promise<SingleResidenceResponse> {
         const response = await dataSources.pgHandler.createResidence(
             await dataSources.googleMapsHandler.locationFromPlaceID(
                 options.google_place_id

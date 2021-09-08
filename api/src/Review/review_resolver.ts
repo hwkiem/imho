@@ -4,6 +4,7 @@ import {
     FieldError,
     ResidenceResponse,
     ReviewResponse,
+    SingleReviewResponse,
 } from '../types/object_types';
 import { MyContext } from '../types/types';
 import { validateWriteReviewInput } from '../utils/validators';
@@ -11,11 +12,11 @@ import { Review } from './reviews';
 
 @Resolver(Review)
 export class ReviewResolver {
-    @Mutation(() => ReviewResponse)
+    @Mutation(() => SingleReviewResponse)
     async writeReview(
         @Arg('options') options: WriteReviewInput,
         @Ctx() { dataSources, req }: MyContext
-    ): Promise<ReviewResponse> {
+    ): Promise<SingleReviewResponse> {
         if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
@@ -35,9 +36,9 @@ export class ReviewResolver {
         ) {
             return { errors: getResponse.errors };
         }
-        // let args: WriteReviewArgs;
         if (getResponse.residences.length == 0) {
-            // residence does not exist, create
+            // residence does not exist
+            //
             const locationResult =
                 await dataSources.googleMapsHandler.locationFromPlaceID(
                     options.google_place_id
@@ -45,17 +46,18 @@ export class ReviewResolver {
             if (locationResult instanceof FieldError) {
                 return { errors: [locationResult] };
             }
+            //create
             const createResponse = await dataSources.pgHandler.createResidence(
                 locationResult,
                 {
                     google_place_id: options.google_place_id,
                 }
             );
-            if (createResponse.errors || !createResponse.residences) {
+            if (createResponse.errors || !createResponse.residence) {
                 return { errors: createResponse.errors };
             }
             options.user_id = req.session.userId;
-            options.res_id = createResponse.residences[0].res_id;
+            options.res_id = createResponse.residence.res_id;
         } else {
             // residence exists
             options.user_id = req.session.userId;
@@ -90,12 +92,12 @@ export class ReviewResolver {
         return await dataSources.pgHandler.getReviewsObject(obj, limit);
     }
 
-    @Mutation(() => ReviewResponse)
+    @Mutation(() => SingleReviewResponse)
     async updateMyReviewGeneric(
         @Arg('changes') changes: PartialReview,
         @Arg('res_id') res_id: number,
         @Ctx() { req, dataSources }: MyContext
-    ) {
+    ): Promise<SingleReviewResponse> {
         if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }

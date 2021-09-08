@@ -5,7 +5,11 @@ import {
     GeoBoundaryInput,
     ResidenceSortByInput,
 } from '../types/input_types';
-import { FieldError, ResidenceResponse } from '../types/object_types';
+import {
+    FieldError,
+    ResidenceResponse,
+    SingleResidenceResponse,
+} from '../types/object_types';
 
 import { assembleResidence, unpackLocation } from '../utils/mapUtils';
 import { Residence } from './residence';
@@ -14,7 +18,7 @@ export async function createResidence(
     this: postgresHandler,
     locationResult: GeocodeResult | FieldError,
     input: CreateResidenceInput
-): Promise<ResidenceResponse> {
+): Promise<SingleResidenceResponse> {
     if (locationResult instanceof FieldError) {
         return { errors: [locationResult] };
     }
@@ -30,14 +34,14 @@ export async function createResidence(
         ),
     };
 
-    let r: ResidenceResponse = {};
+    let r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences')
         .insert(args)
         .returning('res_id')
         .then(async (ids) => {
             await this.getResidencesById(ids)
                 .then((res) => {
-                    r = res;
+                    if (res.residences) r.residence = res.residences[0];
                 })
                 .catch(
                     (e) =>

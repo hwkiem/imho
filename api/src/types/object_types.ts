@@ -37,6 +37,15 @@ export class UserResponse {
 }
 
 @ObjectType()
+export class SingleUserResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => User, { nullable: true })
+    user?: User;
+}
+
+@ObjectType()
 export class ResidenceResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
@@ -46,12 +55,30 @@ export class ResidenceResponse {
 }
 
 @ObjectType()
+export class SingleResidenceResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => Residence, { nullable: true })
+    residence?: Residence;
+}
+
+@ObjectType()
 export class ReviewResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
     @Field(() => [Review], { nullable: true })
     reviews?: Review[];
+}
+
+@ObjectType()
+export class SingleReviewResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => Review, { nullable: true })
+    review?: Review;
 }
 
 @ObjectType()
