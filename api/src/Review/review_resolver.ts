@@ -27,7 +27,7 @@ export class ReviewResolver {
         }
         // does the residence already exist?
         const getResponse: ResidenceResponse =
-            await dataSources.pgHandler.getResidencesObject({
+            await dataSources.pgHandler.getResidencesGeneric({
                 google_place_id: options.google_place_id,
             });
         if (
@@ -93,7 +93,7 @@ export class ReviewResolver {
     }
 
     @Mutation(() => SingleReviewResponse)
-    async updateMyReviewGeneric(
+    async updateMyReviewOverwrite(
         @Arg('changes') changes: PartialReview,
         @Arg('res_id') res_id: number,
         @Ctx() { req, dataSources }: MyContext

@@ -13,9 +13,8 @@ import {
     createResidence,
     getResidencesBoundingBox,
     getResidencesById,
+    getResidencesGeneric,
     getResidencesNearArea,
-    getResidencesObject,
-    getResidencesSortBy,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByPrimaryKeyTuple,
@@ -51,15 +50,13 @@ export class postgresHandler extends SQLDataSource {
     // Residences
     public createResidence = createResidence;
 
-    public getResidencesById = getResidencesById;
+    public getResidencesGeneric = getResidencesGeneric;
 
-    public getResidencesObject = getResidencesObject;
+    public getResidencesById = getResidencesById;
 
     public getResidencesBoundingBox = getResidencesBoundingBox;
 
     public getResidencesNearArea = getResidencesNearArea;
-
-    public getResidencesSortBy = getResidencesSortBy;
 
     // Reviews
     public writeReview = writeReview;

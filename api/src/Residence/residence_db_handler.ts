@@ -1,8 +1,10 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { postgresHandler } from '../dataSources/postgres';
+import { QueryOrderChoice, ResidenceSortBy } from '../types/enum_types';
 import {
     CreateResidenceInput,
     GeoBoundaryInput,
+    PartialResidence,
     ResidenceSortByInput,
 } from '../types/input_types';
 import {
@@ -71,6 +73,41 @@ export async function createResidence(
     return r;
 }
 
+export async function getResidencesGeneric(
+    this: postgresHandler,
+    obj: Partial<Residence> = {},
+    sort_params: ResidenceSortByInput = {
+        attribute: ResidenceSortBy.ID,
+        sort: QueryOrderChoice.ASC,
+    },
+    limit: number = 10
+): Promise<ResidenceResponse> {
+    let r: ResidenceResponse = {};
+    await this.knex<Residence>('residences')
+        .select(this.residenceColumns())
+        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+        .where(obj)
+        .groupBy('residences.res_id')
+        .limit(limit)
+        .whereNotNull(sort_params.attribute.substring(4))
+        .orderBy(
+            sort_params.attribute == ResidenceSortBy.ID
+                ? 'residences.res_id'
+                : sort_params.attribute,
+            sort_params.sort
+        )
+        .then((residences) => {
+            r.residences = assembleResidence(residences);
+        })
+        .catch(
+            (e) =>
+                (r.errors = [
+                    { field: 'query residence', message: e.toString() },
+                ])
+        );
+    return r;
+}
+
 export async function getResidencesById(
     this: postgresHandler,
     ids: number[]
@@ -94,31 +131,14 @@ export async function getResidencesById(
     return r;
 }
 
-export async function getResidencesObject(
-    this: postgresHandler,
-    obj: Partial<Residence>,
-    limit: number = 10
-): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
-        .where(obj)
-        .groupBy('residences.res_id')
-        .limit(limit)
-        .then((residences: any) => {
-            r.residences = assembleResidence(residences);
-        })
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
-    return r;
-}
-
 export async function getResidencesNearArea(
     this: postgresHandler,
-    obj: Partial<Residence>,
     locationResult: GeocodeResult,
+    obj: Partial<Residence> = {},
+    sort_params: ResidenceSortByInput = {
+        attribute: ResidenceSortBy.ID,
+        sort: QueryOrderChoice.ASC,
+    },
     limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
@@ -134,6 +154,13 @@ export async function getResidencesNearArea(
                 locationResult.geometry.location.lat +
                 ")'::geometry"
         )
+        .whereNotNull(sort_params.attribute.substring(4))
+        .orderBy(
+            sort_params.attribute == ResidenceSortBy.ID
+                ? 'residences.res_id'
+                : sort_params.attribute,
+            sort_params.sort
+        )
         .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);
@@ -147,6 +174,11 @@ export async function getResidencesNearArea(
 export async function getResidencesBoundingBox(
     this: postgresHandler,
     perimeter: GeoBoundaryInput,
+    filter: PartialResidence = {},
+    sort_params: ResidenceSortByInput = {
+        attribute: ResidenceSortBy.ID,
+        sort: QueryOrderChoice.ASC,
+    },
     limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
@@ -166,6 +198,14 @@ export async function getResidencesBoundingBox(
                 this.knexPostgis.geometry('geog')
             )
         )
+        .where(filter)
+        .whereNotNull(sort_params.attribute.substring(4))
+        .orderBy(
+            sort_params.attribute == ResidenceSortBy.ID
+                ? 'residences.res_id'
+                : sort_params.attribute,
+            sort_params.sort
+        )
         .groupBy('residences.res_id')
         .limit(limit)
         .then((residences: any) => {
@@ -177,26 +217,3 @@ export async function getResidencesBoundingBox(
     return r;
 }
 
-export async function getResidencesSortBy(
-    this: postgresHandler,
-    obj: Partial<Residence>,
-    params: ResidenceSortByInput,
-    limit: number = 10
-): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
-        .where(obj)
-        .whereNotNull(params.attribute.substring(4))
-        .groupBy('residences.res_id')
-        .orderBy(params.attribute, params.sort)
-        .limit(limit)
-        .then((residences: any) => {
-            r.residences = assembleResidence(residences);
-        })
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
-    return r;
-}

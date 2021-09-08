@@ -83,6 +83,30 @@ export class PartialReview implements Partial<Review> {
 }
 
 @InputType()
+export class PartialResidence implements Partial<Residence> {
+    @Field({ nullable: true })
+    res_id?: number;
+    @Field({ nullable: true })
+    google_place_id?: string;
+    @Field({ nullable: true })
+    apt_num?: string;
+    @Field({ nullable: true })
+    street_num?: string;
+    @Field({ nullable: true })
+    route?: string;
+    @Field({ nullable: true })
+    city?: string;
+    @Field({ nullable: true })
+    postal_code?: string;
+    @Field({ nullable: true })
+    state?: string;
+    @Field({ nullable: true })
+    avg_rent?: number;
+    @Field(() => Float, { nullable: true })
+    avg_rating?: number;
+}
+
+@InputType()
 export class ResidenceSortByInput {
     @Field(() => ResidenceSortBy)
     attribute: ResidenceSortBy;
@@ -92,36 +116,12 @@ export class ResidenceSortByInput {
 
 @InputType()
 export class ResidenceQueryOptions {
-    @Field(() => Int)
-    limit: number;
-    @Field(() => ResidenceSortByInput)
-    sort_params: ResidenceSortByInput;
-    @Field(() => ResidenceSortByInput)
-    partial_residence: PartialResidence;
-}
-
-@InputType()
-export class PartialResidence implements Partial<Residence> {
-    @Field({ nullable: true })
-    res_id: number;
-    @Field({ nullable: true })
-    google_place_id: string;
-    @Field({ nullable: true })
-    apt_num: string;
-    @Field({ nullable: true })
-    street_num: string;
-    @Field({ nullable: true })
-    route: string;
-    @Field({ nullable: true })
-    city: string;
-    @Field({ nullable: true })
-    postal_code: string;
-    @Field({ nullable: true })
-    state: string;
-    @Field({ nullable: true })
-    avg_rent: number;
-    @Field(() => Float, { nullable: true })
-    avg_rating: number;
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => ResidenceSortByInput, { nullable: true })
+    sort_params?: ResidenceSortByInput;
+    @Field(() => PartialResidence, { nullable: true })
+    partial_residence?: PartialResidence;
 }
 
 @InputType()
