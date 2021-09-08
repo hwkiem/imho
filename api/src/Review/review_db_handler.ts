@@ -21,7 +21,6 @@ export async function writeReview(
         .insert(args)
         .returning(['res_id', 'user_id'])
         .then(async (ids) => {
-            console.log(ids);
             await this.getReviewsByPrimaryKeyTuple({
                 res_id: ids[0].res_id,
                 user_id: ids[0].user_id,

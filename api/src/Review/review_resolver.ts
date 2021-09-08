@@ -6,6 +6,7 @@ import {
     ReviewResponse,
 } from '../types/object_types';
 import { MyContext } from '../types/types';
+import { validateWriteReviewInput } from '../utils/validators';
 import { Review } from './reviews';
 
 @Resolver(Review)
@@ -17,6 +18,11 @@ export class ReviewResolver {
     ): Promise<ReviewResponse> {
         if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        // Validation
+        const err = validateWriteReviewInput(options);
+        if (err) {
+            return { errors: [err] };
         }
         // does the residence already exist?
         const getResponse: ResidenceResponse =
@@ -55,13 +61,6 @@ export class ReviewResolver {
             options.user_id = req.session.userId;
             options.res_id = getResponse.residences[0].res_id;
         }
-        if (options.bath_count && options.bath_count % 0.5 != 0) {
-            return {
-                errors: [
-                    { field: 'bath_count', message: 'incremenets of .5!' },
-                ],
-            };
-        }
         const response = await dataSources.pgHandler.writeReview(options);
         return response;
     }
@@ -99,6 +98,11 @@ export class ReviewResolver {
     ) {
         if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        // Validation
+        const err = validateWriteReviewInput(changes);
+        if (err) {
+            return { errors: [err] };
         }
         return await dataSources.pgHandler.updateReviewGeneric(
             res_id,
