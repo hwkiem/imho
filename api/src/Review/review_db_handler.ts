@@ -1,6 +1,7 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { WriteReviewInput } from '../types/input_types';
-import { ReviewResponse } from '../types/object_types';
+import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
+import { ReviewSortByInput, WriteReviewInput } from '../types/input_types';
+import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
 import { ReviewIdTuple } from '../types/types';
 import { assembleReview } from '../utils/db_helper';
 import { Review } from './reviews';
@@ -8,7 +9,7 @@ import { Review } from './reviews';
 export async function writeReview(
     this: postgresHandler,
     input: WriteReviewInput
-): Promise<ReviewResponse> {
+): Promise<SingleReviewResponse> {
     // nonsense require, but working
     var Range = require('pg-range').Range;
     // strip non-DB attr
@@ -16,7 +17,7 @@ export async function writeReview(
     if (lease_term !== undefined) {
         args.lease_term_ = Range(lease_term.start_date, lease_term.end_date);
     }
-    let r: ReviewResponse = {};
+    let r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .insert(args)
         .returning(['res_id', 'user_id'])
@@ -26,7 +27,7 @@ export async function writeReview(
                 user_id: ids[0].user_id,
             })
                 .then((res) => {
-                    r = res;
+                    if (res.reviews) r.review = res.reviews[0];
                 })
                 .catch((e) => {
                     r.errors = [
@@ -113,15 +114,21 @@ export async function getReviewsByResidenceId(
     return r;
 }
 
-export async function getReviewsObject(
+export async function getReviewsGeneric(
     this: postgresHandler,
-    obj: Partial<Review>,
+    obj: Partial<Review> = {},
+    sort_params: ReviewSortByInput = {
+        attribute: ReviewSortBy.USER_ID,
+        sort: QueryOrderChoice.ASC,
+    },
     limit: number = 10
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where(obj)
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
@@ -138,18 +145,26 @@ export async function updateReviewGeneric(
     res_id: number,
     user_id: number,
     changes: Partial<Review>
-) {
-    let r: ReviewResponse = {};
+): Promise<SingleReviewResponse> {
+    let r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .update(changes)
         .where('res_id', '=', res_id)
         .where('user_id', '=', user_id)
         .returning(['user_id', 'res_id'])
         .then(async (ids) => {
-            r = await this.getReviewsByPrimaryKeyTuple({
+            await this.getReviewsByPrimaryKeyTuple({
                 res_id: ids[0].res_id,
                 user_id: ids[0].user_id,
-            });
+            })
+                .then((reviews) => {
+                    if (reviews.reviews) r.review = reviews.reviews[0];
+                })
+                .catch((e) => {
+                    r.errors = [
+                        { field: 'update review', message: e.toString() },
+                    ];
+                });
         })
         .catch(
             (e) =>

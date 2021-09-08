@@ -2,7 +2,14 @@ import { Field, Float, InputType, Int } from 'type-graphql';
 import { Residence } from '../Residence/residence';
 import { Review } from '../Review/reviews';
 import { User } from '../User/user';
-import { LaundryType, StoveType } from './enum_types';
+import {
+    LaundryType,
+    QueryOrderChoice,
+    ResidenceSortBy,
+    ReviewSortBy,
+    StoveType,
+    UserSortBy,
+} from './enum_types';
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -78,43 +85,81 @@ export class PartialReview implements Partial<Review> {
 }
 
 @InputType()
-export class ResidenceSortByInput {
-    @Field()
-    attribute: string;
-    @Field()
-    sort: string;
-}
-
-// @InputType()
-// export class ResidenceSortByInput {
-//     @Field()
-//     attribute: string;
-//     @Field()
-//     sort: string;
-// }
-
-@InputType()
 export class PartialResidence implements Partial<Residence> {
     @Field({ nullable: true })
-    res_id: number;
+    res_id?: number;
     @Field({ nullable: true })
-    google_place_id: string;
+    google_place_id?: string;
     @Field({ nullable: true })
-    apt_num: string;
+    apt_num?: string;
     @Field({ nullable: true })
-    street_num: string;
+    street_num?: string;
     @Field({ nullable: true })
-    route: string;
+    route?: string;
     @Field({ nullable: true })
-    city: string;
+    city?: string;
     @Field({ nullable: true })
-    postal_code: string;
+    postal_code?: string;
     @Field({ nullable: true })
-    state: string;
+    state?: string;
     @Field({ nullable: true })
-    avg_rent: number;
+    avg_rent?: number;
     @Field(() => Float, { nullable: true })
-    avg_rating: number;
+    avg_rating?: number;
+}
+
+@InputType()
+export class ResidenceSortByInput {
+    @Field(() => ResidenceSortBy)
+    attribute: ResidenceSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
+export class ReviewSortByInput {
+    @Field(() => ReviewSortBy)
+    attribute: ReviewSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
+export class UserSortByInput {
+    @Field(() => UserSortBy)
+    attribute: UserSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
+export class ResidenceQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => ResidenceSortByInput, { nullable: true })
+    sort_params?: ResidenceSortByInput;
+    @Field(() => PartialResidence, { nullable: true })
+    partial_residence?: PartialResidence;
+}
+
+@InputType()
+export class ReviewQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => ReviewSortByInput, { nullable: true })
+    sort_params?: ReviewSortByInput;
+    @Field(() => PartialReview, { nullable: true })
+    partial_review?: PartialReview;
+}
+
+@InputType()
+export class UserQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => UserSortByInput, { nullable: true })
+    sort_params?: UserSortByInput;
+    @Field(() => PartialUser, { nullable: true })
+    partial_user?: PartialUser;
 }
 
 @InputType()

@@ -6,22 +6,20 @@ import {
     createUser,
     deleteUser,
     getUsersById,
-    getUsersLimit,
-    getUsersObject,
+    getUsersGeneric,
 } from '../User/user_db_handler';
 import {
     createResidence,
     getResidencesBoundingBox,
     getResidencesById,
+    getResidencesGeneric,
     getResidencesNearArea,
-    getResidencesObject,
-    getResidencesSortBy,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
     getReviewsByUserId,
-    getReviewsObject,
+    getReviewsGeneric,
     updateReviewGeneric,
     writeReview,
 } from '../Review/review_db_handler';
@@ -38,9 +36,7 @@ export class postgresHandler extends SQLDataSource {
     // Users
     public getUsersById = getUsersById;
 
-    public getUsersLimit = getUsersLimit;
-
-    public getUsersObject = getUsersObject;
+    public getUsersGeneric = getUsersGeneric;
 
     public createUser = createUser;
 
@@ -51,26 +47,24 @@ export class postgresHandler extends SQLDataSource {
     // Residences
     public createResidence = createResidence;
 
-    public getResidencesById = getResidencesById;
+    public getResidencesGeneric = getResidencesGeneric;
 
-    public getResidencesObject = getResidencesObject;
+    public getResidencesById = getResidencesById;
 
     public getResidencesBoundingBox = getResidencesBoundingBox;
 
     public getResidencesNearArea = getResidencesNearArea;
 
-    public getResidencesSortBy = getResidencesSortBy;
-
     // Reviews
     public writeReview = writeReview;
+
+    public getReviewsGeneric = getReviewsGeneric;
 
     public getReviewsByUserId = getReviewsByUserId;
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
 
     public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
-
-    public getReviewsObject = getReviewsObject;
 
     public updateReviewGeneric = updateReviewGeneric;
 

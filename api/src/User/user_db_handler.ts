@@ -3,6 +3,7 @@ import { User } from './user';
 import argon2 from 'argon2';
 import { UserResponse } from '../types/object_types';
 import { RegisterInput } from '../types/input_types';
+import { QueryOrderChoice, UserSortBy } from '../types/enum_types';
 
 export async function getUsersById(
     this: postgresHandler,
@@ -19,30 +20,21 @@ export async function getUsersById(
     return r;
 }
 
-export async function getUsersLimit(
+export async function getUsersGeneric(
     this: postgresHandler,
-    limit: number
-): Promise<UserResponse> {
-    let r: UserResponse = {};
-    await this.knex<User>('users')
-        .select('*')
-        .limit(limit)
-        .then((users) => (r.users = users))
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
-    return r;
-}
-
-export async function getUsersObject(
-    this: postgresHandler,
-    obj: Partial<User>,
+    obj: Partial<User> = {},
+    sort_params = {
+        attribute: UserSortBy.ID,
+        sort: QueryOrderChoice.ASC,
+    },
     limit: number = 10
 ): Promise<UserResponse> {
     let r: UserResponse = {};
     await this.knex<User>('users')
         .select('*')
         .where(obj)
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((users) => (r.users = users))
         .catch(

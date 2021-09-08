@@ -5,22 +5,22 @@ import {
     FieldError,
     PlaceIDResponse,
     ResidenceResponse,
+    SingleResidenceResponse,
 } from '../types/object_types';
 import {
     CreateResidenceInput,
     GeoBoundaryInput,
-    PartialResidence,
-    ResidenceSortByInput,
+    ResidenceQueryOptions,
 } from '../types/input_types';
 import { MyContext } from '../types/types';
 
 @Resolver(Residence)
 export class ResidencyResolver {
-    @Mutation(() => ResidenceResponse)
+    @Mutation(() => SingleResidenceResponse)
     async createResidency(
         @Arg('options') options: CreateResidenceInput,
         @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
+    ): Promise<SingleResidenceResponse> {
         const response = await dataSources.pgHandler.createResidence(
             await dataSources.googleMapsHandler.locationFromPlaceID(
                 options.google_place_id
@@ -30,6 +30,7 @@ export class ResidencyResolver {
         return response;
     }
 
+    // get by batch of ids
     @Query(() => ResidenceResponse)
     async getResidencesById(
         @Arg('res_ids', () => [Int]) ids: [number],
@@ -38,9 +39,28 @@ export class ResidencyResolver {
         return await dataSources.pgHandler.getResidencesById(ids);
     }
 
+    // location agnostic
+    @Query(() => ResidenceResponse)
+    async getResidencesGeneric(
+        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<ResidenceResponse> {
+        // need awaits here?
+        return options
+            ? await dataSources.pgHandler.getResidencesGeneric(
+                  options.partial_residence
+                      ? options.partial_residence
+                      : undefined,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getResidencesGeneric();
+    }
+
     @Query(() => ResidenceResponse)
     async getResidencesBoundingBox(
         @Arg('perimeter') perimeter: GeoBoundaryInput,
+        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         if (
@@ -49,15 +69,23 @@ export class ResidencyResolver {
         ) {
             return { errors: [{ field: 'input', message: 'malformed query' }] };
         }
-        return await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
+        return options
+            ? await dataSources.pgHandler.getResidencesBoundingBox(
+                  perimeter,
+                  options.partial_residence
+                      ? options.partial_residence
+                      : undefined,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
     }
 
     @Query(() => ResidenceResponse)
     async getResidencesByGeoScope(
         @Arg('place_id') place_id: string,
-        @Arg('limit', () => Int, { nullable: true }) limit: number,
-        @Ctx()
-        { dataSources }: MyContext
+        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
+        @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
         const locationResult =
             await dataSources.googleMapsHandler.locationFromPlaceID(place_id);
@@ -65,58 +93,17 @@ export class ResidencyResolver {
             return { errors: [locationResult] };
         }
         const { full_address, ...args } = unpackLocation(locationResult);
-        return await dataSources.pgHandler.getResidencesNearArea(
-            args,
-            locationResult,
-            limit
-        );
-    }
-
-    // get by placeID
-    @Query(() => ResidenceResponse)
-    async getResidencesFromPlaceId(
-        @Arg('place_id', () => String) place_id: string,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesObject({
-            google_place_id: place_id,
-        });
-    }
-
-    @Query(() => ResidenceResponse)
-    async getResidencesSortBy(
-        @Arg('obj') obj: PartialResidence,
-        @Arg('sort_params', { nullable: true }) params: ResidenceSortByInput,
-        @Arg('limit', () => Int, { nullable: true }) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        const a = ['avg_rent', 'avg_rating'];
-        const b = ['asc', 'desc'];
-        if (!a.includes(params.attribute) || !b.includes(params.sort)) {
-            return {
-                errors: [
-                    {
-                        field: 'sort_params',
-                        message:
-                            'attribute one of ' + a + ' and sort one of ' + b,
-                    },
-                ],
-            };
-        }
-        return await dataSources.pgHandler.getResidencesSortBy(
-            obj,
-            params,
-            limit
-        );
-    }
-
-    @Query(() => ResidenceResponse)
-    async getResidencesObjectFilter(
-        @Arg('obj') obj: PartialResidence,
-        @Arg('limit', () => Int, { nullable: true }) limit: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        return await dataSources.pgHandler.getResidencesObject(obj, limit);
+        return options
+            ? await dataSources.pgHandler.getResidencesNearArea(
+                  locationResult,
+                  args,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getResidencesNearArea(
+                  locationResult,
+                  args
+              );
     }
 
     // just for dev
