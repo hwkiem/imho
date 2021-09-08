@@ -2,7 +2,12 @@ import { Field, Float, InputType, Int } from 'type-graphql';
 import { Residence } from '../Residence/residence';
 import { Review } from '../Review/reviews';
 import { User } from '../User/user';
-import { LaundryType, StoveType } from './enum_types';
+import {
+    LaundryType,
+    QueryOrderChoice,
+    ResidenceSortBy,
+    StoveType,
+} from './enum_types';
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -79,19 +84,11 @@ export class PartialReview implements Partial<Review> {
 
 @InputType()
 export class ResidenceSortByInput {
-    @Field()
-    attribute: string;
-    @Field()
-    sort: string;
+    @Field(() => ResidenceSortBy)
+    attribute: ResidenceSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
 }
-
-// @InputType()
-// export class ResidenceSortByInput {
-//     @Field()
-//     attribute: string;
-//     @Field()
-//     sort: string;
-// }
 
 @InputType()
 export class PartialResidence implements Partial<Residence> {

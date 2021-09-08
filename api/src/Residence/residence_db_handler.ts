@@ -184,7 +184,7 @@ export async function getResidencesSortBy(
         .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(obj)
-        .whereNotNull(params.attribute == 'avg_rent' ? 'rent' : 'rating')
+        .whereNotNull(params.attribute.substring(4))
         .groupBy('residences.res_id')
         .orderBy(params.attribute, params.sort)
         .limit(limit)
@@ -196,4 +196,3 @@ export async function getResidencesSortBy(
         );
     return r;
 }
-

@@ -90,19 +90,6 @@ export class ResidencyResolver {
         @Arg('limit', () => Int, { nullable: true }) limit: number,
         @Ctx() { dataSources }: MyContext
     ): Promise<ResidenceResponse> {
-        const a = ['avg_rent', 'avg_rating'];
-        const b = ['asc', 'desc'];
-        if (!a.includes(params.attribute) || !b.includes(params.sort)) {
-            return {
-                errors: [
-                    {
-                        field: 'sort_params',
-                        message:
-                            'attribute one of ' + a + ' and sort one of ' + b,
-                    },
-                ],
-            };
-        }
         return await dataSources.pgHandler.getResidencesSortBy(
             obj,
             params,
