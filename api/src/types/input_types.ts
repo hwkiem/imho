@@ -55,6 +55,24 @@ export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     doorman?: boolean;
 
+    @Field({ nullable: true })
+    pet_friendly?: boolean;
+
+    @Field(() => LaundryType, { nullable: true })
+    laundry?: LaundryType;
+
+    @Field({ nullable: true })
+    backyard?: boolean;
+
+    @Field(() => Float, { nullable: true })
+    bath_count?: number;
+
+    @Field({ nullable: true })
+    bedroom_count?: number;
+
+    @Field({ nullable: true })
+    recommend_score?: number;
+
     @Field(() => DateRangeInput, { nullable: true })
     lease_term?: DateRangeInput;
 }

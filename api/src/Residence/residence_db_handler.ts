@@ -73,23 +73,7 @@ export async function getResidencesById(
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.avg('rating').as('avg_rating'),
-            this.knex.avg('rent').as('avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
+        .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where('residences.res_id', 'in', ids)
         .groupBy('residences.res_id')
@@ -113,23 +97,7 @@ export async function getResidencesObject(
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.avg('rating').as('avg_rating'),
-            this.knex.avg('rent').as('avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
+        .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(obj)
         .groupBy('residences.res_id')
@@ -151,23 +119,7 @@ export async function getResidencesNearArea(
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.avg('rating').as('avg_rating'),
-            this.knex.avg('rent').as('avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
+        .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(obj)
         .groupBy('residences.res_id')
@@ -196,23 +148,7 @@ export async function getResidencesBoundingBox(
     let r: ResidenceResponse = {};
 
     await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.avg('rating').as('avg_rating'),
-            this.knex.avg('rent').as('avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
+        .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(
             this.knexPostgis.boundingBoxContains(
@@ -245,23 +181,7 @@ export async function getResidencesSortBy(
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
     await this.knex<Residence>('residences')
-        .select([
-            'residences.res_id',
-            'google_place_id',
-            'full_address',
-            'apt_num',
-            'street_num',
-            'route',
-            'city',
-            'state',
-            'postal_code',
-            this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-            this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-            this.knex.avg('rating').as('avg_rating'),
-            this.knex.avg('rent').as('avg_rent'),
-            'residences.created_at',
-            'residences.updated_at',
-        ])
+        .select(this.residenceColumns())
         .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
         .where(obj)
         .whereNotNull(params.attribute == 'avg_rent' ? 'rent' : 'rating')
@@ -276,3 +196,4 @@ export async function getResidencesSortBy(
         );
     return r;
 }
+
