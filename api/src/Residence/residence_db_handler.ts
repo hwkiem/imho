@@ -216,4 +216,3 @@ export async function getResidencesBoundingBox(
         );
     return r;
 }
-

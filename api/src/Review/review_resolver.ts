@@ -121,4 +121,25 @@ export class ReviewResolver {
             changes
         );
     }
+
+    @Mutation(() => ReviewResponse)
+    async updateMyReviewGeneric(
+        @Arg('changes') changes: PartialReview,
+        @Arg('res_id') res_id: number,
+        @Ctx() { req, dataSources }: MyContext
+    ) {
+        if (req.session.userId === undefined) {
+            return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        // Validation
+        const err = validateWriteReviewInput(changes);
+        if (err) {
+            return { errors: [err] };
+        }
+        return await dataSources.pgHandler.updateReviewGeneric(
+            res_id,
+            req.session.userId,
+            changes
+        );
+    }
 }
