@@ -1,6 +1,8 @@
 import * as Knex from 'knex';
 import {
+    CREATE_RES_AVERAGES,
     DROP_ON_UPDATE_TIMESTAMP_FUNCTION,
+    DROP_RES_AVERAGES,
     onUpdateTrigger,
     ON_UPDATE_TIMESTAMP_FUNCTION,
 } from '../raw_sql';
@@ -67,11 +69,15 @@ export async function up(knex: Knex): Promise<void> {
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
         .then(() => knex.raw(onUpdateTrigger('reviews')));
+
+    // View to abstract to residences -> their averages
+    await knex.raw(CREATE_RES_AVERAGES);
 }
 
 export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropTable('reviews');
     await knex.schema.dropTable('users');
     await knex.schema.dropTable('residences');
+    await knex.raw(DROP_RES_AVERAGES);
     await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }
