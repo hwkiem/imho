@@ -83,19 +83,12 @@ export async function getResidencesGeneric(
     limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+    await this.knex<Residence>('residences_enhanced')
+        .select('*')
         .where(obj)
-        .groupBy('residences.res_id')
         .limit(limit)
-        .whereNotNull(sort_params.attribute.substring(4))
-        .orderBy(
-            sort_params.attribute == ResidenceSortBy.ID
-                ? 'residences.res_id'
-                : sort_params.attribute,
-            sort_params.sort
-        )
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .then((residences) => {
             r.residences = assembleResidence(residences);
         })
@@ -113,11 +106,9 @@ export async function getResidencesById(
     ids: number[]
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
-        .where('residences.res_id', 'in', ids)
-        .groupBy('residences.res_id')
+    await this.knex<Residence>('residences_enhanced')
+        .select('*')
+        .where('res_id', 'in', ids)
         .then((residences) => {
             r.residences = assembleResidence(residences);
         })
@@ -142,25 +133,18 @@ export async function getResidencesNearArea(
     limit: number = 10
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+    await this.knex<Residence>('residences_enhanced')
+        .select('*')
         .where(obj)
-        .groupBy('residences.res_id')
         .orderByRaw(
-            "residences.geog <-> 'POINT(" +
+            "residences_enhanced.geog <-> 'POINT(" +
                 locationResult.geometry.location.lng +
                 ' ' +
                 locationResult.geometry.location.lat +
                 ")'::geometry"
         )
-        .whereNotNull(sort_params.attribute.substring(4))
-        .orderBy(
-            sort_params.attribute == ResidenceSortBy.ID
-                ? 'residences.res_id'
-                : sort_params.attribute,
-            sort_params.sort
-        )
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);
@@ -183,9 +167,8 @@ export async function getResidencesBoundingBox(
 ): Promise<ResidenceResponse> {
     let r: ResidenceResponse = {};
 
-    await this.knex<Residence>('residences')
-        .select(this.residenceColumns())
-        .leftOuterJoin('reviews', 'residences.res_id', 'reviews.res_id')
+    await this.knex('residences_enhanced')
+        .select('*')
         .where(
             this.knexPostgis.boundingBoxContains(
                 this.knexPostgis.makeEnvelope(
@@ -199,14 +182,8 @@ export async function getResidencesBoundingBox(
             )
         )
         .where(filter)
-        .whereNotNull(sort_params.attribute.substring(4))
-        .orderBy(
-            sort_params.attribute == ResidenceSortBy.ID
-                ? 'residences.res_id'
-                : sort_params.attribute,
-            sort_params.sort
-        )
-        .groupBy('residences.res_id')
+        .whereNotNull(sort_params.attribute)
+        .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((residences: any) => {
             r.residences = assembleResidence(residences);

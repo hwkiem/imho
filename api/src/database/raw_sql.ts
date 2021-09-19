@@ -1,3 +1,6 @@
+import * as Knex from 'knex';
+import { Residence } from '../Residence/residence';
+import { residenceColumns } from '../utils/db_helper';
 export const ON_UPDATE_TIMESTAMP_FUNCTION = `
     CREATE OR REPLACE FUNCTION on_update_timestamp()
     RETURNS TRIGGER
@@ -8,7 +11,7 @@ export const ON_UPDATE_TIMESTAMP_FUNCTION = `
         END; $$;
     `;
 
-export const DROP_RES_AVERAGES = `DROP VIEW IF EXISTS res_averages`;
+export const DROP_ENHANCED_RES_VIEW = `DROP VIEW IF EXISTS residences_enhanced`;
 
 export const DROP_ON_UPDATE_TIMESTAMP_FUNCTION = `DROP FUNCTION on_update_timestamp`;
 
@@ -20,10 +23,19 @@ export const onUpdateTrigger = (table: string): string => {
     `;
 };
 
-export const CREATE_RES_AVERAGES = `
-    CREATE OR REPLACE VIEW res_averages (
-        res_id, avg_rent, avg_rating
-        ) as
-         SELECT residences.res_id, avg(reviews.rent), avg(reviews.rating) 
-         FROM residences left outer join reviews ON 
-            reviews.res_id = residences.res_id group by residences.res_id`;
+export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex): string => {
+    const sub = knex('residences')
+        .select([
+            'residences.res_id',
+            knex.raw('avg(reviews.rent) as avg_rent'),
+            knex.raw('avg(reviews.rating) as avg_rating'),
+        ])
+        .leftOuterJoin('reviews', 'reviews.res_id', 'residences.res_id')
+        .groupBy('residences.res_id')
+        .as('aggs');
+    const viewDefinition = knex<Residence>('residences')
+        .select(residenceColumns())
+        .join(sub, 'aggs.res_id', 'residences.res_id');
+
+    return `CREATE OR REPLACE VIEW residences_enhanced AS (\n ${viewDefinition})`;
+};

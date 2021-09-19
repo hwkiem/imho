@@ -54,6 +54,63 @@ export async function seed(knex: Knex): Promise<void> {
     ]);
 
     await knex<Residence>('residences').insert([
+        // building
+        {
+            google_place_id: 'ChIJA7uBlJcphYAR79QB8w6fAVg',
+            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
+            ),
+        },
+        // its apt's
+        {
+            google_place_id:
+                'Eio5MjAgQ3JhbmJyb29rIEN0ICMzZSwgRGF2aXMsIENBIDk1NjE2LCBVU0EiHhocChYKFAoSCQO7gZSXKYWAEe_UAfMOnwFYEgIzZQ',
+            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            apt_num: '3e',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
+            ),
+        },
+        {
+            google_place_id:
+                'Eio5MjAgQ3JhbmJyb29rIEN0ICMxYSwgRGF2aXMsIENBIDk1NjE2LCBVU0EiHhocChYKFAoSCQO7gZSXKYWAEe_UAfMOnwFYEgIxYQ',
+            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            apt_num: '1a',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
+            ),
+        },
+        {
+            google_place_id:
+                'Eio5MjAgQ3JhbmJyb29rIEN0ICM1ZCwgRGF2aXMsIENBIDk1NjE2LCBVU0EiHhocChYKFAoSCQO7gZSXKYWAEe_UAfMOnwFYEgI1ZA',
+            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            apt_num: '5d',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
+            ),
+        },
+        // others
         {
             google_place_id: 'ChIJ5z8sO3gphYARfxI717FQgtI',
             full_address: '1737 Pomona Dr, Davis, CA 95616, USA',

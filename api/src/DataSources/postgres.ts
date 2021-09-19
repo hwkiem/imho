@@ -23,7 +23,7 @@ import {
     updateReviewGeneric,
     writeReview,
 } from '../Review/review_db_handler';
-import { residenceColumns, reviewColumns } from '../utils/db_helper';
+import { reviewColumns } from '../utils/db_helper';
 
 export class postgresHandler extends SQLDataSource {
     protected knexPostgis: KnexPostgis.KnexPostgis;
@@ -70,6 +70,4 @@ export class postgresHandler extends SQLDataSource {
 
     // Helpers
     public reviewColumns = reviewColumns;
-
-    public residenceColumns = residenceColumns;
 }
