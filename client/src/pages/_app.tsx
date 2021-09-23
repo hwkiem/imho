@@ -1,4 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
+import '@fontsource/raleway/400.css';
+import '@fontsource/open-sans/700.css';
 import { theme } from '../theme';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { useApollo } from '../lib/apollo';

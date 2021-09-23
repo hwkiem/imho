@@ -12,7 +12,7 @@ import { Form, useFormik, yupToFormErrors } from 'formik';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { useWriteReviewMutation } from '../../generated/graphql';
-import { Map } from '../ui/maps/map';
+import { Map } from '../maps/map';
 
 export const EntryReview: React.FC = () => {
     const [review, { data }] = useWriteReviewMutation();

@@ -7,7 +7,7 @@ import {
     Stack,
     Image,
 } from '@chakra-ui/react';
-import { RegularResidenceFragment } from '../../../generated/graphql';
+import { RegularResidenceFragment } from '../../generated/graphql';
 import { Dispatch, SetStateAction } from 'react';
 
 const IMAGE =

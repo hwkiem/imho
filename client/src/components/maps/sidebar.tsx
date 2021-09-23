@@ -8,7 +8,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
-import { RegularResidenceFragment } from '../../../generated/graphql';
+import { RegularResidenceFragment } from '../../generated/graphql';
 import { ResidenceCard } from './rescard';
 import GoogleMap from 'google-map-react';
 

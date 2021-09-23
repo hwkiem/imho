@@ -1,645 +1,500 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = {
-    [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
-    { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = {};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-    ID: string;
-    String: string;
-    Boolean: boolean;
-    Int: number;
-    Float: number;
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
 };
 
 export type ChangePasswordInput = {
-    email: Scalars['String'];
-    old_password: Scalars['String'];
-    new_password: Scalars['String'];
+  email: Scalars['String'];
+  old_password: Scalars['String'];
+  new_password: Scalars['String'];
 };
 
 export type Coords = {
-    __typename?: 'Coords';
-    lat: Scalars['Float'];
-    lng: Scalars['Float'];
+  __typename?: 'Coords';
+  lat: Scalars['Float'];
+  lng: Scalars['Float'];
 };
 
 export type CreateResidenceInput = {
-    google_place_id: Scalars['String'];
+  google_place_id: Scalars['String'];
 };
 
+export type DateRange = {
+  __typename?: 'DateRange';
+  start_date: Scalars['DateTime'];
+  end_date: Scalars['DateTime'];
+};
+
+export type DateRangeInput = {
+  start_date: Scalars['DateTime'];
+  end_date: Scalars['DateTime'];
+};
+
+
 export type FieldError = {
-    __typename?: 'FieldError';
-    field: Scalars['String'];
-    message: Scalars['String'];
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
 };
 
 export type GeoBoundaryInput = {
-    xMax: Scalars['Float'];
-    xMin: Scalars['Float'];
-    yMax: Scalars['Float'];
-    yMin: Scalars['Float'];
+  xMax: Scalars['Float'];
+  xMin: Scalars['Float'];
+  yMax: Scalars['Float'];
+  yMin: Scalars['Float'];
 };
 
+/** Laundry options */
+export enum LaundryType {
+  InUnit = 'IN_UNIT',
+  Building = 'BUILDING',
+  None = 'NONE'
+}
+
 export type LoginInput = {
-    email: Scalars['String'];
-    password: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type Mutation = {
-    __typename?: 'Mutation';
-    register: UserResponse;
-    logout: UserResponse;
-    login: UserResponse;
-    changeMyPassword: UserResponse;
-    deleteUser: UserResponse;
-    createResidency: ResidenceResponse;
-    writeReview: ReviewResponse;
+  __typename?: 'Mutation';
+  register: UserResponse;
+  logout: UserResponse;
+  login: UserResponse;
+  changeMyPassword: UserResponse;
+  deleteUser: UserResponse;
+  createResidency: ResidenceResponse;
+  writeReview: ReviewResponse;
 };
+
 
 export type MutationRegisterArgs = {
-    options: RegisterInput;
+  options: RegisterInput;
 };
+
 
 export type MutationLoginArgs = {
-    input: LoginInput;
+  input: LoginInput;
 };
+
 
 export type MutationChangeMyPasswordArgs = {
-    args: ChangePasswordInput;
+  args: ChangePasswordInput;
 };
+
 
 export type MutationDeleteUserArgs = {
-    id: Scalars['Float'];
+  id: Scalars['Float'];
 };
+
 
 export type MutationCreateResidencyArgs = {
-    options: CreateResidenceInput;
+  options: CreateResidenceInput;
 };
 
+
 export type MutationWriteReviewArgs = {
-    options: WriteReviewInput;
+  options: WriteReviewInput;
 };
 
 export type PartialResidence = {
-    res_id?: Maybe<Scalars['Float']>;
-    google_place_id?: Maybe<Scalars['String']>;
-    apt_num?: Maybe<Scalars['String']>;
-    street_num?: Maybe<Scalars['String']>;
-    route?: Maybe<Scalars['String']>;
-    city?: Maybe<Scalars['String']>;
-    postal_code?: Maybe<Scalars['String']>;
-    state?: Maybe<Scalars['String']>;
-    avg_rent?: Maybe<Scalars['Float']>;
-    avg_rating?: Maybe<Scalars['Float']>;
+  res_id?: Maybe<Scalars['Float']>;
+  google_place_id?: Maybe<Scalars['String']>;
+  apt_num?: Maybe<Scalars['String']>;
+  street_num?: Maybe<Scalars['String']>;
+  route?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  postal_code?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  avg_rating?: Maybe<Scalars['Float']>;
 };
 
 export type PartialReview = {
-    rating?: Maybe<Scalars['Float']>;
-    rent?: Maybe<Scalars['Float']>;
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  stove?: Maybe<StoveType>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  lease_term?: Maybe<DateRangeInput>;
 };
 
 export type PartialUser = {
-    first_name?: Maybe<Scalars['String']>;
-    last_name?: Maybe<Scalars['String']>;
+  first_name?: Maybe<Scalars['String']>;
+  last_name?: Maybe<Scalars['String']>;
 };
 
 export type PlaceIdResponse = {
-    __typename?: 'PlaceIDResponse';
-    errors?: Maybe<FieldError>;
-    place_id?: Maybe<Scalars['String']>;
+  __typename?: 'PlaceIDResponse';
+  errors?: Maybe<FieldError>;
+  place_id?: Maybe<Scalars['String']>;
 };
 
 export type Query = {
-    __typename?: 'Query';
-    me: UserResponse;
-    getUsersbyId: UserResponse;
-    getUsersObjFilter: UserResponse;
-    getResidencesById: ResidenceResponse;
-    getResidencesBoundingBox: ResidenceResponse;
-    getResidencesByGeoScope: ResidenceResponse;
-    getResidencesFromPlaceId: ResidenceResponse;
-    getResidencesSortBy: ResidenceResponse;
-    getResidencesObjectFilter: ResidenceResponse;
-    placeIdFromAddress: PlaceIdResponse;
-    getReviewsByUserId: ReviewResponse;
-    getReviewsByResidenceId: ReviewResponse;
-    getReviewsObjFilter: ReviewResponse;
+  __typename?: 'Query';
+  me: UserResponse;
+  getUsersbyId: UserResponse;
+  getUsersObjFilter: UserResponse;
+  getResidencesById: ResidenceResponse;
+  getResidencesBoundingBox: ResidenceResponse;
+  getResidencesByGeoScope: ResidenceResponse;
+  getResidencesFromPlaceId: ResidenceResponse;
+  getResidencesSortBy: ResidenceResponse;
+  getResidencesObjectFilter: ResidenceResponse;
+  placeIdFromAddress: PlaceIdResponse;
+  getReviewsByUserId: ReviewResponse;
+  getReviewsByResidenceId: ReviewResponse;
+  getReviewsObjFilter: ReviewResponse;
 };
+
 
 export type QueryGetUsersbyIdArgs = {
-    user_ids: Array<Scalars['Int']>;
+  user_ids: Array<Scalars['Int']>;
 };
+
 
 export type QueryGetUsersObjFilterArgs = {
-    limit?: Maybe<Scalars['Float']>;
-    obj: PartialUser;
+  limit?: Maybe<Scalars['Int']>;
+  obj: PartialUser;
 };
+
 
 export type QueryGetResidencesByIdArgs = {
-    res_ids: Array<Scalars['Int']>;
+  res_ids: Array<Scalars['Int']>;
 };
+
 
 export type QueryGetResidencesBoundingBoxArgs = {
-    perimeter: GeoBoundaryInput;
+  perimeter: GeoBoundaryInput;
 };
+
 
 export type QueryGetResidencesByGeoScopeArgs = {
-    limit?: Maybe<Scalars['Float']>;
-    place_id: Scalars['String'];
+  limit?: Maybe<Scalars['Int']>;
+  place_id: Scalars['String'];
 };
+
 
 export type QueryGetResidencesFromPlaceIdArgs = {
-    place_id: Scalars['String'];
+  place_id: Scalars['String'];
 };
+
 
 export type QueryGetResidencesSortByArgs = {
-    limit?: Maybe<Scalars['Float']>;
-    sort_params?: Maybe<ResidenceSortByInput>;
-    obj: PartialResidence;
+  limit?: Maybe<Scalars['Int']>;
+  sort_params?: Maybe<ResidenceSortByInput>;
+  obj: PartialResidence;
 };
+
 
 export type QueryGetResidencesObjectFilterArgs = {
-    limit?: Maybe<Scalars['Float']>;
-    obj: PartialResidence;
+  limit?: Maybe<Scalars['Int']>;
+  obj: PartialResidence;
 };
+
 
 export type QueryPlaceIdFromAddressArgs = {
-    address: Scalars['String'];
+  address: Scalars['String'];
 };
+
 
 export type QueryGetReviewsByUserIdArgs = {
-    user_ids: Array<Scalars['Int']>;
+  user_ids: Array<Scalars['Int']>;
 };
+
 
 export type QueryGetReviewsByResidenceIdArgs = {
-    residence_ids: Array<Scalars['Int']>;
+  residence_ids: Array<Scalars['Int']>;
 };
 
+
 export type QueryGetReviewsObjFilterArgs = {
-    limit?: Maybe<Scalars['Float']>;
-    obj: PartialReview;
+  limit?: Maybe<Scalars['Int']>;
+  obj: PartialReview;
 };
 
 export type RegisterInput = {
-    email: Scalars['String'];
-    first_name: Scalars['String'];
-    last_name: Scalars['String'];
-    password: Scalars['String'];
+  email: Scalars['String'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type Residence = {
-    __typename?: 'Residence';
-    res_id: Scalars['Float'];
-    google_place_id: Scalars['String'];
-    full_address: Scalars['String'];
-    apt_num?: Maybe<Scalars['String']>;
-    street_num: Scalars['String'];
-    route: Scalars['String'];
-    city: Scalars['String'];
-    state: Scalars['String'];
-    postal_code: Scalars['String'];
-    coords: Coords;
-    avg_rating?: Maybe<Scalars['Float']>;
-    avg_rent?: Maybe<Scalars['Float']>;
-    myReviews?: Maybe<Array<Review>>;
-    created_at: Scalars['String'];
-    updated_at: Scalars['String'];
+  __typename?: 'Residence';
+  res_id: Scalars['Float'];
+  google_place_id: Scalars['String'];
+  full_address: Scalars['String'];
+  apt_num?: Maybe<Scalars['String']>;
+  street_num: Scalars['String'];
+  route: Scalars['String'];
+  city: Scalars['String'];
+  state: Scalars['String'];
+  postal_code: Scalars['String'];
+  coords: Coords;
+  avg_rating?: Maybe<Scalars['Float']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  myReviews?: Maybe<Array<Review>>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
 export type ResidenceResponse = {
-    __typename?: 'ResidenceResponse';
-    errors?: Maybe<Array<FieldError>>;
-    residences?: Maybe<Array<Residence>>;
+  __typename?: 'ResidenceResponse';
+  errors?: Maybe<Array<FieldError>>;
+  residences?: Maybe<Array<Residence>>;
 };
 
 export type ResidenceSortByInput = {
-    attribute: Scalars['String'];
-    sort: Scalars['String'];
+  attribute: Scalars['String'];
+  sort: Scalars['String'];
 };
 
 export type Review = {
-    __typename?: 'Review';
-    res_id: Scalars['Float'];
-    user_id: Scalars['Float'];
-    rating?: Maybe<Scalars['Float']>;
-    rent?: Maybe<Scalars['Float']>;
-    residence?: Maybe<Residence>;
-    created_at: Scalars['String'];
-    updated_at: Scalars['String'];
+  __typename?: 'Review';
+  res_id: Scalars['Float'];
+  user_id: Scalars['Float'];
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  residence?: Maybe<Residence>;
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  stove?: Maybe<StoveType>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Float']>;
+  recommend_score?: Maybe<Scalars['Float']>;
+  lease_term?: Maybe<DateRange>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
 export type ReviewResponse = {
-    __typename?: 'ReviewResponse';
-    errors?: Maybe<Array<FieldError>>;
-    reviews?: Maybe<Array<Review>>;
+  __typename?: 'ReviewResponse';
+  errors?: Maybe<Array<FieldError>>;
+  reviews?: Maybe<Array<Review>>;
 };
 
+/** Stove options */
+export enum StoveType {
+  Gas = 'GAS',
+  Electric = 'ELECTRIC'
+}
+
 export type User = {
-    __typename?: 'User';
-    user_id: Scalars['Float'];
-    first_name: Scalars['String'];
-    last_name: Scalars['String'];
-    email: Scalars['String'];
-    profession?: Maybe<Scalars['String']>;
-    myReviews?: Maybe<Array<Review>>;
-    created_at: Scalars['String'];
-    updated_at: Scalars['String'];
+  __typename?: 'User';
+  user_id: Scalars['Float'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  email: Scalars['String'];
+  profession?: Maybe<Scalars['String']>;
+  myReviews?: Maybe<Array<Review>>;
+  created_at: Scalars['String'];
+  updated_at: Scalars['String'];
 };
 
 export type UserResponse = {
-    __typename?: 'UserResponse';
-    errors?: Maybe<Array<FieldError>>;
-    users?: Maybe<Array<User>>;
+  __typename?: 'UserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  users?: Maybe<Array<User>>;
 };
 
 export type WriteReviewInput = {
-    google_place_id: Scalars['String'];
-    rating?: Maybe<Scalars['Float']>;
-    rent?: Maybe<Scalars['Float']>;
+  google_place_id: Scalars['String'];
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  stove?: Maybe<StoveType>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  lease_term?: Maybe<DateRangeInput>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Int']>;
+  recommend_score?: Maybe<Scalars['Int']>;
 };
 
-export type RegularErrorFragment = {
-    __typename?: 'FieldError';
-    field: string;
-    message: string;
-};
+export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type RegularResidenceFragment = {
-    __typename?: 'Residence';
-    res_id: number;
-    full_address: string;
-    avg_rating?: Maybe<number>;
-    avg_rent?: Maybe<number>;
-    coords: { __typename?: 'Coords'; lat: number; lng: number };
-};
+export type RegularResidenceFragment = { __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } };
 
-export type RegularResidenceResponseFragment = {
-    __typename?: 'ResidenceResponse';
-    errors?: Maybe<
-        Array<{ __typename?: 'FieldError'; field: string; message: string }>
-    >;
-    residences?: Maybe<
-        Array<{
-            __typename?: 'Residence';
-            res_id: number;
-            full_address: string;
-            avg_rating?: Maybe<number>;
-            avg_rent?: Maybe<number>;
-            coords: { __typename?: 'Coords'; lat: number; lng: number };
-        }>
-    >;
-};
+export type RegularResidenceResponseFragment = { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> };
 
-export type RegularReviewFragment = {
-    __typename?: 'Review';
-    res_id: number;
-    user_id: number;
-    rent?: Maybe<number>;
-    rating?: Maybe<number>;
-    residence?: Maybe<{ __typename?: 'Residence'; full_address: string }>;
-};
+export type RegularReviewFragment = { __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> };
 
-export type RegularReviewResponseFragment = {
-    __typename?: 'ReviewResponse';
-    errors?: Maybe<
-        Array<{ __typename?: 'FieldError'; field: string; message: string }>
-    >;
-    reviews?: Maybe<
-        Array<{
-            __typename?: 'Review';
-            res_id: number;
-            user_id: number;
-            rent?: Maybe<number>;
-            rating?: Maybe<number>;
-            residence?: Maybe<{
-                __typename?: 'Residence';
-                full_address: string;
-            }>;
-        }>
-    >;
-};
+export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> }>> };
 
-export type RegularUserFragment = {
-    __typename?: 'User';
-    user_id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    created_at: string;
-    updated_at: string;
-};
+export type RegularUserFragment = { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
 
-export type RegularUserResponseFragment = {
-    __typename?: 'UserResponse';
-    errors?: Maybe<
-        Array<{ __typename?: 'FieldError'; field: string; message: string }>
-    >;
-    users?: Maybe<
-        Array<{
-            __typename?: 'User';
-            user_id: number;
-            first_name: string;
-            last_name: string;
-            email: string;
-            created_at: string;
-            updated_at: string;
-        }>
-    >;
-};
+export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> };
 
 export type LoginMutationVariables = Exact<{
-    input: LoginInput;
+  input: LoginInput;
 }>;
 
-export type LoginMutation = {
-    __typename?: 'Mutation';
-    login: {
-        __typename?: 'UserResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        users?: Maybe<
-            Array<{
-                __typename?: 'User';
-                user_id: number;
-                first_name: string;
-                last_name: string;
-                email: string;
-                created_at: string;
-                updated_at: string;
-            }>
-        >;
-    };
-};
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
-export type LogoutMutation = {
-    __typename?: 'Mutation';
-    logout: {
-        __typename?: 'UserResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        users?: Maybe<
-            Array<{
-                __typename?: 'User';
-                user_id: number;
-                first_name: string;
-                last_name: string;
-                email: string;
-                created_at: string;
-                updated_at: string;
-            }>
-        >;
-    };
-};
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type RegisterMutationVariables = Exact<{
-    options: RegisterInput;
+  options: RegisterInput;
 }>;
 
-export type RegisterMutation = {
-    __typename?: 'Mutation';
-    register: {
-        __typename?: 'UserResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        users?: Maybe<
-            Array<{
-                __typename?: 'User';
-                user_id: number;
-                first_name: string;
-                last_name: string;
-                email: string;
-                created_at: string;
-                updated_at: string;
-            }>
-        >;
-    };
-};
+
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export type WriteReviewMutationVariables = Exact<{
-    options: WriteReviewInput;
+  options: WriteReviewInput;
 }>;
 
-export type WriteReviewMutation = {
-    __typename?: 'Mutation';
-    writeReview: {
-        __typename?: 'ReviewResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        reviews?: Maybe<
-            Array<{
-                __typename?: 'Review';
-                res_id: number;
-                user_id: number;
-                rent?: Maybe<number>;
-                rating?: Maybe<number>;
-                residence?: Maybe<{
-                    __typename?: 'Residence';
-                    full_address: string;
-                }>;
-            }>
-        >;
-    };
-};
+
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> }>> } };
 
 export type GetResidencesBoundingBoxQueryVariables = Exact<{
-    perimeter: GeoBoundaryInput;
+  perimeter: GeoBoundaryInput;
 }>;
 
-export type GetResidencesBoundingBoxQuery = {
-    __typename?: 'Query';
-    getResidencesBoundingBox: {
-        __typename?: 'ResidenceResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        residences?: Maybe<
-            Array<{
-                __typename?: 'Residence';
-                res_id: number;
-                full_address: string;
-                avg_rating?: Maybe<number>;
-                avg_rent?: Maybe<number>;
-                coords: { __typename?: 'Coords'; lat: number; lng: number };
-            }>
-        >;
-    };
-};
+
+export type GetResidencesBoundingBoxQuery = { __typename?: 'Query', getResidencesBoundingBox: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
 
 export type GetResidencesByGeoScopeQueryVariables = Exact<{
-    limit?: Maybe<Scalars['Float']>;
-    place_id: Scalars['String'];
+  limit?: Maybe<Scalars['Int']>;
+  place_id: Scalars['String'];
 }>;
 
-export type GetResidencesByGeoScopeQuery = {
-    __typename?: 'Query';
-    getResidencesByGeoScope: {
-        __typename?: 'ResidenceResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        residences?: Maybe<
-            Array<{
-                __typename?: 'Residence';
-                res_id: number;
-                full_address: string;
-                avg_rating?: Maybe<number>;
-                avg_rent?: Maybe<number>;
-                coords: { __typename?: 'Coords'; lat: number; lng: number };
-            }>
-        >;
-    };
-};
+
+export type GetResidencesByGeoScopeQuery = { __typename?: 'Query', getResidencesByGeoScope: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
 
 export type GetReviewsByUserIdQueryVariables = Exact<{
-    user_ids: Array<Scalars['Int']> | Scalars['Int'];
+  user_ids: Array<Scalars['Int']> | Scalars['Int'];
 }>;
 
-export type GetReviewsByUserIdQuery = {
-    __typename?: 'Query';
-    getReviewsByUserId: {
-        __typename?: 'ReviewResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        reviews?: Maybe<
-            Array<{
-                __typename?: 'Review';
-                res_id: number;
-                user_id: number;
-                rent?: Maybe<number>;
-                rating?: Maybe<number>;
-                residence?: Maybe<{
-                    __typename?: 'Residence';
-                    full_address: string;
-                }>;
-            }>
-        >;
-    };
-};
 
-export type MeQueryVariables = Exact<{ [key: string]: never }>;
+export type GetReviewsByUserIdQuery = { __typename?: 'Query', getReviewsByUserId: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> }>> } };
 
-export type MeQuery = {
-    __typename?: 'Query';
-    me: {
-        __typename?: 'UserResponse';
-        errors?: Maybe<
-            Array<{ __typename?: 'FieldError'; field: string; message: string }>
-        >;
-        users?: Maybe<
-            Array<{
-                __typename?: 'User';
-                user_id: number;
-                first_name: string;
-                last_name: string;
-                email: string;
-                created_at: string;
-                updated_at: string;
-            }>
-        >;
-    };
-};
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
 
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
-        field
-        message
-    }
-`;
+  field
+  message
+}
+    `;
 export const RegularResidenceFragmentDoc = gql`
     fragment RegularResidence on Residence {
-        res_id
-        full_address
-        coords {
-            lat
-            lng
-        }
-        avg_rating
-        avg_rent
-    }
-`;
+  res_id
+  full_address
+  coords {
+    lat
+    lng
+  }
+  avg_rating
+  avg_rent
+}
+    `;
 export const RegularResidenceResponseFragmentDoc = gql`
     fragment RegularResidenceResponse on ResidenceResponse {
-        errors {
-            ...RegularError
-        }
-        residences {
-            ...RegularResidence
-        }
-    }
+  errors {
+    ...RegularError
+  }
+  residences {
+    ...RegularResidence
+  }
+}
     ${RegularErrorFragmentDoc}
-    ${RegularResidenceFragmentDoc}
-`;
+${RegularResidenceFragmentDoc}`;
 export const RegularReviewFragmentDoc = gql`
     fragment RegularReview on Review {
-        res_id
-        user_id
-        rent
-        rating
-        residence {
-            full_address
-        }
-    }
-`;
+  res_id
+  user_id
+  rent
+  rating
+  residence {
+    full_address
+  }
+}
+    `;
 export const RegularReviewResponseFragmentDoc = gql`
     fragment RegularReviewResponse on ReviewResponse {
-        errors {
-            ...RegularError
-        }
-        reviews {
-            ...RegularReview
-        }
-    }
+  errors {
+    ...RegularError
+  }
+  reviews {
+    ...RegularReview
+  }
+}
     ${RegularErrorFragmentDoc}
-    ${RegularReviewFragmentDoc}
-`;
+${RegularReviewFragmentDoc}`;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
-        user_id
-        first_name
-        last_name
-        email
-        created_at
-        updated_at
-    }
-`;
+  user_id
+  first_name
+  last_name
+  email
+  created_at
+  updated_at
+}
+    `;
 export const RegularUserResponseFragmentDoc = gql`
     fragment RegularUserResponse on UserResponse {
-        errors {
-            ...RegularError
-        }
-        users {
-            ...RegularUser
-        }
-    }
+  errors {
+    ...RegularError
+  }
+  users {
+    ...RegularUser
+  }
+}
     ${RegularErrorFragmentDoc}
-    ${RegularUserFragmentDoc}
-`;
+${RegularUserFragmentDoc}`;
 export const LoginDocument = gql`
     mutation Login($input: LoginInput!) {
-        login(input: $input) {
-            ...RegularUserResponse
-        }
-    }
-    ${RegularUserResponseFragmentDoc}
-`;
-export type LoginMutationFn = Apollo.MutationFunction<
-    LoginMutation,
-    LoginMutationVariables
->;
+  login(input: $input) {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
  * __useLoginMutation__
@@ -658,36 +513,21 @@ export type LoginMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLoginMutation(
-    baseOptions?: Apollo.MutationHookOptions<
-        LoginMutation,
-        LoginMutationVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
-        LoginDocument,
-        options
-    );
-}
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<
-    LoginMutation,
-    LoginMutationVariables
->;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
-        logout {
-            ...RegularUserResponse
-        }
-    }
-    ${RegularUserResponseFragmentDoc}
-`;
-export type LogoutMutationFn = Apollo.MutationFunction<
-    LogoutMutation,
-    LogoutMutationVariables
->;
+  logout {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
  * __useLogoutMutation__
@@ -705,36 +545,21 @@ export type LogoutMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLogoutMutation(
-    baseOptions?: Apollo.MutationHookOptions<
-        LogoutMutation,
-        LogoutMutationVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
-        LogoutDocument,
-        options
-    );
-}
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
-    LogoutMutation,
-    LogoutMutationVariables
->;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
     mutation Register($options: RegisterInput!) {
-        register(options: $options) {
-            ...RegularUserResponse
-        }
-    }
-    ${RegularUserResponseFragmentDoc}
-`;
-export type RegisterMutationFn = Apollo.MutationFunction<
-    RegisterMutation,
-    RegisterMutationVariables
->;
+  register(options: $options) {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
  * __useRegisterMutation__
@@ -753,36 +578,21 @@ export type RegisterMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useRegisterMutation(
-    baseOptions?: Apollo.MutationHookOptions<
-        RegisterMutation,
-        RegisterMutationVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(
-        RegisterDocument,
-        options
-    );
-}
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
+      }
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<
-    RegisterMutation,
-    RegisterMutationVariables
->;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const WriteReviewDocument = gql`
     mutation WriteReview($options: WriteReviewInput!) {
-        writeReview(options: $options) {
-            ...RegularReviewResponse
-        }
-    }
-    ${RegularReviewResponseFragmentDoc}
-`;
-export type WriteReviewMutationFn = Apollo.MutationFunction<
-    WriteReviewMutation,
-    WriteReviewMutationVariables
->;
+  writeReview(options: $options) {
+    ...RegularReviewResponse
+  }
+}
+    ${RegularReviewResponseFragmentDoc}`;
+export type WriteReviewMutationFn = Apollo.MutationFunction<WriteReviewMutation, WriteReviewMutationVariables>;
 
 /**
  * __useWriteReviewMutation__
@@ -801,34 +611,20 @@ export type WriteReviewMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useWriteReviewMutation(
-    baseOptions?: Apollo.MutationHookOptions<
-        WriteReviewMutation,
-        WriteReviewMutationVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useMutation<
-        WriteReviewMutation,
-        WriteReviewMutationVariables
-    >(WriteReviewDocument, options);
-}
-export type WriteReviewMutationHookResult = ReturnType<
-    typeof useWriteReviewMutation
->;
+export function useWriteReviewMutation(baseOptions?: Apollo.MutationHookOptions<WriteReviewMutation, WriteReviewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<WriteReviewMutation, WriteReviewMutationVariables>(WriteReviewDocument, options);
+      }
+export type WriteReviewMutationHookResult = ReturnType<typeof useWriteReviewMutation>;
 export type WriteReviewMutationResult = Apollo.MutationResult<WriteReviewMutation>;
-export type WriteReviewMutationOptions = Apollo.BaseMutationOptions<
-    WriteReviewMutation,
-    WriteReviewMutationVariables
->;
+export type WriteReviewMutationOptions = Apollo.BaseMutationOptions<WriteReviewMutation, WriteReviewMutationVariables>;
 export const GetResidencesBoundingBoxDocument = gql`
     query GetResidencesBoundingBox($perimeter: GeoBoundaryInput!) {
-        getResidencesBoundingBox(perimeter: $perimeter) {
-            ...RegularResidenceResponse
-        }
-    }
-    ${RegularResidenceResponseFragmentDoc}
-`;
+  getResidencesBoundingBox(perimeter: $perimeter) {
+    ...RegularResidenceResponse
+  }
+}
+    ${RegularResidenceResponseFragmentDoc}`;
 
 /**
  * __useGetResidencesBoundingBoxQuery__
@@ -846,48 +642,24 @@ export const GetResidencesBoundingBoxDocument = gql`
  *   },
  * });
  */
-export function useGetResidencesBoundingBoxQuery(
-    baseOptions: Apollo.QueryHookOptions<
-        GetResidencesBoundingBoxQuery,
-        GetResidencesBoundingBoxQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useQuery<
-        GetResidencesBoundingBoxQuery,
-        GetResidencesBoundingBoxQueryVariables
-    >(GetResidencesBoundingBoxDocument, options);
-}
-export function useGetResidencesBoundingBoxLazyQuery(
-    baseOptions?: Apollo.LazyQueryHookOptions<
-        GetResidencesBoundingBoxQuery,
-        GetResidencesBoundingBoxQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useLazyQuery<
-        GetResidencesBoundingBoxQuery,
-        GetResidencesBoundingBoxQueryVariables
-    >(GetResidencesBoundingBoxDocument, options);
-}
-export type GetResidencesBoundingBoxQueryHookResult = ReturnType<
-    typeof useGetResidencesBoundingBoxQuery
->;
-export type GetResidencesBoundingBoxLazyQueryHookResult = ReturnType<
-    typeof useGetResidencesBoundingBoxLazyQuery
->;
-export type GetResidencesBoundingBoxQueryResult = Apollo.QueryResult<
-    GetResidencesBoundingBoxQuery,
-    GetResidencesBoundingBoxQueryVariables
->;
-export const GetResidencesByGeoScopeDocument = gql`
-    query GetResidencesByGeoScope($limit: Float, $place_id: String!) {
-        getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
-            ...RegularResidenceResponse
+export function useGetResidencesBoundingBoxQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>(GetResidencesBoundingBoxDocument, options);
+      }
+export function useGetResidencesBoundingBoxLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>(GetResidencesBoundingBoxDocument, options);
         }
-    }
-    ${RegularResidenceResponseFragmentDoc}
-`;
+export type GetResidencesBoundingBoxQueryHookResult = ReturnType<typeof useGetResidencesBoundingBoxQuery>;
+export type GetResidencesBoundingBoxLazyQueryHookResult = ReturnType<typeof useGetResidencesBoundingBoxLazyQuery>;
+export type GetResidencesBoundingBoxQueryResult = Apollo.QueryResult<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>;
+export const GetResidencesByGeoScopeDocument = gql`
+    query GetResidencesByGeoScope($limit: Int, $place_id: String!) {
+  getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
+    ...RegularResidenceResponse
+  }
+}
+    ${RegularResidenceResponseFragmentDoc}`;
 
 /**
  * __useGetResidencesByGeoScopeQuery__
@@ -906,48 +678,24 @@ export const GetResidencesByGeoScopeDocument = gql`
  *   },
  * });
  */
-export function useGetResidencesByGeoScopeQuery(
-    baseOptions: Apollo.QueryHookOptions<
-        GetResidencesByGeoScopeQuery,
-        GetResidencesByGeoScopeQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useQuery<
-        GetResidencesByGeoScopeQuery,
-        GetResidencesByGeoScopeQueryVariables
-    >(GetResidencesByGeoScopeDocument, options);
-}
-export function useGetResidencesByGeoScopeLazyQuery(
-    baseOptions?: Apollo.LazyQueryHookOptions<
-        GetResidencesByGeoScopeQuery,
-        GetResidencesByGeoScopeQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useLazyQuery<
-        GetResidencesByGeoScopeQuery,
-        GetResidencesByGeoScopeQueryVariables
-    >(GetResidencesByGeoScopeDocument, options);
-}
-export type GetResidencesByGeoScopeQueryHookResult = ReturnType<
-    typeof useGetResidencesByGeoScopeQuery
->;
-export type GetResidencesByGeoScopeLazyQueryHookResult = ReturnType<
-    typeof useGetResidencesByGeoScopeLazyQuery
->;
-export type GetResidencesByGeoScopeQueryResult = Apollo.QueryResult<
-    GetResidencesByGeoScopeQuery,
-    GetResidencesByGeoScopeQueryVariables
->;
+export function useGetResidencesByGeoScopeQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>(GetResidencesByGeoScopeDocument, options);
+      }
+export function useGetResidencesByGeoScopeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>(GetResidencesByGeoScopeDocument, options);
+        }
+export type GetResidencesByGeoScopeQueryHookResult = ReturnType<typeof useGetResidencesByGeoScopeQuery>;
+export type GetResidencesByGeoScopeLazyQueryHookResult = ReturnType<typeof useGetResidencesByGeoScopeLazyQuery>;
+export type GetResidencesByGeoScopeQueryResult = Apollo.QueryResult<GetResidencesByGeoScopeQuery, GetResidencesByGeoScopeQueryVariables>;
 export const GetReviewsByUserIdDocument = gql`
     query GetReviewsByUserId($user_ids: [Int!]!) {
-        getReviewsByUserId(user_ids: $user_ids) {
-            ...RegularReviewResponse
-        }
-    }
-    ${RegularReviewResponseFragmentDoc}
-`;
+  getReviewsByUserId(user_ids: $user_ids) {
+    ...RegularReviewResponse
+  }
+}
+    ${RegularReviewResponseFragmentDoc}`;
 
 /**
  * __useGetReviewsByUserIdQuery__
@@ -965,48 +713,24 @@ export const GetReviewsByUserIdDocument = gql`
  *   },
  * });
  */
-export function useGetReviewsByUserIdQuery(
-    baseOptions: Apollo.QueryHookOptions<
-        GetReviewsByUserIdQuery,
-        GetReviewsByUserIdQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useQuery<
-        GetReviewsByUserIdQuery,
-        GetReviewsByUserIdQueryVariables
-    >(GetReviewsByUserIdDocument, options);
-}
-export function useGetReviewsByUserIdLazyQuery(
-    baseOptions?: Apollo.LazyQueryHookOptions<
-        GetReviewsByUserIdQuery,
-        GetReviewsByUserIdQueryVariables
-    >
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useLazyQuery<
-        GetReviewsByUserIdQuery,
-        GetReviewsByUserIdQueryVariables
-    >(GetReviewsByUserIdDocument, options);
-}
-export type GetReviewsByUserIdQueryHookResult = ReturnType<
-    typeof useGetReviewsByUserIdQuery
->;
-export type GetReviewsByUserIdLazyQueryHookResult = ReturnType<
-    typeof useGetReviewsByUserIdLazyQuery
->;
-export type GetReviewsByUserIdQueryResult = Apollo.QueryResult<
-    GetReviewsByUserIdQuery,
-    GetReviewsByUserIdQueryVariables
->;
+export function useGetReviewsByUserIdQuery(baseOptions: Apollo.QueryHookOptions<GetReviewsByUserIdQuery, GetReviewsByUserIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetReviewsByUserIdQuery, GetReviewsByUserIdQueryVariables>(GetReviewsByUserIdDocument, options);
+      }
+export function useGetReviewsByUserIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetReviewsByUserIdQuery, GetReviewsByUserIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetReviewsByUserIdQuery, GetReviewsByUserIdQueryVariables>(GetReviewsByUserIdDocument, options);
+        }
+export type GetReviewsByUserIdQueryHookResult = ReturnType<typeof useGetReviewsByUserIdQuery>;
+export type GetReviewsByUserIdLazyQueryHookResult = ReturnType<typeof useGetReviewsByUserIdLazyQuery>;
+export type GetReviewsByUserIdQueryResult = Apollo.QueryResult<GetReviewsByUserIdQuery, GetReviewsByUserIdQueryVariables>;
 export const MeDocument = gql`
     query Me {
-        me {
-            ...RegularUserResponse
-        }
-    }
-    ${RegularUserResponseFragmentDoc}
-`;
+  me {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
 
 /**
  * __useMeQuery__
@@ -1023,18 +747,14 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(
-    baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
-export function useMeLazyQuery(
-    baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
-) {
-    const options = { ...defaultOptions, ...baseOptions };
-    return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-}
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;

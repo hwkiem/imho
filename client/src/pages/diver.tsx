@@ -1,5 +1,5 @@
 import { Layout } from '../components/layout/layout';
-import { Map } from '../components/ui/maps/map';
+import { Map } from '../components/maps/map';
 import { RegularResidenceFragment } from '../generated/graphql';
 import { Page } from '../types/page';
 interface DiverProps {

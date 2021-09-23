@@ -5,7 +5,7 @@ import {
     RegularResidenceFragment,
     useGetResidencesBoundingBoxQuery,
     useGetResidencesByGeoScopeLazyQuery,
-} from '../../../generated/graphql';
+} from '../../generated/graphql';
 import { Marker } from './marker';
 import { SearchBar } from './searchbar';
 import { SideBar } from './sidebar';
@@ -90,24 +90,21 @@ export const Map: React.FC<MapProps> = ({
     const [geoscope, results] = useGetResidencesByGeoScopeLazyQuery();
 
     useEffect(() => {
+        if (results.data?.getResidencesByGeoScope.residences)
+            setResidences(results.data?.getResidencesByGeoScope.residences);
+    }, [results]);
+
+    useEffect(() => {
         if (data?.getResidencesBoundingBox.residences)
             setResidences(data?.getResidencesBoundingBox.residences);
     }, [data]);
-
-    useEffect(() => {
-        if (results.data?.getResidencesByGeoScope.residences)
-            setResidences(results.data.getResidencesByGeoScope.residences);
-    });
 
     const searchHandler = (place: google.maps.places.PlaceResult) => {
         if (valueHook) valueHook(place);
         const loc = place.geometry?.location;
         const place_id = place.place_id;
         if (place_id) geoscope({ variables: { place_id: place_id } });
-        if (loc) {
-            setCenter({ lat: loc.lat(), lng: loc.lng() });
-            setCenterMarker(true);
-        }
+        if (loc) setCenter({ lat: loc.lat(), lng: loc.lng() });
     };
 
     const [hover, setHover] = useState(-1);
@@ -191,15 +188,16 @@ export const Map: React.FC<MapProps> = ({
                             />
                         );
                     })}
-                {centerMarker && residences.length == 0 && (
-                    <Icon
-                        {...center}
-                        as={RiHomeSmileFill}
-                        color={'orange.400'}
-                        style={{ transform: 'translate(-50%, -100%)' }}
-                        w={8}
-                        h={8}
-                    />
+                {residences.length == 0 && (
+                    <Box>
+                        <Icon
+                            as={RiHomeSmileFill}
+                            color={'orange.400'}
+                            style={{ transform: 'translate(-50%, -100%)' }}
+                            w={8}
+                            h={8}
+                        />
+                    </Box>
                 )}
             </GoogleMap>
             {showRefresh && (
