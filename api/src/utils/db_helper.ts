@@ -1,4 +1,4 @@
-import { postgresHandler } from '../dataSources/postgres';
+import { postgresHandler } from '../DataSources/postgres';
 import { Review } from '../Review/reviews';
 
 export const assembleReview = (reviews: any): Review[] => {

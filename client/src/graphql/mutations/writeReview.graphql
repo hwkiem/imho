@@ -1,5 +1,10 @@
 mutation WriteReview($options: WriteReviewInput!) {
     writeReview(options: $options) {
-        ...RegularReviewResponse
+        errors {
+            ...RegularError
+        }
+        review {
+            ...RegularReview
+        }
     }
 }

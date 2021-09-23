@@ -1,5 +1,5 @@
-query GetResidencesByGeoScope($limit: Int, $place_id: String!) {
-    getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
+query GetResidencesByGeoScope($options: ResidenceQueryOptions, $place_id: String!) {
+    getResidencesByGeoScope(options: $options, place_id: $place_id) {
         ...RegularResidenceResponse
     }
 }

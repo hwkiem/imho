@@ -71,13 +71,15 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  register: UserResponse;
-  logout: UserResponse;
-  login: UserResponse;
+  register: SingleUserResponse;
+  logout: SingleUserResponse;
+  login: SingleUserResponse;
   changeMyPassword: UserResponse;
-  deleteUser: UserResponse;
-  createResidency: ResidenceResponse;
-  writeReview: ReviewResponse;
+  deleteUser: SingleUserResponse;
+  createResidency: SingleResidenceResponse;
+  writeReview: SingleReviewResponse;
+  updateMyReviewOverwrite: SingleReviewResponse;
+  updateMyReviewGeneric: ReviewResponse;
 };
 
 
@@ -110,6 +112,18 @@ export type MutationWriteReviewArgs = {
   options: WriteReviewInput;
 };
 
+
+export type MutationUpdateMyReviewOverwriteArgs = {
+  res_id: Scalars['Float'];
+  changes: PartialReview;
+};
+
+
+export type MutationUpdateMyReviewGenericArgs = {
+  res_id: Scalars['Float'];
+  changes: PartialReview;
+};
+
 export type PartialResidence = {
   res_id?: Maybe<Scalars['Float']>;
   google_place_id?: Maybe<Scalars['String']>;
@@ -135,6 +149,12 @@ export type PartialReview = {
   dishwasher?: Maybe<Scalars['Boolean']>;
   parking?: Maybe<Scalars['Boolean']>;
   doorman?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Float']>;
+  recommend_score?: Maybe<Scalars['Float']>;
   lease_term?: Maybe<DateRangeInput>;
 };
 
@@ -151,19 +171,17 @@ export type PlaceIdResponse = {
 
 export type Query = {
   __typename?: 'Query';
-  me: UserResponse;
+  me: SingleUserResponse;
   getUsersbyId: UserResponse;
-  getUsersObjFilter: UserResponse;
+  getUsersGeneric: UserResponse;
   getResidencesById: ResidenceResponse;
+  getResidencesGeneric: ResidenceResponse;
   getResidencesBoundingBox: ResidenceResponse;
   getResidencesByGeoScope: ResidenceResponse;
-  getResidencesFromPlaceId: ResidenceResponse;
-  getResidencesSortBy: ResidenceResponse;
-  getResidencesObjectFilter: ResidenceResponse;
   placeIdFromAddress: PlaceIdResponse;
+  getReviewsGeneric: ReviewResponse;
   getReviewsByUserId: ReviewResponse;
   getReviewsByResidenceId: ReviewResponse;
-  getReviewsObjFilter: ReviewResponse;
 };
 
 
@@ -172,9 +190,8 @@ export type QueryGetUsersbyIdArgs = {
 };
 
 
-export type QueryGetUsersObjFilterArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  obj: PartialUser;
+export type QueryGetUsersGenericArgs = {
+  options?: Maybe<UserQueryOptions>;
 };
 
 
@@ -183,37 +200,30 @@ export type QueryGetResidencesByIdArgs = {
 };
 
 
+export type QueryGetResidencesGenericArgs = {
+  options?: Maybe<ResidenceQueryOptions>;
+};
+
+
 export type QueryGetResidencesBoundingBoxArgs = {
+  options?: Maybe<ResidenceQueryOptions>;
   perimeter: GeoBoundaryInput;
 };
 
 
 export type QueryGetResidencesByGeoScopeArgs = {
-  limit?: Maybe<Scalars['Int']>;
+  options?: Maybe<ResidenceQueryOptions>;
   place_id: Scalars['String'];
-};
-
-
-export type QueryGetResidencesFromPlaceIdArgs = {
-  place_id: Scalars['String'];
-};
-
-
-export type QueryGetResidencesSortByArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  sort_params?: Maybe<ResidenceSortByInput>;
-  obj: PartialResidence;
-};
-
-
-export type QueryGetResidencesObjectFilterArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  obj: PartialResidence;
 };
 
 
 export type QueryPlaceIdFromAddressArgs = {
   address: Scalars['String'];
+};
+
+
+export type QueryGetReviewsGenericArgs = {
+  options?: Maybe<ReviewQueryOptions>;
 };
 
 
@@ -226,11 +236,11 @@ export type QueryGetReviewsByResidenceIdArgs = {
   residence_ids: Array<Scalars['Int']>;
 };
 
-
-export type QueryGetReviewsObjFilterArgs = {
-  limit?: Maybe<Scalars['Int']>;
-  obj: PartialReview;
-};
+/** OrderBy options */
+export enum QueryOrderChoice {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 export type RegisterInput = {
   email: Scalars['String'];
@@ -258,15 +268,28 @@ export type Residence = {
   updated_at: Scalars['String'];
 };
 
+export type ResidenceQueryOptions = {
+  limit?: Maybe<Scalars['Int']>;
+  sort_params?: Maybe<ResidenceSortByInput>;
+  partial_residence?: Maybe<PartialResidence>;
+};
+
 export type ResidenceResponse = {
   __typename?: 'ResidenceResponse';
   errors?: Maybe<Array<FieldError>>;
   residences?: Maybe<Array<Residence>>;
 };
 
+/** Field by which to sort residence query results */
+export enum ResidenceSortBy {
+  Rent = 'RENT',
+  Rating = 'RATING',
+  Id = 'ID'
+}
+
 export type ResidenceSortByInput = {
-  attribute: Scalars['String'];
-  sort: Scalars['String'];
+  attribute: ResidenceSortBy;
+  sort: QueryOrderChoice;
 };
 
 export type Review = {
@@ -296,10 +319,46 @@ export type Review = {
   updated_at: Scalars['String'];
 };
 
+export type ReviewQueryOptions = {
+  limit?: Maybe<Scalars['Int']>;
+  sort_params?: Maybe<ReviewSortByInput>;
+  partial_review?: Maybe<PartialReview>;
+};
+
 export type ReviewResponse = {
   __typename?: 'ReviewResponse';
   errors?: Maybe<Array<FieldError>>;
   reviews?: Maybe<Array<Review>>;
+};
+
+/** Field by which to sort review query results */
+export enum ReviewSortBy {
+  Rent = 'RENT',
+  Rating = 'RATING',
+  UserId = 'USER_ID'
+}
+
+export type ReviewSortByInput = {
+  attribute: ReviewSortBy;
+  sort: QueryOrderChoice;
+};
+
+export type SingleResidenceResponse = {
+  __typename?: 'SingleResidenceResponse';
+  errors?: Maybe<Array<FieldError>>;
+  residence?: Maybe<Residence>;
+};
+
+export type SingleReviewResponse = {
+  __typename?: 'SingleReviewResponse';
+  errors?: Maybe<Array<FieldError>>;
+  review?: Maybe<Review>;
+};
+
+export type SingleUserResponse = {
+  __typename?: 'SingleUserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  user?: Maybe<User>;
 };
 
 /** Stove options */
@@ -320,10 +379,26 @@ export type User = {
   updated_at: Scalars['String'];
 };
 
+export type UserQueryOptions = {
+  limit?: Maybe<Scalars['Int']>;
+  sort_params?: Maybe<UserSortByInput>;
+  partial_user?: Maybe<PartialUser>;
+};
+
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
   users?: Maybe<Array<User>>;
+};
+
+/** Field by which to sort user query results */
+export enum UserSortBy {
+  Id = 'ID'
+}
+
+export type UserSortByInput = {
+  attribute: UserSortBy;
+  sort: QueryOrderChoice;
 };
 
 export type WriteReviewInput = {
@@ -360,33 +435,33 @@ export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', err
 
 export type RegularUserFragment = { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
 
-export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> };
+export type RegularUserResponseFragment = { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
 
 export type RegisterMutationVariables = Exact<{
   options: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
 
 export type WriteReviewMutationVariables = Exact<{
   options: WriteReviewInput;
 }>;
 
 
-export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> }>> } };
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'SingleReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, review?: Maybe<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating?: Maybe<number>, residence?: Maybe<{ __typename?: 'Residence', full_address: string }> }> } };
 
 export type GetResidencesBoundingBoxQueryVariables = Exact<{
   perimeter: GeoBoundaryInput;
@@ -396,7 +471,7 @@ export type GetResidencesBoundingBoxQueryVariables = Exact<{
 export type GetResidencesBoundingBoxQuery = { __typename?: 'Query', getResidencesBoundingBox: { __typename?: 'ResidenceResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, residences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, full_address: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number } }>> } };
 
 export type GetResidencesByGeoScopeQueryVariables = Exact<{
-  limit?: Maybe<Scalars['Int']>;
+  options?: Maybe<ResidenceQueryOptions>;
   place_id: Scalars['String'];
 }>;
 
@@ -413,7 +488,7 @@ export type GetReviewsByUserIdQuery = { __typename?: 'Query', getReviewsByUserId
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, users?: Maybe<Array<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }>> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
 
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
@@ -477,11 +552,11 @@ export const RegularUserFragmentDoc = gql`
 }
     `;
 export const RegularUserResponseFragmentDoc = gql`
-    fragment RegularUserResponse on UserResponse {
+    fragment RegularUserResponse on SingleUserResponse {
   errors {
     ...RegularError
   }
-  users {
+  user {
     ...RegularUser
   }
 }
@@ -588,10 +663,16 @@ export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutatio
 export const WriteReviewDocument = gql`
     mutation WriteReview($options: WriteReviewInput!) {
   writeReview(options: $options) {
-    ...RegularReviewResponse
+    errors {
+      ...RegularError
+    }
+    review {
+      ...RegularReview
+    }
   }
 }
-    ${RegularReviewResponseFragmentDoc}`;
+    ${RegularErrorFragmentDoc}
+${RegularReviewFragmentDoc}`;
 export type WriteReviewMutationFn = Apollo.MutationFunction<WriteReviewMutation, WriteReviewMutationVariables>;
 
 /**
@@ -654,8 +735,8 @@ export type GetResidencesBoundingBoxQueryHookResult = ReturnType<typeof useGetRe
 export type GetResidencesBoundingBoxLazyQueryHookResult = ReturnType<typeof useGetResidencesBoundingBoxLazyQuery>;
 export type GetResidencesBoundingBoxQueryResult = Apollo.QueryResult<GetResidencesBoundingBoxQuery, GetResidencesBoundingBoxQueryVariables>;
 export const GetResidencesByGeoScopeDocument = gql`
-    query GetResidencesByGeoScope($limit: Int, $place_id: String!) {
-  getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
+    query GetResidencesByGeoScope($options: ResidenceQueryOptions, $place_id: String!) {
+  getResidencesByGeoScope(options: $options, place_id: $place_id) {
     ...RegularResidenceResponse
   }
 }
@@ -673,7 +754,7 @@ export const GetResidencesByGeoScopeDocument = gql`
  * @example
  * const { data, loading, error } = useGetResidencesByGeoScopeQuery({
  *   variables: {
- *      limit: // value for 'limit'
+ *      options: // value for 'options'
  *      place_id: // value for 'place_id'
  *   },
  * });
