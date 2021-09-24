@@ -1,6 +1,8 @@
 import Knex from 'knex';
 import path from 'path';
 
+// console.log(process.env.DB_PASSWORD);
+
 const knexConfig: Knex.Config = {
     client: 'pg',
     connection: {

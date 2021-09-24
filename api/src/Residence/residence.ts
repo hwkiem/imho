@@ -2,13 +2,13 @@ import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
 import { Review } from '../Review/reviews';
 import { MyContext } from '../types/types';
 
-@ObjectType()
-class Coords {
-    @Field()
-    lat: number;
-    @Field()
-    lng: number;
-}
+// @ObjectType()
+// class Coords {
+//     @Field()
+//     lat: number;
+//     @Field()
+//     lng: number;
+// }
 
 @ObjectType()
 export class Residence {
@@ -16,34 +16,10 @@ export class Residence {
     res_id: number;
 
     @Field()
-    google_place_id: string;
-
-    // Location
-    @Field()
-    full_address: string;
-
-    @Field({ nullable: true })
-    apt_num?: string;
+    loc_id: number;
 
     @Field()
-    street_num: string;
-
-    @Field()
-    route: string;
-
-    @Field()
-    city: string;
-
-    @Field()
-    state: string;
-
-    @Field()
-    postal_code: string;
-
-    @Field(() => Coords)
-    coords: Coords;
-
-    geog: any;
+    unit: string;
 
     // Review
     @Field(() => Float, { nullable: true })
@@ -69,6 +45,24 @@ export class Residence {
         }
         return;
     }
+    //im mad
+    // @Field(() => Location, { nullable: true })
+    // async myLocation(
+    //     @Root() residence: Residence,
+    //     @Ctx() { dataSources }: MyContext
+    // ): Promise<Location | undefined> {
+    //     var r: Location | undefined = undefined;
+    //     await dataSources.pgHandler
+    //         .getLocationsById([residence.loc_id])
+    //         .then((loc) => {
+    //             if (loc.locations) r = loc.locations[0];
+    //         });
+
+    //     if (res.errors === undefined && res.locations !== undefined) {
+    //         return res.locations[0];
+    //     }
+    //     return;
+    // }
 
     @Field(() => String)
     created_at = new Date();

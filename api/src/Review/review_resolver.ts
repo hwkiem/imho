@@ -29,10 +29,40 @@ export class ReviewResolver {
         if (err) {
             return { errors: [err] };
         }
+        // does loc exist yet?
+        var loc = await dataSources.pgHandler.locationExists(
+            options.google_place_id
+        );
+        // loc does not exist
+        if (loc === null) {
+            const geocode =
+                await dataSources.googleMapsHandler.locationFromPlaceID(
+                    options.google_place_id
+                );
+            if (geocode instanceof FieldError) return { errors: [geocode] };
+            const response = await dataSources.pgHandler.createLocation(
+                geocode,
+                { google_place_id: options.google_place_id }
+            );
+            if (response.errors) return { errors: response.errors };
+            if (!response.location)
+                return {
+                    errors: [
+                        {
+                            field: 'create location',
+                            message:
+                                'unable to make location for this residence',
+                        },
+                    ],
+                };
+            // add loc_id to input
+            loc = response.location.loc_id;
+        } // now loc is valid if we need to create a new residence
+
         // does the residence already exist?
         const getResponse: ResidenceResponse =
             await dataSources.pgHandler.getResidencesGeneric({
-                google_place_id: options.google_place_id,
+                unit: options.unit,
             });
         if (
             getResponse.errors !== undefined ||
@@ -41,8 +71,7 @@ export class ReviewResolver {
             return { errors: getResponse.errors };
         }
         if (getResponse.residences.length == 0) {
-            // residence does not exist
-            //
+            // residence does not exists
             const locationResult =
                 await dataSources.googleMapsHandler.locationFromPlaceID(
                     options.google_place_id
@@ -50,14 +79,15 @@ export class ReviewResolver {
             if (locationResult instanceof FieldError) {
                 return { errors: [locationResult] };
             }
+            // console.log(loc);
             //create
-            const createResponse = await dataSources.pgHandler.createResidence(
-                locationResult,
-                {
-                    google_place_id: options.google_place_id,
-                }
-            );
+            const createResponse = await dataSources.pgHandler.createResidence({
+                loc_id: loc,
+                unit: options.unit ? options.unit : '1',
+                google_place_id: '', // meh
+            });
             if (createResponse.errors || !createResponse.residence) {
+                console.log('errors :/');
                 return { errors: createResponse.errors };
             }
             options.user_id = req.session.userId;
@@ -67,7 +97,8 @@ export class ReviewResolver {
             options.user_id = req.session.userId;
             options.res_id = getResponse.residences[0].res_id;
         }
-        const response = await dataSources.pgHandler.writeReview(options);
+        const { unit, ...args } = options;
+        const response = await dataSources.pgHandler.writeReview(args);
         return response;
     }
 

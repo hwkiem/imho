@@ -42,6 +42,17 @@ registerEnumType(ResidenceSortBy, {
     description: 'Field by which to sort residence query results',
 });
 
+export enum LocationSortBy {
+    RENT = 'avg_rent',
+    RATING = 'avg_rating',
+    ID = 'loc_id',
+}
+
+registerEnumType(LocationSortBy, {
+    name: 'LocationSortBy',
+    description: 'Field by which to sort location query results',
+});
+
 export enum ReviewSortBy {
     RENT = 'rating',
     RATING = 'rating',

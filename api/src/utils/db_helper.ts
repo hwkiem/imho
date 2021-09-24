@@ -19,13 +19,24 @@ export const assembleReview = (reviews: any): Review[] => {
 
 // used by migrations view
 export function residenceColumns() {
+    return [
+        'residences.res_id',
+        'loc_id',
+        'unit',
+        'residences.created_at',
+        'residences.updated_at',
+        'avg_rating',
+        'avg_rent',
+    ];
+}
+// used on residences_enhanced outer join locations
+export function locationColumns() {
     const knex = Knex(knexConfig as Knex.Config);
     const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knex);
     return [
-        'residences.res_id',
+        'loc_id',
         'google_place_id',
         'full_address',
-        'apt_num',
         'street_num',
         'route',
         'city',
@@ -34,10 +45,8 @@ export function residenceColumns() {
         'geog',
         knexPostgis.x(knexPostgis.geometry('geog')),
         knexPostgis.y(knexPostgis.geometry('geog')),
-        'residences.created_at',
-        'residences.updated_at',
-        'avg_rating',
-        'avg_rent',
+        'created_at',
+        'updated_at',
     ];
 }
 
@@ -61,7 +70,6 @@ export function reviewColumns(this: postgresHandler) {
         'backyard',
         'bath_count',
         'bedroom_count',
-        'recommend_score',
         this.knex.raw('lower(lease_term_) as start'),
         this.knex.raw('upper(lease_term_) as end'),
         'created_at',

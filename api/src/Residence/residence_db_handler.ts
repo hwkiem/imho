@@ -8,35 +8,19 @@ import {
     ResidenceSortByInput,
 } from '../types/input_types';
 import {
-    FieldError,
     ResidenceResponse,
     SingleResidenceResponse,
 } from '../types/object_types';
 
-import { assembleResidence, unpackLocation } from '../utils/mapUtils';
-import { Residence } from './residence';
+import { assembleResidence } from '../utils/mapUtils';
+import { Residence } from './Residence';
 
 export async function createResidence(
     this: postgresHandler,
-    locationResult: GeocodeResult | FieldError,
     input: CreateResidenceInput
 ): Promise<SingleResidenceResponse> {
-    if (locationResult instanceof FieldError) {
-        return { errors: [locationResult] };
-    }
-    const args = {
-        ...input,
-        ...unpackLocation(locationResult),
-        geog: this.knexPostgis.geographyFromText(
-            'Point(' +
-                locationResult.geometry.location.lng +
-                ' ' +
-                locationResult.geometry.location.lat +
-                ')'
-        ),
-    };
-
     let r: SingleResidenceResponse = {};
+    const { google_place_id, ...args } = input;
     await this.knex<Residence>('residences')
         .insert(args)
         .returning('res_id')
@@ -110,7 +94,7 @@ export async function getResidencesById(
         .select('*')
         .where('res_id', 'in', ids)
         .then((residences) => {
-            r.residences = assembleResidence(residences);
+            r.residences = residences;
         })
         .catch(
             (e) =>

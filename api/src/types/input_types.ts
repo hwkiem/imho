@@ -1,9 +1,11 @@
 import { Field, Float, InputType, Int } from 'type-graphql';
-import { Residence } from '../Residence/residence';
+import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/reviews';
 import { User } from '../User/user';
+import { Location } from '../Location/Location';
 import {
     LaundryType,
+    LocationSortBy,
     QueryOrderChoice,
     ResidenceSortBy,
     ReviewSortBy,
@@ -77,9 +79,6 @@ export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     bedroom_count?: number;
 
-    @Field({ nullable: true })
-    recommend_score?: number;
-
     @Field(() => DateRangeInput, { nullable: true })
     lease_term?: DateRangeInput;
 }
@@ -109,9 +108,40 @@ export class PartialResidence implements Partial<Residence> {
 }
 
 @InputType()
+export class PartialLocation implements Partial<Location> {
+    @Field({ nullable: true })
+    loc_id?: number;
+    @Field({ nullable: true })
+    google_place_id?: string;
+    @Field({ nullable: true })
+    street_num?: string;
+    @Field({ nullable: true })
+    route?: string;
+    @Field({ nullable: true })
+    city?: string;
+    @Field({ nullable: true })
+    postal_code?: string;
+    @Field({ nullable: true })
+    state?: string;
+    // averages on locations? fewer than on residences?
+    // @Field({ nullable: true })
+    // avg_rent?: number;
+    // @Field(() => Float, { nullable: true })
+    // avg_rating?: number;
+}
+
+@InputType()
 export class ResidenceSortByInput {
     @Field(() => ResidenceSortBy)
     attribute: ResidenceSortBy;
+    @Field(() => QueryOrderChoice)
+    sort: QueryOrderChoice;
+}
+
+@InputType()
+export class LocationSortByInput {
+    @Field(() => LocationSortBy)
+    attribute: LocationSortBy;
     @Field(() => QueryOrderChoice)
     sort: QueryOrderChoice;
 }
@@ -140,6 +170,16 @@ export class ResidenceQueryOptions {
     sort_params?: ResidenceSortByInput;
     @Field(() => PartialResidence, { nullable: true })
     partial_residence?: PartialResidence;
+}
+
+@InputType()
+export class LocationQueryOptions {
+    @Field(() => Int, { nullable: true })
+    limit?: number;
+    @Field(() => LocationSortByInput, { nullable: true })
+    sort_params?: LocationSortByInput;
+    @Field(() => PartialLocation, { nullable: true })
+    partial_location?: PartialLocation;
 }
 
 @InputType()
@@ -212,6 +252,19 @@ export class ReviewQueryInput {
 
 @InputType()
 export class CreateResidenceInput {
+    // not in db
+    @Field()
+    google_place_id: string;
+
+    //in db
+    @Field()
+    unit: string;
+
+    loc_id: number;
+}
+
+@InputType()
+export class CreateLocationInput {
     @Field()
     google_place_id: string;
 }
@@ -221,6 +274,9 @@ export class WriteReviewInput {
     // input from frontend
     @Field()
     google_place_id: string;
+
+    @Field()
+    unit?: string;
 
     @Field(() => Float, { nullable: true })
     rating?: number;
@@ -272,9 +328,6 @@ export class WriteReviewInput {
 
     @Field(() => Int, { nullable: true })
     bedroom_count?: number;
-
-    @Field(() => Int, { nullable: true })
-    recommend_score?: number;
 
     // for db
     lease_term_?: Range;
