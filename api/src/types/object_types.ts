@@ -1,7 +1,8 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Residence } from '../Residence/residence';
+import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/reviews';
 import { User } from '../User/user';
+import { Location } from '../Location/Location';
 
 @ObjectType()
 export class Coords {
@@ -53,6 +54,14 @@ export class ResidenceResponse {
     @Field(() => [Residence], { nullable: true })
     residences?: Residence[];
 }
+@ObjectType()
+export class LocationResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => [Location], { nullable: true })
+    locations?: Location[];
+}
 
 @ObjectType()
 export class SingleResidenceResponse {
@@ -61,6 +70,14 @@ export class SingleResidenceResponse {
 
     @Field(() => Residence, { nullable: true })
     residence?: Residence;
+}
+@ObjectType()
+export class SingleLocationResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => Location, { nullable: true })
+    location?: Location;
 }
 
 @ObjectType()

@@ -1,15 +1,12 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
-import { Residence } from './residence';
-import { unpackLocation } from '../utils/mapUtils';
+import { Residence } from './Residence';
 import {
     FieldError,
-    PlaceIDResponse,
     ResidenceResponse,
     SingleResidenceResponse,
 } from '../types/object_types';
 import {
     CreateResidenceInput,
-    GeoBoundaryInput,
     ResidenceQueryOptions,
 } from '../types/input_types';
 import { MyContext } from '../types/types';
@@ -17,16 +14,47 @@ import { MyContext } from '../types/types';
 @Resolver(Residence)
 export class ResidencyResolver {
     @Mutation(() => SingleResidenceResponse)
-    async createResidency(
+    async createResidence(
         @Arg('options') options: CreateResidenceInput,
         @Ctx() { dataSources }: MyContext
     ): Promise<SingleResidenceResponse> {
-        const response = await dataSources.pgHandler.createResidence(
-            await dataSources.googleMapsHandler.locationFromPlaceID(
-                options.google_place_id
-            ),
-            options
-        );
+        const loc = await dataSources.pgHandler.getLocationsGeneric({
+            google_place_id: options.google_place_id,
+        });
+        if (loc.errors !== undefined || loc.locations === undefined) {
+            return { errors: loc.errors };
+        }
+        // Location does not exist, create
+        if (loc.locations && loc.locations.length == 0) {
+            const geocode =
+                await dataSources.googleMapsHandler.locationFromPlaceID(
+                    options.google_place_id
+                );
+            const { unit, ...rest } = options;
+            if (geocode instanceof FieldError) return { errors: [geocode] };
+            const response = await dataSources.pgHandler.createLocation(
+                geocode,
+                rest
+            );
+            if (response.errors) return { errors: response.errors };
+            if (!response.location)
+                return {
+                    errors: [
+                        {
+                            field: 'create location',
+                            message:
+                                'unable to make location for this residence',
+                        },
+                    ],
+                };
+            // add loc_id to input
+            options.loc_id = response.location.loc_id;
+        } else {
+            // loc already exists, add its loc_id
+            options.loc_id = loc.locations[0].loc_id;
+        }
+
+        const response = await dataSources.pgHandler.createResidence(options);
         return response;
     }
 
@@ -55,63 +83,5 @@ export class ResidencyResolver {
                   options.limit ? options.limit : undefined
               )
             : await dataSources.pgHandler.getResidencesGeneric();
-    }
-
-    @Query(() => ResidenceResponse)
-    async getResidencesBoundingBox(
-        @Arg('perimeter') perimeter: GeoBoundaryInput,
-        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        if (
-            perimeter.xMax < perimeter.xMin ||
-            perimeter.yMax < perimeter.yMin
-        ) {
-            return { errors: [{ field: 'input', message: 'malformed query' }] };
-        }
-        return options
-            ? await dataSources.pgHandler.getResidencesBoundingBox(
-                  perimeter,
-                  options.partial_residence
-                      ? options.partial_residence
-                      : undefined,
-                  options.sort_params ? options.sort_params : undefined,
-                  options.limit ? options.limit : undefined
-              )
-            : await dataSources.pgHandler.getResidencesBoundingBox(perimeter);
-    }
-
-    @Query(() => ResidenceResponse)
-    async getResidencesByGeoScope(
-        @Arg('place_id') place_id: string,
-        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<ResidenceResponse> {
-        const locationResult =
-            await dataSources.googleMapsHandler.locationFromPlaceID(place_id);
-        if (locationResult instanceof FieldError) {
-            return { errors: [locationResult] };
-        }
-        const { full_address, ...args } = unpackLocation(locationResult);
-        return options
-            ? await dataSources.pgHandler.getResidencesNearArea(
-                  locationResult,
-                  args,
-                  options.sort_params ? options.sort_params : undefined,
-                  options.limit ? options.limit : undefined
-              )
-            : await dataSources.pgHandler.getResidencesNearArea(
-                  locationResult,
-                  args
-              );
-    }
-
-    // just for dev
-    @Query(() => PlaceIDResponse)
-    async placeIdFromAddress(
-        @Arg('address', () => String) address: string,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<PlaceIDResponse> {
-        return await dataSources.googleMapsHandler.placeIdFromAddress(address);
     }
 }

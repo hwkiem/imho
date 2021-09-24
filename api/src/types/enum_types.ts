@@ -34,12 +34,23 @@ registerEnumType(QueryOrderChoice, {
 export enum ResidenceSortBy {
     RENT = 'avg_rent',
     RATING = 'avg_rating',
-    ID = 'xyz_residences.res_id',
+    ID = 'res_id',
 }
 
 registerEnumType(ResidenceSortBy, {
     name: 'ResidenceSortBy',
     description: 'Field by which to sort residence query results',
+});
+
+export enum LocationSortBy {
+    RENT = 'avg_rent',
+    RATING = 'avg_rating',
+    ID = 'loc_id',
+}
+
+registerEnumType(LocationSortBy, {
+    name: 'LocationSortBy',
+    description: 'Field by which to sort location query results',
 });
 
 export enum ReviewSortBy {
