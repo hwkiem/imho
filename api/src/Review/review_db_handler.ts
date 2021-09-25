@@ -1,4 +1,4 @@
-import { postgresHandler } from '../DataSources/postgres';
+import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
 import { ReviewSortByInput, WriteReviewInput } from '../types/input_types';
 import { ReviewResponse, SingleReviewResponse } from '../types/object_types';

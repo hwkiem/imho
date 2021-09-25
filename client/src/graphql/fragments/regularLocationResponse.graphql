@@ -1,0 +1,8 @@
+fragment RegularLocationResponse on LocationResponse {
+    errors {
+            ...RegularError
+        }
+    locations {
+        ...RegularLocation
+    }
+}

@@ -7,23 +7,23 @@ import {
     Stack,
     Image,
 } from '@chakra-ui/react';
-import { RegularResidenceFragment } from '../../generated/graphql';
+import { RegularLocationFragment } from '../../generated/graphql';
 import { Dispatch, SetStateAction } from 'react';
 
 const IMAGE =
     'https://images.unsplash.com/photo-1518051870910-a46e30d9db16?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80';
 
-interface ResidenceCardProps {
-    residence: RegularResidenceFragment;
+interface LocationCardProps {
+    location: RegularLocationFragment;
     hover: boolean;
     setHover: Dispatch<SetStateAction<number>>;
     onClick: () => void;
 }
 
-export const ResidenceCard: React.FC<ResidenceCardProps> = ({
+export const LocationCard: React.FC<LocationCardProps> = ({
     hover,
     setHover,
-    residence,
+    location,
     onClick,
 }) => {
     return (
@@ -39,7 +39,7 @@ export const ResidenceCard: React.FC<ResidenceCardProps> = ({
             zIndex={1}
             cursor={'pointer'}
             onMouseEnter={() => {
-                setHover(residence.res_id);
+                setHover(location.loc_id);
             }}
             onMouseLeave={() => {
                 setHover(-1);
@@ -52,18 +52,18 @@ export const ResidenceCard: React.FC<ResidenceCardProps> = ({
                     fontSize={'sm'}
                     textTransform={'uppercase'}
                 >
-                    {residence.full_address.split(',')[0]}
+                    {location.full_address.split(',')[0]}
                 </Text>
 
                 <Stack direction={'row'} align={'center'}>
-                    {residence.avg_rent && (
+                    {location.avg_rent && (
                         <Text fontWeight={800} fontSize={'xl'}>
-                            ${residence.avg_rent}
+                            ${location.avg_rent}
                         </Text>
                     )}
-                    {residence.avg_rating && (
+                    {location.avg_rating && (
                         <Text color={'gray.600'}>
-                            {residence.avg_rating} stars
+                            {location.avg_rating} stars
                         </Text>
                     )}
                 </Stack>

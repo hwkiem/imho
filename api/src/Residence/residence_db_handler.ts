@@ -1,5 +1,5 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
-import { postgresHandler } from '../DataSources/postgres';
+import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ResidenceSortBy } from '../types/enum_types';
 import {
     CreateResidenceInput,

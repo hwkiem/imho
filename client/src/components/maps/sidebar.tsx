@@ -8,19 +8,19 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
-import { RegularResidenceFragment } from '../../generated/graphql';
-import { ResidenceCard } from './rescard';
+import { RegularLocationFragment } from '../../generated/graphql';
+import { LocationCard } from './loccard';
 import GoogleMap from 'google-map-react';
 
 interface SideBarProps extends ChakraProps {
-    residences: RegularResidenceFragment[];
+    locations: RegularLocationFragment[];
     hover: number;
     setHover: Dispatch<SetStateAction<number>>; // updating the hovered id
     setCenter: Dispatch<SetStateAction<GoogleMap.Coords>>;
 }
 
 export const SideBar: React.FC<SideBarProps> = ({
-    residences,
+    locations,
     hover,
     setHover,
     setCenter,
@@ -40,15 +40,15 @@ export const SideBar: React.FC<SideBarProps> = ({
             overflowY={'scroll'}
             style={{ scrollbarWidth: 'none' }}
         >
-            <Heading mt={2}>Residences</Heading>
+            <Heading mt={2}>Locations</Heading>
             <VStack padding={3}>
-                {residences.map((res) => (
-                    <ResidenceCard
-                        residence={res}
-                        hover={res.res_id == hover}
+                {locations.map((loc) => (
+                    <LocationCard
+                        location={loc}
+                        hover={loc.loc_id == hover}
                         setHover={setHover}
                         onClick={() => {
-                            setCenter({ ...res.coords });
+                            setCenter({ ...loc.coords });
                         }}
                     />
                 ))}

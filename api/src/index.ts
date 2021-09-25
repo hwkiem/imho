@@ -9,9 +9,9 @@ import connectRedis from 'connect-redis';
 import { UserResolver } from './User/user_resolver';
 import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { postgresHandler } from './DataSources/postgres';
+import { postgresHandler } from './dataSources/postgres';
 import { ReviewResolver } from './Review/review_resolver';
-import { googleMapsHandler } from './DataSources/mapsAPI';
+import { googleMapsHandler } from './dataSources/mapsAPI';
 import { LocationResolver } from './Location/location_resolver';
 
 var morgan = require('morgan')

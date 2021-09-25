@@ -1,8 +1,0 @@
-fragment RegularResidenceResponse on ResidenceResponse {
-    errors {
-        ...RegularError
-    }
-    residences {
-        ...RegularResidence
-    }
-}

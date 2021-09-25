@@ -1,10 +1,9 @@
 fragment RegularResidence on Residence {
     res_id
-    full_address
-    coords {
-        lat
-        lng
-    }
+    unit
     avg_rating
     avg_rent
+    myReviews {
+        ...RegularReview
+    }
 }

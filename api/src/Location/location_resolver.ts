@@ -7,6 +7,7 @@ import {
 } from '../types/object_types';
 import {
     CreateLocationInput,
+    GeoBoundaryInput,
     LocationQueryOptions,
 } from '../types/input_types';
 import { MyContext } from '../types/types';
@@ -81,6 +82,30 @@ export class LocationResolver {
                   options.limit ? options.limit : undefined
               )
             : await dataSources.pgHandler.getLocationsGeneric();
+    }
+
+    @Query(() => LocationResponse)
+    async getLocationsBoundingBox(
+        @Arg('perimeter') perimeter: GeoBoundaryInput,
+        @Arg('options', { nullable: true }) options: LocationQueryOptions,
+        @Ctx() { dataSources }: MyContext
+    ): Promise<LocationResponse> {
+        if (
+            perimeter.xMax < perimeter.xMin ||
+            perimeter.yMax < perimeter.yMin
+        ) {
+            return { errors: [{ field: 'input', message: 'malformed query' }] };
+        }
+        return options
+            ? await dataSources.pgHandler.getLocationsBoundingBox(
+                  perimeter,
+                  options.partial_location
+                      ? options.partial_location
+                      : undefined,
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getLocationsBoundingBox(perimeter);
     }
 
     // just for dev

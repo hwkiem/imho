@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { RiHomeSmile2Fill, RiHomeSmile2Line } from 'react-icons/ri';
 
 interface MarkerProps {
-    res_id: number;
+    loc_id: number;
     lat: number;
     lng: number;
     address: string;
@@ -14,7 +14,7 @@ interface MarkerProps {
 }
 
 export const Marker: React.FC<MarkerProps> = ({
-    res_id,
+    loc_id,
     hover,
     setHover,
     onClick,
@@ -26,7 +26,7 @@ export const Marker: React.FC<MarkerProps> = ({
         style={{ transform: 'translate(-50%, -100%)' }}
         color={'teal'}
         onMouseEnter={() => {
-            setHover(res_id);
+            setHover(loc_id);
         }}
         onMouseLeave={() => {
             setHover(-1);

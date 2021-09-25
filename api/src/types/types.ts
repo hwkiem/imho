@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { googleMapsHandler } from '../DataSources/mapsAPI';
-import { postgresHandler } from '../DataSources/postgres';
+import { googleMapsHandler } from '../dataSources/mapsAPI';
+import { postgresHandler } from '../dataSources/postgres';
 
 export type MyContext = {
     req: Request;

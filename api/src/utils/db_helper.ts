@@ -1,4 +1,4 @@
-import { postgresHandler } from '../DataSources/postgres';
+import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/reviews';
 import KnexPostgis from 'knex-postgis';
 import Knex from 'knex';
