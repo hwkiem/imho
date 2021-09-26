@@ -26,7 +26,11 @@ import {
     FormikProvider,
 } from 'formik';
 import React, { useState } from 'react';
-import { StoveType, WriteReviewInput } from '../../../../generated/graphql';
+import {
+    LaundryType,
+    StoveType,
+    WriteReviewInput,
+} from '../../../../generated/graphql';
 
 export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
     values,
@@ -40,7 +44,7 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
         lease_term,
         rating,
         rent,
-        recommend_score,
+        unit,
         ...ammenities
     } = values;
 
@@ -62,14 +66,17 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                         alignItems="center"
                                     >
                                         <FormLabel htmlFor={k} mb="0">
-                                            {k}
+                                            {k.replaceAll('_', ' ')}
                                         </FormLabel>
                                         <Switch
                                             id={k}
                                             onChange={() => {
-                                                if (k == 'laundry')
+                                                if (
+                                                    k == 'laundry' &&
+                                                    !values.laundry
+                                                ) {
                                                     laundryDisclosure.onOpen();
-                                                else if (k == 'stove')
+                                                } else if (k == 'stove' && !v)
                                                     stoveDisclosure.onOpen();
                                                 else setFieldValue(k, !v);
                                             }}
@@ -85,21 +92,32 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                     >
                         <ModalOverlay />
                         <ModalContent>
-                            <ModalHeader>Laundy Type?</ModalHeader>
+                            <ModalHeader>Laundry Type?</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
-                                <Button>Some button</Button>
-                            </ModalBody>
-
-                            <ModalFooter>
                                 <Button
-                                    colorScheme="blue"
-                                    mr={3}
-                                    onClick={laundryDisclosure.onClose}
+                                    onClick={() => {
+                                        setFieldValue(
+                                            'laundry',
+                                            LaundryType.InUnit
+                                        );
+                                        laundryDisclosure.onClose();
+                                    }}
                                 >
-                                    Close
+                                    {LaundryType.InUnit}
                                 </Button>
-                            </ModalFooter>
+                                <Button
+                                    onClick={() => {
+                                        setFieldValue(
+                                            'laundry',
+                                            LaundryType.Building
+                                        );
+                                        laundryDisclosure.onClose();
+                                    }}
+                                >
+                                    {LaundryType.Building}
+                                </Button>
+                            </ModalBody>
                         </ModalContent>
                     </Modal>
                     <Modal
@@ -117,6 +135,7 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                             'stove',
                                             StoveType.Electric
                                         );
+                                        stoveDisclosure.onClose();
                                     }}
                                 >
                                     {StoveType.Electric}
@@ -124,21 +143,12 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                 <Button
                                     onClick={() => {
                                         setFieldValue('stove', StoveType.Gas);
+                                        stoveDisclosure.onClose();
                                     }}
                                 >
                                     {StoveType.Gas}
                                 </Button>
                             </ModalBody>
-
-                            <ModalFooter>
-                                <Button
-                                    colorScheme="blue"
-                                    mr={3}
-                                    onClick={stoveDisclosure.onClose}
-                                >
-                                    Close
-                                </Button>
-                            </ModalFooter>
                         </ModalContent>
                     </Modal>
                 </Form>

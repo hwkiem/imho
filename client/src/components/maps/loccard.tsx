@@ -6,7 +6,17 @@ import {
     Text,
     Stack,
     Image,
+    VStack,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
 } from '@chakra-ui/react';
+
 import { RegularLocationFragment } from '../../generated/graphql';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -26,6 +36,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
     location,
     onClick,
 }) => {
+    console.log(location.myResidences);
     return (
         <Box
             role={'group'}
@@ -58,15 +69,37 @@ export const LocationCard: React.FC<LocationCardProps> = ({
                 <Stack direction={'row'} align={'center'}>
                     {location.avg_rent && (
                         <Text fontWeight={800} fontSize={'xl'}>
-                            ${location.avg_rent}
+                            ${location.avg_rent.toFixed(0)}
                         </Text>
                     )}
                     {location.avg_rating && (
                         <Text color={'gray.600'}>
-                            {location.avg_rating} stars
+                            {location.avg_rating.toFixed(2)} stars
                         </Text>
                     )}
                 </Stack>
+                {location.myResidences && location.myResidences.length > 1 && (
+                    <VStack>
+                        <Table variant="simple">
+                            <Thead>
+                                <Tr>
+                                    <Th>Unit</Th>
+                                    <Th>Avg. Rent</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {location.myResidences.map((res) => {
+                                    return (
+                                        <Tr>
+                                            <Th>{res.unit}</Th>
+                                            <Th>{res.avg_rent}</Th>
+                                        </Tr>
+                                    );
+                                })}
+                            </Tbody>
+                        </Table>
+                    </VStack>
+                )}
             </Stack>
         </Box>
     );

@@ -55,13 +55,13 @@ export const NavBar: React.FC = () => {
     const btnRef = useRef<HTMLButtonElement>(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const router = useRouter();
-    const { data, loading } = useMeQuery();
+    const { data } = useMeQuery();
     const [logout] = useLogoutMutation();
     const client = useApolloClient();
 
     let user = null;
-    if (data?.me.users) {
-        user = data.me.users[0];
+    if (data?.me.user) {
+        user = data.me.user;
     }
     return (
         <Center zIndex={10}>
@@ -122,7 +122,6 @@ export const NavBar: React.FC = () => {
                             mr={4}
                             ref={btnRef}
                             onClick={async () => {
-                                console.log('!');
                                 await logout();
                                 await client.clearStore();
                                 router.push('/login');

@@ -35,10 +35,9 @@ export class ReviewResolver {
         );
         // loc does not exist
         if (loc === null) {
-            const geocode =
-                await dataSources.googleMapsHandler.locationFromPlaceID(
-                    options.google_place_id
-                );
+            const geocode = await dataSources.googleMapsHandler.locationFromPlaceID(
+                options.google_place_id
+            );
             if (geocode instanceof FieldError) return { errors: [geocode] };
             const response = await dataSources.pgHandler.createLocation(
                 geocode,
@@ -60,10 +59,11 @@ export class ReviewResolver {
         } // now loc is valid if we need to create a new residence
 
         // does the residence already exist?
-        const getResponse: ResidenceResponse =
-            await dataSources.pgHandler.getResidencesGeneric({
+        const getResponse: ResidenceResponse = await dataSources.pgHandler.getResidencesGeneric(
+            {
                 unit: options.unit,
-            });
+            }
+        );
         if (
             getResponse.errors !== undefined ||
             getResponse.residences === undefined
@@ -72,14 +72,12 @@ export class ReviewResolver {
         }
         if (getResponse.residences.length == 0) {
             // residence does not exists
-            const locationResult =
-                await dataSources.googleMapsHandler.locationFromPlaceID(
-                    options.google_place_id
-                );
+            const locationResult = await dataSources.googleMapsHandler.locationFromPlaceID(
+                options.google_place_id
+            );
             if (locationResult instanceof FieldError) {
                 return { errors: [locationResult] };
             }
-            // console.log(loc);
             //create
             const createResponse = await dataSources.pgHandler.createResidence({
                 loc_id: loc,

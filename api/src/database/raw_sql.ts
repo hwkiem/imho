@@ -55,8 +55,6 @@ export const CREATE_ENHANCED_LOCATION_VIEW = (knex: Knex): string => {
         loc_avg('avg_rent', knex),
         loc_avg('avg_rating', knex),
     ]);
-    // console.log(
-    //     `CREATE OR REPLACE VIEW locations_enhanced AS (\n ${viewDefinition})`
-    // );
+
     return `CREATE OR REPLACE VIEW locations_enhanced AS (\n ${viewDefinition})`;
 };

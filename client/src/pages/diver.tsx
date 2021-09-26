@@ -1,15 +1,15 @@
 import { Layout } from '../components/layout/layout';
 import { Map } from '../components/maps/map';
-import { RegularResidenceFragment } from '../generated/graphql';
+import { RegularLocationFragment } from '../generated/graphql';
 import { Page } from '../types/page';
 interface DiverProps {
-    residences: RegularResidenceFragment[];
+    locations: RegularLocationFragment[];
 }
 
 const Diver: Page<DiverProps> = () => {
     return (
         <Map
-            withResidences
+            withLocations
             withSideBar
             variant="large"
             withSearchBar

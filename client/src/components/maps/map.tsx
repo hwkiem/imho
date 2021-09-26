@@ -72,9 +72,7 @@ export const Map: React.FC<MapProps> = ({
         null
     );
 
-    const [locations, setLocations] = useState<RegularLocationFragment[]>(
-        []
-    );
+    const [locations, setLocations] = useState<RegularLocationFragment[]>([]);
 
     const { loading, data, error, refetch } = useGetLocationsBoundingBoxQuery({
         variables: {
@@ -95,8 +93,9 @@ export const Map: React.FC<MapProps> = ({
     }, [results]);
 
     useEffect(() => {
-        if (data?.getLocationsBoundingBox.locations)
+        if (data?.getLocationsBoundingBox.locations) {
             setLocations(data?.getLocationsBoundingBox.locations);
+        }
     }, [data]);
 
     const searchHandler = (place: google.maps.places.PlaceResult) => {
@@ -159,7 +158,6 @@ export const Map: React.FC<MapProps> = ({
                     setApiFlag(true);
                 }}
                 onChange={(value) => {
-                    console.log(value.bounds);
                     setCurrentBounds(value.bounds);
                     if (!initialBounds) {
                         setInitialBounds(value.bounds);
