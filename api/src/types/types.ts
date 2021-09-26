@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { googleMapsHandler } from '../DataSources/mapsAPI';
+import { googleMapsHandler } from '../dataSources/mapsAPI';
 import { postgresHandler } from '../dataSources/postgres';
 
 export type MyContext = {

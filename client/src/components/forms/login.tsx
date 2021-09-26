@@ -62,7 +62,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
                                             field
                                             message
                                         }
-                                        users {
+                                        user {
                                             user_id
                                             first_name
                                             last_name
@@ -78,7 +78,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
                 },
             });
 
-            if (res.data?.login.users) {
+            if (res.data?.login.user) {
                 router.push('/diver');
             } else if (res.data?.login.errors) {
                 console.log(res.data.login.errors);

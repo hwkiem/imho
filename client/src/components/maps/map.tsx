@@ -2,10 +2,10 @@ import { Box, Button, Icon } from '@chakra-ui/react';
 import GoogleMap from 'google-map-react';
 import { useState, useEffect } from 'react';
 import {
-    RegularResidenceFragment,
-    useGetResidencesBoundingBoxQuery,
-    useGetResidencesByGeoScopeLazyQuery,
-} from '../../../generated/graphql';
+    RegularLocationFragment,
+    useGetLocationsBoundingBoxQuery,
+    useGetLocationsByGeoScopeLazyQuery,
+} from '../../generated/graphql';
 import { Marker } from './marker';
 import { SearchBar } from './searchbar';
 import { SideBar } from './sidebar';
@@ -19,13 +19,13 @@ interface CommonMapProps {
     valueHook?: (place: google.maps.places.PlaceResult) => void;
 }
 
-type ResidenceProps =
+type LocationProps =
     | {
-          withResidences?: false;
+          withLocations?: false;
           withSideBar?: never;
       }
     | {
-          withResidences: true;
+          withLocations: true;
           withSideBar?: boolean;
       };
 
@@ -39,13 +39,13 @@ type AutoCompleteProps =
           searchTypes: SearchTypes[];
       };
 
-type MapProps = CommonMapProps & ResidenceProps & AutoCompleteProps;
+type MapProps = CommonMapProps & LocationProps & AutoCompleteProps;
 
 const DAVIS_CENTER: GoogleMap.Coords = { lat: 38.5449, lng: -121.7405 };
 const DEFAULT_ZOOM = 14;
 
 export const Map: React.FC<MapProps> = ({
-    withResidences,
+    withLocations,
     withSearchBar,
     searchTypes,
     valueHook,
@@ -53,7 +53,7 @@ export const Map: React.FC<MapProps> = ({
     fixed,
     variant,
 }) => {
-    // Used for panning the map to target residence or search res
+    // Used for panning the map to target Location or search res
     const [center, setCenter] = useState(DAVIS_CENTER);
     // Used for zooming to target residence or search res
     const [zoom, setZoom] = useState(DEFAULT_ZOOM);
@@ -72,11 +72,9 @@ export const Map: React.FC<MapProps> = ({
         null
     );
 
-    const [residences, setResidences] = useState<RegularResidenceFragment[]>(
-        []
-    );
+    const [locations, setLocations] = useState<RegularLocationFragment[]>([]);
 
-    const { loading, data, error, refetch } = useGetResidencesBoundingBoxQuery({
+    const { loading, data, error, refetch } = useGetLocationsBoundingBoxQuery({
         variables: {
             perimeter: {
                 xMin: initialBounds ? initialBounds.nw.lng : -180,
@@ -87,27 +85,25 @@ export const Map: React.FC<MapProps> = ({
         },
     });
 
-    const [geoscope, results] = useGetResidencesByGeoScopeLazyQuery();
+    const [geoscope, results] = useGetLocationsByGeoScopeLazyQuery();
 
     useEffect(() => {
-        if (data?.getResidencesBoundingBox.residences)
-            setResidences(data?.getResidencesBoundingBox.residences);
+        if (results.data?.getLocationsByGeoScope.locations)
+            setLocations(results.data?.getLocationsByGeoScope.locations);
+    }, [results]);
+
+    useEffect(() => {
+        if (data?.getLocationsBoundingBox.locations) {
+            setLocations(data?.getLocationsBoundingBox.locations);
+        }
     }, [data]);
-
-    useEffect(() => {
-        if (results.data?.getResidencesByGeoScope.residences)
-            setResidences(results.data.getResidencesByGeoScope.residences);
-    });
 
     const searchHandler = (place: google.maps.places.PlaceResult) => {
         if (valueHook) valueHook(place);
         const loc = place.geometry?.location;
         const place_id = place.place_id;
         if (place_id) geoscope({ variables: { place_id: place_id } });
-        if (loc) {
-            setCenter({ lat: loc.lat(), lng: loc.lng() });
-            setCenterMarker(true);
-        }
+        if (loc) setCenter({ lat: loc.lat(), lng: loc.lng() });
     };
 
     const [hover, setHover] = useState(-1);
@@ -133,9 +129,9 @@ export const Map: React.FC<MapProps> = ({
                     variant={variant}
                 />
             )}
-            {withSideBar && residences && (
+            {withSideBar && locations && (
                 <SideBar
-                    residences={residences}
+                    locations={locations}
                     hover={hover}
                     setHover={setHover}
                     setCenter={setCenter}
@@ -162,7 +158,6 @@ export const Map: React.FC<MapProps> = ({
                     setApiFlag(true);
                 }}
                 onChange={(value) => {
-                    console.log(value.bounds);
                     setCurrentBounds(value.bounds);
                     if (!initialBounds) {
                         setInitialBounds(value.bounds);
@@ -172,34 +167,33 @@ export const Map: React.FC<MapProps> = ({
                     setCenter(value.center);
                 }}
             >
-                {withResidences &&
-                    residences &&
-                    residences.map((res) => {
+                {withLocations &&
+                    locations &&
+                    locations.map((loc) => {
                         return (
                             <Marker
-                                res_id={res.res_id}
-                                lat={res.coords.lat}
-                                lng={res.coords.lng}
-                                address={res.full_address}
-                                hover={hover == res.res_id}
+                                loc_id={loc.loc_id}
+                                lat={loc.coords.lat}
+                                lng={loc.coords.lng}
+                                address={loc.full_address}
+                                hover={hover == loc.loc_id}
                                 setHover={setHover}
                                 onClick={() => {
-                                    console.log(center);
-                                    console.log(res.coords);
-                                    setCenter(res.coords);
+                                    setCenter(loc.coords);
                                 }}
                             />
                         );
                     })}
-                {centerMarker && residences.length == 0 && (
-                    <Icon
-                        {...center}
-                        as={RiHomeSmileFill}
-                        color={'orange.400'}
-                        style={{ transform: 'translate(-50%, -100%)' }}
-                        w={8}
-                        h={8}
-                    />
+                {locations.length == 0 && (
+                    <Box>
+                        <Icon
+                            as={RiHomeSmileFill}
+                            color={'orange.400'}
+                            style={{ transform: 'translate(-50%, -100%)' }}
+                            w={8}
+                            h={8}
+                        />
+                    </Box>
                 )}
             </GoogleMap>
             {showRefresh && (

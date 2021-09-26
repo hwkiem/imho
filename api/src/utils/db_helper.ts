@@ -1,5 +1,8 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/reviews';
+import KnexPostgis from 'knex-postgis';
+import Knex from 'knex';
+import knexConfig from '../database/knexfile';
 
 export const assembleReview = (reviews: any): Review[] => {
     return reviews.map((review: any) => {
@@ -14,26 +17,40 @@ export const assembleReview = (reviews: any): Review[] => {
     });
 };
 
-export function residenceColumns(this: postgresHandler) {
+// used by migrations view
+export function residenceColumns() {
     return [
         'residences.res_id',
+        'loc_id',
+        'unit',
+        'residences.created_at',
+        'residences.updated_at',
+        'avg_rating',
+        'avg_rent',
+    ];
+}
+// used on residences_enhanced outer join locations
+export function locationColumns() {
+    const knex = Knex(knexConfig as Knex.Config);
+    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knex);
+    return [
+        'loc_id',
         'google_place_id',
         'full_address',
-        'apt_num',
         'street_num',
         'route',
         'city',
         'state',
         'postal_code',
-        this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-        this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-        this.knex.avg('rating').as('avg_rating'),
-        this.knex.avg('rent').as('avg_rent'),
-        'residences.created_at',
-        'residences.updated_at',
+        'geog',
+        knexPostgis.x(knexPostgis.geometry('geog')),
+        knexPostgis.y(knexPostgis.geometry('geog')),
+        'created_at',
+        'updated_at',
     ];
 }
 
+// used by review_db_handler, make a view for this too? with lease term
 export function reviewColumns(this: postgresHandler) {
     return [
         'res_id',
@@ -53,32 +70,9 @@ export function reviewColumns(this: postgresHandler) {
         'backyard',
         'bath_count',
         'bedroom_count',
-        'recommend_score',
         this.knex.raw('lower(lease_term_) as start'),
         this.knex.raw('upper(lease_term_) as end'),
         'created_at',
         'updated_at',
     ];
 }
-
-//should be able to pull off higher order functions
-// export function selectResidence(base: Knex<Residence>) {
-//     return () =>
-//         base.select([
-//             'residences.res_id',
-//             'google_place_id',
-//             'full_address',
-//             'apt_num',
-//             'street_num',
-//             'route',
-//             'city',
-//             'state',
-//             'postal_code',
-//             this.knexPostgis.x(this.knexPostgis.geometry('geog')),
-//             this.knexPostgis.y(this.knexPostgis.geometry('geog')),
-//             this.knex.avg('rating').as('avg_rating'),
-//             this.knex.avg('rent').as('avg_rent'),
-//             'residences.created_at',
-//             'residences.updated_at',
-//         ]);
-// }

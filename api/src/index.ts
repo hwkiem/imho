@@ -11,7 +11,10 @@ import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { postgresHandler } from './dataSources/postgres';
 import { ReviewResolver } from './Review/review_resolver';
-import { googleMapsHandler } from './DataSources/mapsAPI';
+import { googleMapsHandler } from './dataSources/mapsAPI';
+import { LocationResolver } from './Location/location_resolver';
+
+var morgan = require('morgan')
 
 const main = async () => {
     const app = express();
@@ -21,6 +24,7 @@ const main = async () => {
     const redis = new Redis(process.env.REDIS_URL);
 
     app.set('trust proxy', 1);
+    app.use(morgan("combined"))
     app.use(
         cors({
             origin: process.env.CORS_ORIGIN,
@@ -50,7 +54,12 @@ const main = async () => {
     const apolloServer = new ApolloServer({
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
         schema: await buildSchema({
-            resolvers: [UserResolver, ResidencyResolver, ReviewResolver],
+            resolvers: [
+                UserResolver,
+                ResidencyResolver,
+                ReviewResolver,
+                LocationResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({

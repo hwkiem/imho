@@ -1,5 +1,5 @@
 import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
-import { Residence } from '../Residence/residence';
+import { Residence } from '../Residence/Residence';
 import { LaundryType, StoveType } from '../types/enum_types';
 import { DateRange } from '../types/object_types';
 import { MyContext } from '../types/types';
@@ -12,14 +12,14 @@ export class Review {
     @Field()
     user_id: number;
 
-    @Field(() => Float, { nullable: true })
+    @Field()
     rating?: number;
 
     @Field({ nullable: true })
     rent?: number;
 
     @Field(() => Residence, { nullable: true })
-    async residence(
+    async myResidence(
         @Root() review: Review,
         @Ctx() { dataSources }: MyContext
     ): Promise<Residence | undefined> {
@@ -74,9 +74,6 @@ export class Review {
 
     @Field({ nullable: true })
     bedroom_count?: number;
-
-    @Field({ nullable: true })
-    recommend_score?: number;
 
     @Field(() => DateRange, { nullable: true })
     lease_term?: DateRange;

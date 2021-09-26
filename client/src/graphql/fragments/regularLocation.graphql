@@ -1,0 +1,13 @@
+fragment RegularLocation on Location {
+    loc_id
+    full_address
+    coords {
+        lat
+        lng
+    }
+    avg_rent
+    avg_rating
+    myResidences {
+       ...RegularResidence 
+    }
+}

@@ -1,5 +1,0 @@
-query GetResidencesByGeoScope($limit: Float, $place_id: String!) {
-    getResidencesByGeoScope(limit: $limit, place_id: $place_id) {
-        ...RegularResidenceResponse
-    }
-}

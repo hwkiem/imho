@@ -1,5 +1,5 @@
-import { Center, Flex, Heading, Stack } from '@chakra-ui/react';
-import { RetroReview } from '../components/forms/retroreview';
+import { Flex, Stack } from '@chakra-ui/react';
+import { RetroForm } from '../components/forms/retro/retroform';
 
 const Review: React.FC = () => {
     return (
@@ -13,7 +13,7 @@ const Review: React.FC = () => {
                 px={6}
                 mx={6}
             >
-                <RetroReview />
+                <RetroForm />
             </Stack>
         </Flex>
     );

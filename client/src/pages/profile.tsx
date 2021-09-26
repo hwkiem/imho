@@ -1,17 +1,10 @@
-import { Box, Flex, Heading, Stack, useColorModeValue } from '@chakra-ui/react';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { Box, Flex, Heading, Stack } from '@chakra-ui/react';
 import { Layout } from '../components/layout/layout';
 import {
-    MeDocument,
-    MeQuery,
     RegularReviewFragment,
     RegularUserFragment,
-    GetReviewsByUserIdQuery,
-    GetReviewsByUserIdDocument,
 } from '../generated/graphql';
-import { initializeApollo } from '../lib/apollo';
 import { Page } from '../types/page';
-import { useIsAuth } from '../utils/useIsAuth';
 
 interface ProfileProps {
     me: RegularUserFragment;
@@ -19,7 +12,6 @@ interface ProfileProps {
 }
 
 const Profile: Page<ProfileProps> = ({ me, reviews }) => {
-    useIsAuth();
     return (
         <Flex minH={'100vh'} bg={'gray.50'}>
             <Stack
@@ -31,9 +23,7 @@ const Profile: Page<ProfileProps> = ({ me, reviews }) => {
                 px={6}
                 mx={6}
             >
-                <Heading>
-                    Hello {me.first_name}! Welcome to your dashboard.
-                </Heading>
+                <Heading>Hello! Welcome to your dashboard.</Heading>
                 <Box bg={'white'} w={'100%'} m={4} rounded={4} boxShadow={'sm'}>
                     <Heading size={'sm'} m={4}>
                         Welcome Home!
@@ -46,65 +36,12 @@ const Profile: Page<ProfileProps> = ({ me, reviews }) => {
                                 Review ID: {review.res_id}
                                 Rent: {review.rent}
                                 Rating: {review.rating}
-                                Address: {review.residence?.full_address}
                             </Box>
                         ))}
                 </Stack>
             </Stack>
         </Flex>
     );
-};
-
-export const getServerSideProps = async ({
-    req,
-    res,
-}: GetServerSidePropsContext): Promise<
-    GetServerSidePropsResult<ProfileProps>
-> => {
-    const apollo = initializeApollo({
-        headers: req.headers,
-    });
-    const meQuery = await apollo.query<MeQuery>({
-        query: MeDocument,
-    });
-    if (meQuery.data.me.errors) {
-        return {
-            redirect: {
-                permanent: false,
-                destination: '/login',
-            },
-        };
-    } else if (meQuery.data.me.users) {
-        const me = meQuery.data.me.users[0];
-        const reviewQuery = apollo.query<GetReviewsByUserIdQuery>({
-            query: GetReviewsByUserIdDocument,
-            variables: { user_ids: [me.user_id] },
-        });
-        const props: GetServerSidePropsResult<ProfileProps> = {
-            props: {
-                me: me,
-            },
-        };
-        const resp = (await reviewQuery).data.getReviewsByUserId;
-        if (resp) {
-            if (resp.reviews) {
-                props.props.reviews = resp.reviews;
-                return props;
-            }
-            if (resp.errors) console.log(resp.errors);
-            return props;
-        } else {
-            console.log(resp);
-            return props;
-        }
-    } else {
-        return {
-            redirect: {
-                permanent: false,
-                destination: '/error',
-            },
-        };
-    }
 };
 
 Profile.layout = Layout;

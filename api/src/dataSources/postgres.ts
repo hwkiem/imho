@@ -10,10 +10,8 @@ import {
 } from '../User/user_db_handler';
 import {
     createResidence,
-    getResidencesBoundingBox,
     getResidencesById,
     getResidencesGeneric,
-    getResidencesNearArea,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByPrimaryKeyTuple,
@@ -23,7 +21,15 @@ import {
     updateReviewGeneric,
     writeReview,
 } from '../Review/review_db_handler';
-import { residenceColumns, reviewColumns } from '../utils/db_helper';
+import { reviewColumns } from '../utils/db_helper';
+import {
+    createLocation,
+    getLocationsById,
+    getLocationsNearArea,
+    getLocationsGeneric,
+    getLocationsBoundingBox,
+    locationExists,
+} from '../Location/location_db_handler';
 
 export class postgresHandler extends SQLDataSource {
     protected knexPostgis: KnexPostgis.KnexPostgis;
@@ -44,16 +50,26 @@ export class postgresHandler extends SQLDataSource {
 
     public changePassword = changePassword;
 
+    // Locations
+
+    public getLocationsById = getLocationsById;
+
+    public createLocation = createLocation;
+
+    public getLocationsNearArea = getLocationsNearArea;
+
+    public getLocationsGeneric = getLocationsGeneric;
+
+    public getLocationsBoundingBox = getLocationsBoundingBox;
+
+    public locationExists = locationExists;
+
     // Residences
     public createResidence = createResidence;
 
     public getResidencesGeneric = getResidencesGeneric;
 
     public getResidencesById = getResidencesById;
-
-    public getResidencesBoundingBox = getResidencesBoundingBox;
-
-    public getResidencesNearArea = getResidencesNearArea;
 
     // Reviews
     public writeReview = writeReview;
@@ -70,6 +86,4 @@ export class postgresHandler extends SQLDataSource {
 
     // Helpers
     public reviewColumns = reviewColumns;
-
-    public residenceColumns = residenceColumns;
 }

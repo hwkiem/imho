@@ -1,9 +1,11 @@
+import 'reflect-metadata';
 import * as Knex from 'knex';
-import { Residence } from '../../Residence/residence';
+import { Residence } from '../../Residence/Residence';
 import { Review } from '../../Review/reviews';
 import { User } from '../../User/user';
 import KnexPostgis from 'knex-postgis';
 import knexConfig from '../knexfile';
+import { StoveType } from '../../types/enum_types';
 
 const knex = new Knex.Client(knexConfig);
 const knexPostgis = KnexPostgis(knex);
@@ -53,7 +55,19 @@ export async function seed(knex: Knex): Promise<void> {
         },
     ]);
 
-    await knex<Residence>('residences').insert([
+    await knex<Location>('locations').insert([
+        {
+            google_place_id: 'ChIJA7uBlJcphYAR79QB8w6fAVg',
+            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            street_num: '920',
+            route: 'Cranbrook Court',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
+            ),
+        },
         {
             google_place_id: 'ChIJ5z8sO3gphYARfxI717FQgtI',
             full_address: '1737 Pomona Dr, Davis, CA 95616, USA',
@@ -67,10 +81,8 @@ export async function seed(knex: Knex): Promise<void> {
             ),
         },
         {
-            google_place_id:
-                'Eik2MTQgU3ljYW1vcmUgTG4gIzFhLCBEYXZpcywgQ0EgOTU2MTYsIFVTQSIeGhwKFgoUChIJYxBDa6wphYARlcQYVmKInAwSAjFh',
-            full_address: '614 Sycamore Ln #1a, Davis, CA 95616, USA',
-            apt_num: '1a',
+            google_place_id: 'ChIJC4XVZawphYAR9STg547WSeQ',
+            full_address: '614 Sycamore Ln, Davis, CA 95616, USA',
             street_num: '614',
             route: 'Sycamore Lane',
             city: 'Davis',
@@ -78,20 +90,6 @@ export async function seed(knex: Knex): Promise<void> {
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7609074 + ' ' + 38.5483489 + ')'
-            ),
-        },
-        {
-            google_place_id:
-                'Eio5MjAgQ3JhbmJyb29rIEN0ICMzZiwgRGF2aXMsIENBIDk1NjE2LCBVU0EiHhocChYKFAoSCXugiI6XKYWAEcRojVAXUfgbEgIzZg',
-            full_address: '920 Cranbrook Ct #3f, Davis, CA 95616, USA',
-            apt_num: '3f',
-            street_num: '920',
-            route: 'Cranbrook Court',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
-            geog: knexPostgis.geographyFromText(
-                'Point(' + -121.7405625 + ' ' + 38.5585907 + ')'
             ),
         },
         {
@@ -106,6 +104,30 @@ export async function seed(knex: Knex): Promise<void> {
                 'Point(' + -121.7551427 + ' ' + 38.5560044 + ')'
             ),
         },
+        {
+            google_place_id: 'ChIJfX6HAbEphYARBl5uwq5ksYQ',
+            full_address: '606 Villanova Dr, Davis, CA 95616, USA',
+            street_num: '539',
+            route: 'Villanova Drive',
+            city: 'Davis',
+            state: 'California',
+            postal_code: '95616',
+            geog: knexPostgis.geographyFromText(
+                'Point(' + -121.7551427 + ' ' + 38.5560044 + ')'
+            ),
+        },
+    ]);
+
+    const loc_start = (await knex.raw('select min(loc_id) from locations'))
+        .rows[0].min;
+
+    await knex<Residence>('residences').insert([
+        { unit: '2f', loc_id: loc_start },
+        { unit: '1a', loc_id: loc_start },
+        { unit: '5c', loc_id: loc_start },
+        { unit: '1', loc_id: loc_start + 1 },
+        { unit: '1', loc_id: loc_start + 2 },
+        { unit: '1', loc_id: loc_start + 3 },
     ]);
 
     const userStart = (await knex.raw('select min(user_id) from users')).rows[0]
@@ -113,17 +135,114 @@ export async function seed(knex: Knex): Promise<void> {
     const resStart = (await knex.raw('select min(res_id) from residences'))
         .rows[0].min;
 
+    // var Range = require('pg-range').Range;
+
     await knex<Review>('reviews').insert([
-        { user_id: userStart, res_id: resStart, rent: 4000, rating: 5 },
-        { user_id: userStart + 1, res_id: resStart, rent: 4200, rating: 4 },
-        { user_id: userStart + 1, res_id: resStart + 1 },
+        // 1
+        {
+            user_id: userStart,
+            res_id: resStart,
+            rent: 4000,
+            rating: 2,
+            air_conditioning: true,
+            bath_count: 1.5,
+            bedroom_count: 2,
+            parking: false,
+            doorman: false,
+            // must figure out
+            // lease_term: Range(
+            //     new Date('January 2019'),
+            //     new Date('January 2020')
+            // ),
+        },
+        {
+            user_id: userStart + 1,
+            res_id: resStart,
+            rent: 2500,
+            rating: 5,
+            air_conditioning: true,
+            bath_count: 1.5,
+            bedroom_count: 2,
+            parking: false,
+            doorman: false,
+            pet_friendly: false,
+        },
+        // 2
         {
             user_id: userStart + 2,
-            res_id: resStart + 2,
-            rent: 10000,
-            rating: 2,
+            res_id: resStart + 1,
+            rent: 3000,
+            rating: 4,
+            air_conditioning: true,
+            bath_count: 1,
+            bedroom_count: 1,
+            pet_friendly: false,
+            heat: true,
+            stove: StoveType.ELECTRIC,
         },
-        { user_id: userStart + 3, res_id: resStart + 3, rent: 1000, rating: 3 },
-        { user_id: userStart + 4, res_id: resStart + 3, rent: 2500, rating: 3 },
+        {
+            user_id: userStart,
+            res_id: resStart + 1,
+            rent: 2700,
+            rating: 5,
+            air_conditioning: true,
+            bath_count: 1,
+            bedroom_count: 1,
+            pet_friendly: false,
+            heat: true,
+            stove: StoveType.ELECTRIC,
+            parking: true,
+        },
+        // 3
+        {
+            user_id: userStart + 4,
+            res_id: resStart + 2,
+            rent: 4000,
+            rating: 5,
+            air_conditioning: true,
+            heat: true,
+            stove: StoveType.ELECTRIC,
+            parking: true,
+            dishwasher: true,
+            gym: true,
+        },
+        // 4
+        {
+            user_id: userStart + 2,
+            res_id: resStart + 3,
+            rent: 6000,
+            rating: 5,
+            air_conditioning: true,
+            bath_count: 2,
+            bedroom_count: 2,
+            parking: false,
+            doorman: false,
+        },
+        // 5
+        {
+            user_id: userStart + 1,
+            res_id: resStart + 4,
+            rent: 10000,
+            rating: 3,
+            air_conditioning: false,
+            heat: false,
+            stove: StoveType.GAS,
+            parking: true,
+            dishwasher: true,
+            gym: true,
+        },
+        // 6
+        {
+            user_id: userStart + 3,
+            res_id: resStart + 5,
+            rent: 4000,
+            rating: 5,
+            air_conditioning: true,
+            heat: true,
+            stove: StoveType.ELECTRIC,
+            parking: true,
+            dishwasher: true,
+            gym: true,
+        },
     ]);
 }
