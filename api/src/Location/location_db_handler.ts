@@ -116,7 +116,7 @@ export async function getLocationsNearArea(
         .select('*')
         .where(obj)
         .orderByRaw(
-            "locations.geog <-> 'POINT(" +
+            "locations_enhanced.geog <-> 'POINT(" +
                 locationResult.geometry.location.lng +
                 ' ' +
                 locationResult.geometry.location.lat +
