@@ -2,15 +2,6 @@ import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
 import { Coords } from '../types/object_types';
 import { MyContext } from '../types/types';
-
-// @ObjectType()
-// class Coords {
-//     @Field()
-//     lat: number;
-//     @Field()
-//     lng: number;
-// }
-
 @ObjectType()
 export class Location {
     @Field()
