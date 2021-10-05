@@ -3,7 +3,6 @@
         "target": "es6",
         "lib": ["dom", "dom.iterable", "esnext"],
         "types": ["node", "googlemaps"],
-        "allowJs": true,
         "skipLibCheck": true,
         "strict": true,
         "noImplicitAny": true,
@@ -26,10 +25,7 @@
         "**/*.ts",
         "**/*.tsx",
         "src/lib/apollo.js",
-        "src/lib/apollo.js",
-        "src/lib/apollo.js",
-        "src/components/utils/monthPicker.jsx",
         "src/components/utils/monthPicker.jsx"
     ],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", ".next"]
 }
