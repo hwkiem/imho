@@ -5,11 +5,7 @@ import {
     PlaceIDResponse,
     SingleLocationResponse,
 } from '../types/object_types';
-import {
-    CreateLocationInput,
-    GeoBoundaryInput,
-    LocationQueryOptions,
-} from '../types/input_types';
+import { GeoBoundaryInput, LocationQueryOptions } from '../types/input_types';
 import { MyContext } from '../types/types';
 import { Location } from './Location';
 import { unpackLocation } from '../utils/mapUtils';
@@ -18,19 +14,10 @@ import { unpackLocation } from '../utils/mapUtils';
 export class LocationResolver {
     @Mutation(() => SingleLocationResponse)
     async createLocation(
-        @Arg('options') options: CreateLocationInput,
+        @Arg('place_id') place_id: string,
         @Ctx() { dataSources }: MyContext
     ): Promise<SingleLocationResponse> {
-        const loc = await dataSources.googleMapsHandler.locationFromPlaceID(
-            options.google_place_id
-        );
-        if (loc instanceof FieldError) return { errors: [loc] };
-
-        const response = await dataSources.pgHandler.createLocation(
-            loc,
-            options
-        );
-        return response;
+        return await dataSources.pgHandler.createLocation(place_id);
     }
 
     // get by batch of ids

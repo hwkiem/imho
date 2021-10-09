@@ -1,12 +1,11 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import {
-    PartialReview,
+    AllAttributes,
     ReviewQueryOptions,
     WriteReviewInput,
 } from '../types/input_types';
 import {
     FieldError,
-    ResidenceResponse,
     ReviewResponse,
     SingleReviewResponse,
 } from '../types/object_types';
@@ -21,83 +20,36 @@ export class ReviewResolver {
         @Arg('options') options: WriteReviewInput,
         @Ctx() { dataSources, req }: MyContext
     ): Promise<SingleReviewResponse> {
-        if (req.session.userId === undefined) {
+        // ensure user logged in
+        const user_id = req.session.userId;
+        if (user_id === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         // Validation
-        const err = validateWriteReviewInput(options);
+        const err = validateWriteReviewInput(options.review_details);
         if (err) {
             return { errors: [err] };
         }
-        // does loc exist yet?
-        var loc = await dataSources.pgHandler.locationExists(
+
+        // ensure location exists
+        const loc_id = await dataSources.pgHandler.createLocationIfNotExists(
             options.google_place_id
         );
-        // loc does not exist
-        if (loc === null) {
-            const geocode = await dataSources.googleMapsHandler.locationFromPlaceID(
-                options.google_place_id
-            );
-            if (geocode instanceof FieldError) return { errors: [geocode] };
-            const response = await dataSources.pgHandler.createLocation(
-                geocode,
-                { google_place_id: options.google_place_id }
-            );
-            if (response.errors) return { errors: response.errors };
-            if (!response.location)
-                return {
-                    errors: [
-                        {
-                            field: 'create location',
-                            message:
-                                'unable to make location for this residence',
-                        },
-                    ],
-                };
-            // add loc_id to input
-            loc = response.location.loc_id;
-        } // now loc is valid if we need to create a new residence
+        if (loc_id instanceof FieldError) return { errors: [loc_id] };
 
-        // does the residence already exist?
-        const getResponse: ResidenceResponse = await dataSources.pgHandler.getResidencesGeneric(
-            {
-                unit: options.unit,
-            }
+        // ensure residence exists
+        const res_id = await dataSources.pgHandler.createResidenceIfNotExists(
+            loc_id,
+            options.unit
         );
-        if (
-            getResponse.errors !== undefined ||
-            getResponse.residences === undefined
-        ) {
-            return { errors: getResponse.errors };
-        }
-        if (getResponse.residences.length == 0) {
-            // residence does not exists
-            const locationResult = await dataSources.googleMapsHandler.locationFromPlaceID(
-                options.google_place_id
-            );
-            if (locationResult instanceof FieldError) {
-                return { errors: [locationResult] };
-            }
-            //create
-            const createResponse = await dataSources.pgHandler.createResidence({
-                loc_id: loc,
-                unit: options.unit ? options.unit : '1',
-                google_place_id: '', // meh
-            });
-            if (createResponse.errors || !createResponse.residence) {
-                console.log('errors :/');
-                return { errors: createResponse.errors };
-            }
-            options.user_id = req.session.userId;
-            options.res_id = createResponse.residence.res_id;
-        } else {
-            // residence exists
-            options.user_id = req.session.userId;
-            options.res_id = getResponse.residences[0].res_id;
-        }
-        const { unit, ...args } = options;
-        const response = await dataSources.pgHandler.writeReview(args);
-        return response;
+        if (res_id instanceof FieldError) return { errors: [res_id] };
+
+        // write review
+        return await dataSources.pgHandler.writeReview(
+            res_id,
+            user_id,
+            options.review_details
+        );
     }
 
     @Query(() => ReviewResponse) // return number of rows returned? everywhere?
@@ -132,7 +84,7 @@ export class ReviewResolver {
 
     @Mutation(() => SingleReviewResponse)
     async updateMyReviewOverwrite(
-        @Arg('changes') changes: PartialReview,
+        @Arg('changes') changes: AllAttributes,
         @Arg('res_id') res_id: number,
         @Ctx() { req, dataSources }: MyContext
     ): Promise<SingleReviewResponse> {
@@ -153,7 +105,7 @@ export class ReviewResolver {
 
     @Mutation(() => ReviewResponse)
     async updateMyReviewGeneric(
-        @Arg('changes') changes: PartialReview,
+        @Arg('changes') changes: AllAttributes,
         @Arg('res_id') res_id: number,
         @Ctx() { req, dataSources }: MyContext
     ) {

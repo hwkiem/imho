@@ -1,13 +1,14 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
+import { googleMapsHandler } from '../dataSources/mapsAPI';
 import { postgresHandler } from '../dataSources/postgres';
 import { LocationSortBy, QueryOrderChoice } from '../types/enum_types';
 import {
-    CreateLocationInput,
     GeoBoundaryInput,
     LocationSortByInput,
     PartialLocation,
 } from '../types/input_types';
 import {
+    FieldError,
     LocationResponse,
     SingleLocationResponse,
 } from '../types/object_types';
@@ -16,17 +17,21 @@ import { Location } from './Location';
 
 export async function createLocation(
     this: postgresHandler,
-    locationResult: GeocodeResult,
-    input: CreateLocationInput
+    google_place_id: string
 ): Promise<SingleLocationResponse> {
+    // obtain and validate location from place_id
+    const maps = new googleMapsHandler();
+    const geocode = await maps.locationFromPlaceID(google_place_id);
+    if (geocode instanceof FieldError) return { errors: [geocode] };
+
     const args = {
-        ...input,
-        ...unpackLocation(locationResult),
+        google_place_id,
+        ...unpackLocation(geocode),
         geog: this.knexPostgis.geographyFromText(
             'Point(' +
-                locationResult.geometry.location.lng +
+                geocode.geometry.location.lng +
                 ' ' +
-                locationResult.geometry.location.lat +
+                geocode.geometry.location.lat +
                 ')'
         ),
     };
@@ -90,6 +95,28 @@ export async function getLocationsById(
         .where('loc_id', 'in', ids)
         .then((locations) => {
             r.locations = assembleLocation(locations);
+        })
+        .catch(
+            (e) =>
+                (r.errors = [
+                    { field: 'query location', message: e.toString() },
+                ])
+        );
+
+    return r;
+}
+
+export async function getSingleLocationById(
+    this: postgresHandler,
+    ids: number[]
+): Promise<SingleLocationResponse> {
+    let r: SingleLocationResponse = {};
+    await this.knex<Location>('locations_enhanced')
+        .select('*')
+        .where('loc_id', 'in', ids)
+        .limit(1)
+        .then((locations) => {
+            r.location = assembleLocation(locations)[0];
         })
         .catch(
             (e) =>
@@ -207,7 +234,6 @@ export async function getLocationsBoundingBox(
     return r;
 }
 
-// return loc_id or null
 export async function locationExists(
     this: postgresHandler,
     place_id: string
@@ -228,4 +254,21 @@ export async function locationExists(
         });
 
     return r;
+}
+
+export async function createLocationIfNotExists(
+    this: postgresHandler,
+    place_id: string
+): Promise<number | FieldError> {
+    const locId = await this.locationExists(place_id);
+    // does location exist
+    if (locId === null) {
+        // create one
+        const res = await this.createLocation(place_id);
+        if (res.errors) return res.errors[0];
+        if (res.location) return res.location.loc_id;
+        return { field: 'create location', message: 'empty response' };
+    } else {
+        return locId;
+    }
 }

@@ -84,8 +84,8 @@ export function reviewColumns(this: postgresHandler) {
         'backyard',
         'bath_count',
         'bedroom_count',
-        this.knex.raw('lower(lease_term_) as start'),
-        this.knex.raw('upper(lease_term_) as end'),
+        this.knex.raw('lower(lease_term) as start'),
+        this.knex.raw('upper(lease_term) as end'),
         'created_at',
         'updated_at',
     ];

@@ -78,7 +78,6 @@ export class UserResolver {
                 req.session.destroy((err) => {
                     res.clearCookie('oreo');
                     if (err) {
-                        console.log(err);
                         resolve({
                             errors: [
                                 {
