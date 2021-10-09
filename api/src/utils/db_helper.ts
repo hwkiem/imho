@@ -27,6 +27,20 @@ export function residenceColumns() {
         'residences.updated_at',
         'avg_rating',
         'avg_rent',
+        'dishwasher',
+        'air_conditioning',
+        'heat',
+        'stove',
+        'pool',
+        'gym',
+        'garbage_disposal',
+        'parking',
+        'doorman',
+        'pet_friendly',
+        'laundry',
+        'backyard',
+        'bath_count',
+        'bedroom_count',
     ];
 }
 // used on residences_enhanced outer join locations

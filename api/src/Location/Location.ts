@@ -1,15 +1,8 @@
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
+import { LaundryType } from '../types/enum_types';
 import { Coords } from '../types/object_types';
 import { MyContext } from '../types/types';
-
-// @ObjectType()
-// class Coords {
-//     @Field()
-//     lat: number;
-//     @Field()
-//     lng: number;
-// }
 
 @ObjectType()
 export class Location {
@@ -42,13 +35,35 @@ export class Location {
 
     geog: any;
 
-    // Aggregates
-    // need to nail this list down, which aspect of Review aggregated across entire location?
+    // aggregates
+    // averages
     @Field(() => Float, { nullable: true })
     avg_rent?: number;
 
     @Field(() => Float, { nullable: true })
     avg_rating?: number;
+
+    // modes
+    @Field({ nullable: true })
+    pool?: boolean;
+
+    @Field({ nullable: true })
+    gym?: boolean;
+
+    @Field({ nullable: true })
+    parking?: boolean;
+
+    @Field({ nullable: true })
+    doorman?: boolean;
+
+    @Field({ nullable: true })
+    pet_friendly?: boolean;
+
+    @Field(() => LaundryType, { nullable: true })
+    laundry?: LaundryType;
+
+    @Field({ nullable: true })
+    backyard?: boolean;
 
     // Field Resolvers
     @Field(() => [Residence], { nullable: true })

@@ -116,7 +116,7 @@ export async function getLocationsNearArea(
         .select('*')
         .where(obj)
         .orderByRaw(
-            "locations.geog <-> 'POINT(" +
+            "locations_enhanced.geog <-> 'POINT(" +
                 locationResult.geometry.location.lng +
                 ' ' +
                 locationResult.geometry.location.lat +
@@ -129,7 +129,10 @@ export async function getLocationsNearArea(
             r.locations = assembleLocation(locations);
         })
         .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+            (e) =>
+                (r.errors = [
+                    { field: 'query location', message: e.toString() },
+                ])
         );
     return r;
 }
@@ -196,7 +199,10 @@ export async function getLocationsBoundingBox(
             r.locations = assembleLocation(locations);
         })
         .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
+            (e) =>
+                (r.errors = [
+                    { field: 'query location', message: e.toString() },
+                ])
         );
     return r;
 }
