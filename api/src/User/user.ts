@@ -1,5 +1,6 @@
-import { ObjectType, Field, Ctx } from 'type-graphql';
+import { ObjectType, Field, Ctx, Arg } from 'type-graphql';
 import { Review } from '../Review/reviews';
+import { ReviewQueryOptions } from '../types/input_types';
 import { MyContext } from '../types/types';
 
 @ObjectType()
@@ -23,14 +24,29 @@ export class User {
 
     @Field(() => [Review], { nullable: true })
     async myReviews(
-        @Ctx() { req, dataSources }: MyContext
+        @Ctx() { req, dataSources }: MyContext,
+        @Arg('options', { nullable: true }) options: ReviewQueryOptions
     ): Promise<Review[] | undefined> {
         const uid = req.session.userId;
         if (uid === undefined) {
             return;
         }
-        const res = await dataSources.pgHandler.getReviewsByUserId([uid]);
-        if (res.errors === undefined && res.reviews !== undefined) {
+        const res = options
+            ? await dataSources.pgHandler.getReviewsGeneric(
+                  options.partial_review
+                      ? {
+                            ...options.partial_review,
+                            user_id: uid,
+                        }
+                      : { user_id: uid },
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getReviewsGeneric({
+                  user_id: uid,
+              });
+
+        if (!res.errors && res.reviews) {
             return res.reviews;
         }
         return;

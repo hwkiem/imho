@@ -1,6 +1,7 @@
-import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
+import { Arg, Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
 import { LaundryType } from '../types/enum_types';
+import { ResidenceQueryOptions } from '../types/input_types';
 import { Coords } from '../types/object_types';
 import { MyContext } from '../types/types';
 
@@ -69,11 +70,24 @@ export class Location {
     @Field(() => [Residence], { nullable: true })
     async myResidences(
         @Root() location: Location,
+        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
         @Ctx() { dataSources }: MyContext
     ): Promise<Residence[] | undefined> {
-        const res = await dataSources.pgHandler.getResidencesGeneric({
-            loc_id: location.loc_id,
-        });
+        const res = options
+            ? await dataSources.pgHandler.getResidencesGeneric(
+                  options.partial_residence
+                      ? {
+                            ...options.partial_residence,
+                            loc_id: location.loc_id,
+                        }
+                      : { loc_id: location.loc_id },
+                  options.sort_params ? options.sort_params : undefined,
+                  options.limit ? options.limit : undefined
+              )
+            : await dataSources.pgHandler.getResidencesGeneric({
+                  loc_id: location.loc_id,
+              });
+
         if (!res.errors && res.residences) {
             return res.residences;
         }

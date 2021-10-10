@@ -105,6 +105,8 @@ export class PartialResidence implements Partial<Residence> {
     avg_rent?: number;
     @Field(() => Float, { nullable: true })
     avg_rating?: number;
+    @Field({ nullable: true })
+    unit?: string;
 }
 
 @InputType()
@@ -170,6 +172,8 @@ export class ResidenceQueryOptions {
     sort_params?: ResidenceSortByInput;
     @Field(() => PartialResidence, { nullable: true })
     partial_residence?: PartialResidence;
+
+    loc_id: number; // field resolver
 }
 
 @InputType()
