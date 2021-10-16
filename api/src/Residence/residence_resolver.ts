@@ -20,7 +20,8 @@ export class ResidencyResolver {
     ): Promise<SingleResidenceResponse> {
         // ensure location exists
         const loc_id = await dataSources.pgHandler.createLocationIfNotExists(
-            options.google_place_id
+            options.google_place_id,
+            dataSources.googleMapsHandler.locationFromPlaceID
         );
         if (loc_id instanceof FieldError) return { errors: [loc_id] };
 

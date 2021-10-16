@@ -1,5 +1,5 @@
 import { ObjectType, Field, Float, Ctx, Root, Arg } from 'type-graphql';
-import { Review } from '../Review/reviews';
+import { Review } from '../Review/Review';
 import { LaundryType, StoveType } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
 import { MyContext } from '../types/types';

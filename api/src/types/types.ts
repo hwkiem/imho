@@ -10,8 +10,3 @@ export type MyContext = {
         googleMapsHandler: googleMapsHandler;
     };
 };
-
-export type ReviewIdTuple = {
-    user_id: number;
-    res_id: number;
-};

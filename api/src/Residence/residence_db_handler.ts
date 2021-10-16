@@ -12,7 +12,7 @@ import {
     SingleResidenceResponse,
 } from '../types/object_types';
 
-import { assembleResidence } from '../utils/mapUtils';
+// import { assembleResidence } from '../utils/mapUtils';
 import { Residence } from './Residence';
 
 export async function createResidence(
@@ -74,7 +74,7 @@ export async function getResidencesGeneric(
         .whereNotNull(sort_params.attribute)
         .orderBy(sort_params.attribute, sort_params.sort)
         .then((residences) => {
-            r.residences = assembleResidence(residences);
+            r.residences = residences;
         })
         .catch(
             (e) =>
@@ -153,7 +153,7 @@ export async function getResidencesNearArea(
         .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((residences: any) => {
-            r.residences = assembleResidence(residences);
+            r.residences = residences;
         })
         .catch(
             (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
@@ -192,7 +192,7 @@ export async function getResidencesBoundingBox(
         .orderBy(sort_params.attribute, sort_params.sort)
         .limit(limit)
         .then((residences: any) => {
-            r.residences = assembleResidence(residences);
+            r.residences = residences;
         })
         .catch(
             (e) => (r.errors = [{ field: 'query user', message: e.toString() }])

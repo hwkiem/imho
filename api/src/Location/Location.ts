@@ -1,6 +1,6 @@
 import { Arg, Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
-import { LaundryType } from '../types/enum_types';
+import { LaundryType, StoveType } from '../types/enum_types';
 import { ResidenceQueryOptions } from '../types/input_types';
 import { Coords } from '../types/object_types';
 import { MyContext } from '../types/types';
@@ -45,11 +45,27 @@ export class Location {
     avg_rating?: number;
 
     // modes
+
+    @Field({ nullable: true })
+    air_conditioning?: boolean;
+
+    @Field({ nullable: true })
+    heat?: boolean;
+
+    @Field(() => StoveType, { nullable: true })
+    stove?: StoveType;
+
     @Field({ nullable: true })
     pool?: boolean;
 
     @Field({ nullable: true })
     gym?: boolean;
+
+    @Field({ nullable: true })
+    garbage_disposal?: boolean;
+
+    @Field({ nullable: true })
+    dishwasher?: boolean;
 
     @Field({ nullable: true })
     parking?: boolean;

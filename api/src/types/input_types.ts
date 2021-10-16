@@ -1,7 +1,7 @@
 import { Field, Float, InputType, Int } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
-import { Review } from '../Review/reviews';
-import { User } from '../User/user';
+import { Review } from '../Review/Review';
+import { User } from '../User/User';
 import { Location } from '../Location/Location';
 import {
     LaundryType,

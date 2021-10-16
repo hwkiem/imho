@@ -1,5 +1,5 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { User } from './user';
+import { User } from './User';
 import argon2 from 'argon2';
 import { UserResponse } from '../types/object_types';
 import { RegisterInput } from '../types/input_types';

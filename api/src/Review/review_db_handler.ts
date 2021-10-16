@@ -2,9 +2,8 @@ import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
 import { AllAttributes, ReviewSortByInput } from '../types/input_types';
 import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
-import { ReviewIdTuple } from '../types/types';
 import { assembleReview } from '../utils/db_helper';
-import { Review } from './reviews';
+import { Review } from './Review';
 
 export async function writeReview(
     this: postgresHandler,
@@ -12,23 +11,24 @@ export async function writeReview(
     user_id: number,
     review_details: AllAttributes
 ): Promise<SingleReviewResponse> {
+    const { lease_term, ...attr } = review_details;
     let r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .insert({
             res_id: res_id,
             user_id: user_id,
-            ...review_details,
+            ...attr,
             lease_term: require('pg-range').Range(
-                review_details.lease_term.start_date,
-                review_details.lease_term.end_date
+                lease_term.start_date,
+                lease_term.end_date
             ),
         })
         .returning(['res_id', 'user_id'])
         .then(async (ids) => {
-            await this.getReviewsByPrimaryKeyTuple({
-                res_id: ids[0].res_id,
-                user_id: ids[0].user_id,
-            })
+            await this.getReviewsByPrimaryKeyTuple(
+                ids[0].user_id,
+                ids[0].res_id
+            )
                 .then((res) => {
                     if (res.reviews) r.review = res.reviews[0];
                 })
@@ -65,13 +65,14 @@ export async function writeReview(
 
 export async function getReviewsByPrimaryKeyTuple(
     this: postgresHandler,
-    ids: ReviewIdTuple
+    user_id: number,
+    res_id: number
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
-        .where('user_id', '=', ids.user_id)
-        .where('res_id', '=', ids.res_id)
+        .where('user_id', '=', user_id)
+        .where('res_id', '=', res_id)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
         })
@@ -156,10 +157,10 @@ export async function updateReviewGeneric(
         .where('user_id', '=', user_id)
         .returning(['user_id', 'res_id'])
         .then(async (ids) => {
-            await this.getReviewsByPrimaryKeyTuple({
-                res_id: ids[0].res_id,
-                user_id: ids[0].user_id,
-            })
+            await this.getReviewsByPrimaryKeyTuple(
+                ids[0].user_id,
+                ids[0].res_id
+            )
                 .then((reviews) => {
                     if (reviews.reviews) r.review = reviews.reviews[0];
                 })

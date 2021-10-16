@@ -17,7 +17,12 @@ export class LocationResolver {
         @Arg('place_id') place_id: string,
         @Ctx() { dataSources }: MyContext
     ): Promise<SingleLocationResponse> {
-        return await dataSources.pgHandler.createLocation(place_id);
+        const geocode = await dataSources.googleMapsHandler.locationFromPlaceID(
+            place_id
+        );
+        if (geocode instanceof FieldError) return { errors: [geocode] };
+
+        return await dataSources.pgHandler.createLocation(place_id, geocode);
     }
 
     // get by batch of ids

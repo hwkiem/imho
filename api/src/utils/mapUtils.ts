@@ -3,7 +3,6 @@ import {
     GeocodeResult,
 } from '@googlemaps/google-maps-services-js';
 import { Location } from '../Location/Location';
-import { Residence } from '../Residence/Residence';
 
 export const geoToData = (g: GeocodeResponse) => {
     return g.data.results[0];
@@ -33,18 +32,4 @@ export const unpackLocation = (location: GeocodeResult): Partial<Location> => {
     });
 
     return r;
-};
-
-export const assembleResidence = (raw: any): Residence[] => {
-    return raw.map((r: any) => {
-        const { st_x, st_y, ...res } = r;
-        return { coords: { lat: st_y, lng: st_x }, ...res };
-    });
-};
-
-export const assembleLocation = (raw: any): Location[] => {
-    return raw.map((r: any) => {
-        const { st_x, st_y, ...res } = r;
-        return { coords: { lat: st_y, lng: st_x }, ...res };
-    });
 };

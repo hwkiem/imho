@@ -13,7 +13,6 @@ registerEnumType(StoveType, {
 export enum LaundryType {
     IN_UNIT = 'IN_UNIT',
     BUILDING = 'BUILDING',
-    NONE = 'NONE',
 }
 
 registerEnumType(LaundryType, {
@@ -57,6 +56,7 @@ export enum ReviewSortBy {
     RENT = 'rating',
     RATING = 'rating',
     USER_ID = 'res_id',
+    LEASE_TERM = 'lease_term',
 }
 
 registerEnumType(ReviewSortBy, {

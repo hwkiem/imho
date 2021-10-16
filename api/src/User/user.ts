@@ -1,5 +1,6 @@
 import { ObjectType, Field, Ctx, Arg } from 'type-graphql';
-import { Review } from '../Review/reviews';
+import { Review } from '../Review/Review';
+import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
 import { MyContext } from '../types/types';
 
@@ -39,7 +40,10 @@ export class User {
                             user_id: uid,
                         }
                       : { user_id: uid },
-                  options.sort_params ? options.sort_params : undefined,
+                  {
+                      attribute: ReviewSortBy.LEASE_TERM,
+                      sort: QueryOrderChoice.DESC,
+                  }, // overwrite sort to most recent first
                   options.limit ? options.limit : undefined
               )
             : await dataSources.pgHandler.getReviewsGeneric({

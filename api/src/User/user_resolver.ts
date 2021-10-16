@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
-import { User } from './user';
+import { User } from './User';
 import { validateRegister } from '../utils/validators';
 import argon2 from 'argon2';
 import { SingleUserResponse, UserResponse } from '../types/object_types';

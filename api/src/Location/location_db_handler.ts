@@ -1,5 +1,4 @@
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
-import { googleMapsHandler } from '../dataSources/mapsAPI';
 import { postgresHandler } from '../dataSources/postgres';
 import { LocationSortBy, QueryOrderChoice } from '../types/enum_types';
 import {
@@ -12,17 +11,16 @@ import {
     LocationResponse,
     SingleLocationResponse,
 } from '../types/object_types';
-import { assembleLocation, unpackLocation } from '../utils/mapUtils';
+import { assembleLocation } from '../utils/db_helper';
+import { unpackLocation } from '../utils/mapUtils';
 import { Location } from './Location';
 
 export async function createLocation(
     this: postgresHandler,
-    google_place_id: string
+    google_place_id: string,
+    geocode: GeocodeResult
 ): Promise<SingleLocationResponse> {
     // obtain and validate location from place_id
-    const maps = new googleMapsHandler();
-    const geocode = await maps.locationFromPlaceID(google_place_id);
-    if (geocode instanceof FieldError) return { errors: [geocode] };
 
     const args = {
         google_place_id,
@@ -234,12 +232,13 @@ export async function getLocationsBoundingBox(
     return r;
 }
 
+// returns loc_id if exists
 export async function locationExists(
     this: postgresHandler,
     place_id: string
 ): Promise<number | null> {
     var r: number | null = null;
-    await this.knex('locations_enhanced')
+    await this.knex('locations')
         .select('loc_id')
         .where({ google_place_id: place_id })
         .then((ids) => {
@@ -258,13 +257,19 @@ export async function locationExists(
 
 export async function createLocationIfNotExists(
     this: postgresHandler,
-    place_id: string
+    place_id: string,
+    locationFromPlaceID: (
+        place_id: string
+    ) => Promise<GeocodeResult | FieldError>
 ): Promise<number | FieldError> {
     const locId = await this.locationExists(place_id);
     // does location exist
     if (locId === null) {
         // create one
-        const res = await this.createLocation(place_id);
+        const geocode = await locationFromPlaceID(place_id);
+        if (geocode instanceof FieldError) return geocode;
+
+        const res = await this.createLocation(place_id, geocode);
         if (res.errors) return res.errors[0];
         if (res.location) return res.location.loc_id;
         return { field: 'create location', message: 'empty response' };

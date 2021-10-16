@@ -11,7 +11,7 @@ import {
 } from '../types/object_types';
 import { MyContext } from '../types/types';
 import { validateWriteReviewInput } from '../utils/validators';
-import { Review } from './reviews';
+import { Review } from './Review';
 
 @Resolver(Review)
 export class ReviewResolver {
@@ -33,7 +33,8 @@ export class ReviewResolver {
 
         // ensure location exists
         const loc_id = await dataSources.pgHandler.createLocationIfNotExists(
-            options.google_place_id
+            options.google_place_id,
+            dataSources.googleMapsHandler.locationFromPlaceID
         );
         if (loc_id instanceof FieldError) return { errors: [loc_id] };
 
@@ -52,7 +53,7 @@ export class ReviewResolver {
         );
     }
 
-    @Query(() => ReviewResponse) // return number of rows returned? everywhere?
+    @Query(() => ReviewResponse)
     async getReviewsGeneric(
         @Arg('options', { nullable: true }) options: ReviewQueryOptions,
         @Ctx() { dataSources }: MyContext
@@ -88,27 +89,6 @@ export class ReviewResolver {
         @Arg('res_id') res_id: number,
         @Ctx() { req, dataSources }: MyContext
     ): Promise<SingleReviewResponse> {
-        if (req.session.userId === undefined) {
-            return { errors: [{ field: 'session', message: 'not logged in' }] };
-        }
-        // Validation
-        const err = validateWriteReviewInput(changes);
-        if (err) {
-            return { errors: [err] };
-        }
-        return await dataSources.pgHandler.updateReviewGeneric(
-            res_id,
-            req.session.userId,
-            changes
-        );
-    }
-
-    @Mutation(() => ReviewResponse)
-    async updateMyReviewGeneric(
-        @Arg('changes') changes: AllAttributes,
-        @Arg('res_id') res_id: number,
-        @Ctx() { req, dataSources }: MyContext
-    ) {
         if (req.session.userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
