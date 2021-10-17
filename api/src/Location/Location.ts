@@ -1,9 +1,10 @@
-import { Arg, Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
+import { Arg, Field, Float, ObjectType, Root } from 'type-graphql';
+import Container from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
 import { Residence } from '../Residence/Residence';
 import { LaundryType, StoveType } from '../types/enum_types';
 import { ResidenceQueryOptions } from '../types/input_types';
 import { Coords } from '../types/object_types';
-import { MyContext } from '../types/types';
 
 @ObjectType()
 export class Location {
@@ -86,11 +87,11 @@ export class Location {
     @Field(() => [Residence], { nullable: true })
     async myResidences(
         @Root() location: Location,
-        @Arg('options', { nullable: true }) options: ResidenceQueryOptions,
-        @Ctx() { dataSources }: MyContext
+        @Arg('options', { nullable: true }) options: ResidenceQueryOptions
     ): Promise<Residence[] | undefined> {
+        const pg = Container.get(postgresHandler);
         const res = options
-            ? await dataSources.pgHandler.getResidencesGeneric(
+            ? await pg.getResidencesGeneric(
                   options.partial_residence
                       ? {
                             ...options.partial_residence,
@@ -100,7 +101,7 @@ export class Location {
                   options.sort_params ? options.sort_params : undefined,
                   options.limit ? options.limit : undefined
               )
-            : await dataSources.pgHandler.getResidencesGeneric({
+            : await pg.getResidencesGeneric({
                   loc_id: location.loc_id,
               });
 

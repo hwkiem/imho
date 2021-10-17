@@ -1,4 +1,3 @@
-import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { postgresHandler } from '../dataSources/postgres';
 import { LocationSortBy, QueryOrderChoice } from '../types/enum_types';
 import {
@@ -14,13 +13,17 @@ import {
 import { assembleLocation } from '../utils/db_helper';
 import { unpackLocation } from '../utils/mapUtils';
 import { Location } from './Location';
+import { Container } from 'typedi';
+import { googleMapsHandler } from '../dataSources/mapsAPI';
 
 export async function createLocation(
     this: postgresHandler,
-    google_place_id: string,
-    geocode: GeocodeResult
+    google_place_id: string
 ): Promise<SingleLocationResponse> {
     // obtain and validate location from place_id
+    const maps = Container.get(googleMapsHandler);
+    const geocode = await maps.locationFromPlaceID(google_place_id);
+    if (geocode instanceof FieldError) return { errors: [geocode] };
 
     const args = {
         google_place_id,
@@ -128,7 +131,7 @@ export async function getSingleLocationById(
 
 export async function getLocationsNearArea(
     this: postgresHandler,
-    locationResult: GeocodeResult,
+    place_id: string,
     obj: Partial<Location> = {},
     sort_params: LocationSortByInput = {
         attribute: LocationSortBy.ID,
@@ -136,15 +139,19 @@ export async function getLocationsNearArea(
     },
     limit: number = 10
 ): Promise<LocationResponse> {
+    const maps = Container.get(googleMapsHandler);
+    const geocode = await maps.locationFromPlaceID(place_id);
+    if (geocode instanceof FieldError) return { errors: [geocode] };
+
     let r: LocationResponse = {};
     await this.knex<Location>('locations_enhanced')
         .select('*')
         .where(obj)
         .orderByRaw(
             "locations_enhanced.geog <-> 'POINT(" +
-                locationResult.geometry.location.lng +
+                geocode.geometry.location.lng +
                 ' ' +
-                locationResult.geometry.location.lat +
+                geocode.geometry.location.lat +
                 ")'::geometry"
         )
         .whereNotNull(sort_params.attribute)
@@ -257,19 +264,13 @@ export async function locationExists(
 
 export async function createLocationIfNotExists(
     this: postgresHandler,
-    place_id: string,
-    locationFromPlaceID: (
-        place_id: string
-    ) => Promise<GeocodeResult | FieldError>
+    place_id: string
 ): Promise<number | FieldError> {
     const locId = await this.locationExists(place_id);
     // does location exist
     if (locId === null) {
         // create one
-        const geocode = await locationFromPlaceID(place_id);
-        if (geocode instanceof FieldError) return geocode;
-
-        const res = await this.createLocation(place_id, geocode);
+        const res = await this.createLocation(place_id);
         if (res.errors) return res.errors[0];
         if (res.location) return res.location.loc_id;
         return { field: 'create location', message: 'empty response' };

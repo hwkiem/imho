@@ -1,4 +1,6 @@
 import { ObjectType, Field, Ctx, Arg } from 'type-graphql';
+import Container from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/Review';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
@@ -25,15 +27,16 @@ export class User {
 
     @Field(() => [Review], { nullable: true })
     async myReviews(
-        @Ctx() { req, dataSources }: MyContext,
+        @Ctx() { req }: MyContext,
         @Arg('options', { nullable: true }) options: ReviewQueryOptions
     ): Promise<Review[] | undefined> {
         const uid = req.session.userId;
         if (uid === undefined) {
             return;
         }
+        const pg = Container.get(postgresHandler);
         const res = options
-            ? await dataSources.pgHandler.getReviewsGeneric(
+            ? await pg.getReviewsGeneric(
                   options.partial_review
                       ? {
                             ...options.partial_review,
@@ -46,7 +49,7 @@ export class User {
                   }, // overwrite sort to most recent first
                   options.limit ? options.limit : undefined
               )
-            : await dataSources.pgHandler.getReviewsGeneric({
+            : await pg.getReviewsGeneric({
                   user_id: uid,
               });
 

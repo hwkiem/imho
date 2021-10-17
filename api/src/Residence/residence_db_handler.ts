@@ -1,18 +1,11 @@
-import { GeocodeResult } from '@googlemaps/google-maps-services-js';
 import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ResidenceSortBy } from '../types/enum_types';
-import {
-    GeoBoundaryInput,
-    PartialResidence,
-    ResidenceSortByInput,
-} from '../types/input_types';
+import { ResidenceSortByInput } from '../types/input_types';
 import {
     FieldError,
     ResidenceResponse,
     SingleResidenceResponse,
 } from '../types/object_types';
-
-// import { assembleResidence } from '../utils/mapUtils';
 import { Residence } from './Residence';
 
 export async function createResidence(
@@ -125,78 +118,6 @@ export async function getSingleResidenceById(
                 ])
         );
 
-    return r;
-}
-
-export async function getResidencesNearArea(
-    this: postgresHandler,
-    locationResult: GeocodeResult,
-    obj: Partial<Residence> = {},
-    sort_params: ResidenceSortByInput = {
-        attribute: ResidenceSortBy.ID,
-        sort: QueryOrderChoice.ASC,
-    },
-    limit: number = 10
-): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
-    await this.knex<Residence>('residences_enhanced')
-        .select('*')
-        .where(obj)
-        .orderByRaw(
-            "residences_enhanced.geog <-> 'POINT(" +
-                locationResult.geometry.location.lng +
-                ' ' +
-                locationResult.geometry.location.lat +
-                ")'::geometry"
-        )
-        .whereNotNull(sort_params.attribute)
-        .orderBy(sort_params.attribute, sort_params.sort)
-        .limit(limit)
-        .then((residences: any) => {
-            r.residences = residences;
-        })
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
-    return r;
-}
-
-export async function getResidencesBoundingBox(
-    this: postgresHandler,
-    perimeter: GeoBoundaryInput,
-    filter: PartialResidence = {},
-    sort_params: ResidenceSortByInput = {
-        attribute: ResidenceSortBy.ID,
-        sort: QueryOrderChoice.ASC,
-    },
-    limit: number = 10
-): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
-
-    await this.knex('residences_enhanced')
-        .select('*')
-        .where(
-            this.knexPostgis.boundingBoxContains(
-                this.knexPostgis.makeEnvelope(
-                    perimeter.xMin,
-                    perimeter.yMin,
-                    perimeter.xMax,
-                    perimeter.yMax,
-                    4326
-                ),
-                this.knexPostgis.geometry('geog')
-            )
-        )
-        .where(filter)
-        .whereNotNull(sort_params.attribute)
-        .orderBy(sort_params.attribute, sort_params.sort)
-        .limit(limit)
-        .then((residences: any) => {
-            r.residences = residences;
-        })
-        .catch(
-            (e) => (r.errors = [{ field: 'query user', message: e.toString() }])
-        );
     return r;
 }
 

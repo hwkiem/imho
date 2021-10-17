@@ -1,8 +1,9 @@
-import { ObjectType, Field, Float, Ctx, Root, Arg } from 'type-graphql';
+import { ObjectType, Field, Float, Root, Arg } from 'type-graphql';
+import Container from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/Review';
 import { LaundryType, StoveType } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
-import { MyContext } from '../types/types';
 
 @ObjectType()
 export class Residence {
@@ -71,11 +72,11 @@ export class Residence {
     @Field(() => [Review], { nullable: true })
     async myReviews(
         @Root() residence: Residence,
-        @Arg('options', { nullable: true }) options: ReviewQueryOptions,
-        @Ctx() { dataSources }: MyContext
+        @Arg('options', { nullable: true }) options: ReviewQueryOptions
     ): Promise<Review[] | undefined> {
+        const pg = Container.get(postgresHandler);
         const res = options
-            ? await dataSources.pgHandler.getReviewsGeneric(
+            ? await pg.getReviewsGeneric(
                   options.partial_review
                       ? {
                             ...options.partial_review,
@@ -85,7 +86,7 @@ export class Residence {
                   options.sort_params ? options.sort_params : undefined,
                   options.limit ? options.limit : undefined
               )
-            : await dataSources.pgHandler.getReviewsGeneric({
+            : await pg.getReviewsGeneric({
                   res_id: residence.res_id,
               });
 

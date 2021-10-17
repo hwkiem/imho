@@ -35,7 +35,9 @@ import {
     getSingleLocationById,
     createLocationIfNotExists,
 } from '../Location/location_db_handler';
+import { Service } from 'typedi';
 
+@Service()
 export class postgresHandler extends SQLDataSource {
     protected knexPostgis: KnexPostgis.KnexPostgis;
 

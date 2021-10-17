@@ -33,7 +33,8 @@
         "pg": "^8.7.1",
         "pg-range": "^1.1.0",
         "reflect-metadata": "^0.1.13",
-        "type-graphql": "^1.1.1"
+        "type-graphql": "^1.1.1",
+        "typedi": "^0.10.0"
     },
     "devDependencies": {
         "@types/connect-pg-simple": "^4.2.4",
