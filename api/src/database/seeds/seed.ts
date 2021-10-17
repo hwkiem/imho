@@ -101,19 +101,19 @@ export async function seed(knex: Knex): Promise<void> {
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + -121.7551427 + ' ' + 38.5560044 + ')'
+                'Point(' + -121.7551427 + ' ' + 38.5564679 + ')'
             ),
         },
         {
             google_place_id: 'ChIJfX6HAbEphYARBl5uwq5ksYQ',
             full_address: '606 Villanova Dr, Davis, CA 95616, USA',
-            street_num: '539',
+            street_num: '606',
             route: 'Villanova Drive',
             city: 'Davis',
             state: 'California',
             postal_code: '95616',
             geog: knexPostgis.geographyFromText(
-                'Point(' + -121.7551427 + ' ' + 38.5560044 + ')'
+                'Point(' + -121.7567452 + ' ' + 38.5560953 + ')'
             ),
         },
     ]);
