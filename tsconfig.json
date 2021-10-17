@@ -1,12 +1,11 @@
 {
-  "references": [
-    {
-      "path": "./client"
-    },
-    { "path": "./api" },
-    { "path": "./entities" }
-  ],
-  "files": [],
-  "include": [],
-  "exclude": ["**/node_modules"]
+    "references": [
+        {
+            "path": "./client"
+        },
+        { "path": "./api" }
+    ],
+    "files": [],
+    "include": [],
+    "exclude": ["**/node_modules"]
 }
