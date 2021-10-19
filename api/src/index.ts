@@ -9,12 +9,11 @@ import connectRedis from 'connect-redis';
 import { UserResolver } from './User/user_resolver';
 import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { postgresHandler } from './dataSources/postgres';
 import { ReviewResolver } from './Review/review_resolver';
-import { googleMapsHandler } from './dataSources/mapsAPI';
 import { LocationResolver } from './Location/location_resolver';
+import { Container } from 'typedi';
 
-var morgan = require('morgan')
+// var morgan = require('morgan')
 
 const main = async () => {
     const app = express();
@@ -24,7 +23,7 @@ const main = async () => {
     const redis = new Redis(process.env.REDIS_URL);
 
     app.set('trust proxy', 1);
-    app.use(morgan("combined"))
+    // app.use(morgan("combined"))
     app.use(
         cors({
             origin: process.env.CORS_ORIGIN,
@@ -60,18 +59,13 @@ const main = async () => {
                 ReviewResolver,
                 LocationResolver,
             ],
+            container: Container,
             validate: false,
         }),
         context: ({ req, res }) => ({
             req,
             res,
         }),
-        dataSources: () => {
-            return {
-                pgHandler: new postgresHandler(),
-                googleMapsHandler: new googleMapsHandler(),
-            };
-        },
     });
 
     await apolloServer.start();

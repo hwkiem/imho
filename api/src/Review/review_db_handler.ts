@@ -1,31 +1,34 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
-import { ReviewSortByInput, WriteReviewInput } from '../types/input_types';
+import { AllAttributes, ReviewSortByInput } from '../types/input_types';
 import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
-import { ReviewIdTuple } from '../types/types';
 import { assembleReview } from '../utils/db_helper';
-import { Review } from './reviews';
+import { Review } from './Review';
 
 export async function writeReview(
     this: postgresHandler,
-    input: WriteReviewInput
+    res_id: number,
+    user_id: number,
+    review_details: AllAttributes
 ): Promise<SingleReviewResponse> {
-    // nonsense require, but working
-    var Range = require('pg-range').Range;
-    // strip non-DB attr
-    const { google_place_id, lease_term, ...args } = input;
-    if (lease_term !== undefined) {
-        args.lease_term_ = Range(lease_term.start_date, lease_term.end_date);
-    }
+    const { lease_term, ...attr } = review_details;
     let r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
-        .insert(args)
+        .insert({
+            res_id: res_id,
+            user_id: user_id,
+            ...attr,
+            lease_term: require('pg-range').Range(
+                lease_term.start_date,
+                lease_term.end_date
+            ),
+        })
         .returning(['res_id', 'user_id'])
         .then(async (ids) => {
-            await this.getReviewsByPrimaryKeyTuple({
-                res_id: ids[0].res_id,
-                user_id: ids[0].user_id,
-            })
+            await this.getReviewsByPrimaryKeyTuple(
+                ids[0].user_id,
+                ids[0].res_id
+            )
                 .then((res) => {
                     if (res.reviews) r.review = res.reviews[0];
                 })
@@ -62,13 +65,14 @@ export async function writeReview(
 
 export async function getReviewsByPrimaryKeyTuple(
     this: postgresHandler,
-    ids: ReviewIdTuple
+    user_id: number,
+    res_id: number
 ): Promise<ReviewResponse> {
     let r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
-        .where('user_id', '=', ids.user_id)
-        .where('res_id', '=', ids.res_id)
+        .where('user_id', '=', user_id)
+        .where('res_id', '=', res_id)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
         })
@@ -153,10 +157,10 @@ export async function updateReviewGeneric(
         .where('user_id', '=', user_id)
         .returning(['user_id', 'res_id'])
         .then(async (ids) => {
-            await this.getReviewsByPrimaryKeyTuple({
-                res_id: ids[0].res_id,
-                user_id: ids[0].user_id,
-            })
+            await this.getReviewsByPrimaryKeyTuple(
+                ids[0].user_id,
+                ids[0].res_id
+            )
                 .then((reviews) => {
                     if (reviews.reviews) r.review = reviews.reviews[0];
                 })

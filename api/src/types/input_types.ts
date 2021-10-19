@@ -1,7 +1,7 @@
 import { Field, Float, InputType, Int } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
-import { Review } from '../Review/reviews';
-import { User } from '../User/user';
+import { Review } from '../Review/Review';
+import { User } from '../User/User';
 import { Location } from '../Location/Location';
 import {
     LaundryType,
@@ -105,6 +105,8 @@ export class PartialResidence implements Partial<Residence> {
     avg_rent?: number;
     @Field(() => Float, { nullable: true })
     avg_rating?: number;
+    @Field({ nullable: true })
+    unit?: string;
 }
 
 @InputType()
@@ -170,6 +172,8 @@ export class ResidenceQueryOptions {
     sort_params?: ResidenceSortByInput;
     @Field(() => PartialResidence, { nullable: true })
     partial_residence?: PartialResidence;
+
+    loc_id: number; // field resolver
 }
 
 @InputType()
@@ -252,32 +256,15 @@ export class ReviewQueryInput {
 
 @InputType()
 export class CreateResidenceInput {
-    // not in db
     @Field()
     google_place_id: string;
 
-    //in db
     @Field()
     unit: string;
-
-    loc_id: number;
 }
 
 @InputType()
-export class CreateLocationInput {
-    @Field()
-    google_place_id: string;
-}
-
-@InputType()
-export class WriteReviewInput {
-    // input from frontend
-    @Field()
-    google_place_id: string;
-
-    @Field()
-    unit?: string;
-
+export class AllAttributes {
     @Field(() => Float, { nullable: true })
     rating?: number;
 
@@ -311,8 +298,8 @@ export class WriteReviewInput {
     @Field({ nullable: true })
     doorman?: boolean;
 
-    @Field(() => DateRangeInput, { nullable: true })
-    lease_term?: DateRangeInput;
+    @Field(() => DateRangeInput)
+    lease_term: DateRangeInput;
 
     @Field({ nullable: true })
     pet_friendly?: boolean;
@@ -328,11 +315,16 @@ export class WriteReviewInput {
 
     @Field(() => Int, { nullable: true })
     bedroom_count?: number;
+}
 
-    // for db
-    lease_term_?: Range;
+@InputType()
+export class WriteReviewInput {
+    @Field()
+    google_place_id: string;
 
-    user_id?: number;
+    @Field()
+    unit: string;
 
-    res_id?: number;
+    @Field(() => AllAttributes)
+    review_details: AllAttributes;
 }

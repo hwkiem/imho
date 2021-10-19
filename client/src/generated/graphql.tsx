@@ -16,6 +16,26 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type AllAttributes = {
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  stove?: Maybe<StoveType>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  lease_term: DateRangeInput;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Int']>;
+};
+
 export type ChangePasswordInput = {
   email: Scalars['String'];
   old_password: Scalars['String'];
@@ -26,10 +46,6 @@ export type Coords = {
   __typename?: 'Coords';
   lat: Scalars['Float'];
   lng: Scalars['Float'];
-};
-
-export type CreateLocationInput = {
-  google_place_id: Scalars['String'];
 };
 
 export type CreateResidenceInput = {
@@ -82,6 +98,13 @@ export type Location = {
   coords: Coords;
   avg_rent?: Maybe<Scalars['Float']>;
   avg_rating?: Maybe<Scalars['Float']>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
   myResidences?: Maybe<Array<Residence>>;
 };
 
@@ -161,18 +184,18 @@ export type MutationWriteReviewArgs = {
 
 export type MutationUpdateMyReviewOverwriteArgs = {
   res_id: Scalars['Float'];
-  changes: PartialReview;
+  changes: AllAttributes;
 };
 
 
 export type MutationUpdateMyReviewGenericArgs = {
   res_id: Scalars['Float'];
-  changes: PartialReview;
+  changes: AllAttributes;
 };
 
 
 export type MutationCreateLocationArgs = {
-  options: CreateLocationInput;
+  place_id: Scalars['String'];
 };
 
 export type PartialLocation = {
@@ -328,6 +351,20 @@ export type Residence = {
   unit: Scalars['String'];
   avg_rating?: Maybe<Scalars['Float']>;
   avg_rent?: Maybe<Scalars['Float']>;
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  stove?: Maybe<StoveType>;
+  pool?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  parking?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Float']>;
   myReviews?: Maybe<Array<Review>>;
   created_at: Scalars['String'];
   updated_at: Scalars['String'];
@@ -474,23 +511,7 @@ export type UserSortByInput = {
 export type WriteReviewInput = {
   google_place_id: Scalars['String'];
   unit: Scalars['String'];
-  rating?: Maybe<Scalars['Float']>;
-  rent?: Maybe<Scalars['Float']>;
-  air_conditioning?: Maybe<Scalars['Boolean']>;
-  heat?: Maybe<Scalars['Boolean']>;
-  stove?: Maybe<StoveType>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  garbage_disposal?: Maybe<Scalars['Boolean']>;
-  dishwasher?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  lease_term?: Maybe<DateRangeInput>;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
-  backyard?: Maybe<Scalars['Boolean']>;
-  bath_count?: Maybe<Scalars['Float']>;
-  bedroom_count?: Maybe<Scalars['Int']>;
+  review_details: AllAttributes;
 };
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };

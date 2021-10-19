@@ -75,7 +75,7 @@ export async function up(knex: Knex): Promise<void> {
             table.integer('bedroom_count');
             table.float('bath_count');
             table.integer('rating');
-            table.specificType('lease_term_', 'tsrange');
+            table.specificType('lease_term', 'tsrange');
             table.enum('stove', ['GAS', 'ELECTRIC']);
             table.enum('laundry', ['IN_UNIT', 'BUILDING', 'NONE']);
 

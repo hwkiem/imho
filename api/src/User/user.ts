@@ -1,5 +1,9 @@
-import { ObjectType, Field, Ctx } from 'type-graphql';
-import { Review } from '../Review/reviews';
+import { ObjectType, Field, Ctx, Arg } from 'type-graphql';
+import Container from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
+import { Review } from '../Review/Review';
+import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
+import { ReviewQueryOptions } from '../types/input_types';
 import { MyContext } from '../types/types';
 
 @ObjectType()
@@ -23,14 +27,33 @@ export class User {
 
     @Field(() => [Review], { nullable: true })
     async myReviews(
-        @Ctx() { req, dataSources }: MyContext
+        @Ctx() { req }: MyContext,
+        @Arg('options', { nullable: true }) options: ReviewQueryOptions
     ): Promise<Review[] | undefined> {
         const uid = req.session.userId;
         if (uid === undefined) {
             return;
         }
-        const res = await dataSources.pgHandler.getReviewsByUserId([uid]);
-        if (res.errors === undefined && res.reviews !== undefined) {
+        const pg = Container.get(postgresHandler);
+        const res = options
+            ? await pg.getReviewsGeneric(
+                  options.partial_review
+                      ? {
+                            ...options.partial_review,
+                            user_id: uid,
+                        }
+                      : { user_id: uid },
+                  {
+                      attribute: ReviewSortBy.LEASE_TERM,
+                      sort: QueryOrderChoice.DESC,
+                  }, // overwrite sort to most recent first
+                  options.limit ? options.limit : undefined
+              )
+            : await pg.getReviewsGeneric({
+                  user_id: uid,
+              });
+
+        if (!res.errors && res.reviews) {
             return res.reviews;
         }
         return;

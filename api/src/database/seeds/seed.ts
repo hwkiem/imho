@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import * as Knex from 'knex';
 import { Residence } from '../../Residence/Residence';
-import { Review } from '../../Review/reviews';
-import { User } from '../../User/user';
+import { Review } from '../../Review/Review';
+import { User } from '../../User/User';
 import KnexPostgis from 'knex-postgis';
 import knexConfig from '../knexfile';
 import { StoveType } from '../../types/enum_types';
@@ -135,8 +135,6 @@ export async function seed(knex: Knex): Promise<void> {
     const resStart = (await knex.raw('select min(res_id) from residences'))
         .rows[0].min;
 
-    // var Range = require('pg-range').Range;
-
     await knex<Review>('reviews').insert([
         // 1
         {
@@ -149,11 +147,10 @@ export async function seed(knex: Knex): Promise<void> {
             bedroom_count: 2,
             parking: false,
             doorman: false,
-            // must figure out
-            // lease_term: Range(
-            //     new Date('January 2019'),
-            //     new Date('January 2020')
-            // ),
+            lease_term: require('pg-range').Range(
+                new Date('January 2019'),
+                new Date('January 2020')
+            ),
         },
         {
             user_id: userStart + 1,
@@ -166,6 +163,10 @@ export async function seed(knex: Knex): Promise<void> {
             parking: false,
             doorman: false,
             pet_friendly: false,
+            lease_term: require('pg-range').Range(
+                new Date('January 2017'),
+                new Date('March 2018')
+            ),
         },
         // 2
         {
@@ -179,6 +180,10 @@ export async function seed(knex: Knex): Promise<void> {
             pet_friendly: false,
             heat: true,
             stove: StoveType.ELECTRIC,
+            lease_term: require('pg-range').Range(
+                new Date('January 2016'),
+                new Date('January 2017')
+            ),
         },
         {
             user_id: userStart,
@@ -192,6 +197,10 @@ export async function seed(knex: Knex): Promise<void> {
             heat: true,
             stove: StoveType.ELECTRIC,
             parking: true,
+            lease_term: require('pg-range').Range(
+                new Date('January 2015'),
+                new Date('January 2016')
+            ),
         },
         // 3
         {
@@ -205,6 +214,10 @@ export async function seed(knex: Knex): Promise<void> {
             parking: true,
             dishwasher: true,
             gym: true,
+            lease_term: require('pg-range').Range(
+                new Date('December 2017'),
+                new Date('May 2020')
+            ),
         },
         // 4
         {
@@ -217,6 +230,10 @@ export async function seed(knex: Knex): Promise<void> {
             bedroom_count: 2,
             parking: false,
             doorman: false,
+            lease_term: require('pg-range').Range(
+                new Date('September 2020'),
+                new Date('June 2021')
+            ),
         },
         // 5
         {
@@ -230,6 +247,10 @@ export async function seed(knex: Knex): Promise<void> {
             parking: true,
             dishwasher: true,
             gym: true,
+            lease_term: require('pg-range').Range(
+                new Date('April 2018'),
+                new Date('January 2020')
+            ),
         },
         // 6
         {
@@ -243,6 +264,10 @@ export async function seed(knex: Knex): Promise<void> {
             parking: true,
             dishwasher: true,
             gym: true,
+            lease_term: require('pg-range').Range(
+                new Date('March 2017'),
+                new Date('June 2019')
+            ),
         },
     ]);
 }

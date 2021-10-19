@@ -1,8 +1,9 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { Review } from '../Review/reviews';
+import { Review } from '../Review/Review';
 import KnexPostgis from 'knex-postgis';
 import Knex from 'knex';
 import knexConfig from '../database/knexfile';
+import { Location } from '../Location/Location';
 
 export const assembleReview = (reviews: any): Review[] => {
     return reviews.map((review: any) => {
@@ -17,6 +18,13 @@ export const assembleReview = (reviews: any): Review[] => {
     });
 };
 
+export const assembleLocation = (raw: any): Location[] => {
+    return raw.map((r: any) => {
+        const { st_x, st_y, ...res } = r;
+        return { coords: { lat: st_y, lng: st_x }, ...res };
+    });
+};
+
 // used by migrations view
 export function residenceColumns() {
     return [
@@ -27,6 +35,20 @@ export function residenceColumns() {
         'residences.updated_at',
         'avg_rating',
         'avg_rent',
+        'dishwasher',
+        'air_conditioning',
+        'heat',
+        'stove',
+        'pool',
+        'gym',
+        'garbage_disposal',
+        'parking',
+        'doorman',
+        'pet_friendly',
+        'laundry',
+        'backyard',
+        'bath_count',
+        'bedroom_count',
     ];
 }
 // used on residences_enhanced outer join locations
@@ -70,8 +92,8 @@ export function reviewColumns(this: postgresHandler) {
         'backyard',
         'bath_count',
         'bedroom_count',
-        this.knex.raw('lower(lease_term_) as start'),
-        this.knex.raw('upper(lease_term_) as end'),
+        this.knex.raw('lower(lease_term) as start'),
+        this.knex.raw('upper(lease_term) as end'),
         'created_at',
         'updated_at',
     ];

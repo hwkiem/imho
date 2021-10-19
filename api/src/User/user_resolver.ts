@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
-import { User } from './user';
+import { User } from './User';
 import { validateRegister } from '../utils/validators';
 import argon2 from 'argon2';
 import { SingleUserResponse, UserResponse } from '../types/object_types';
@@ -10,6 +10,8 @@ import {
     RegisterInput,
     UserQueryOptions,
 } from '../types/input_types';
+import { Service } from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
 
 declare module 'express-session' {
     interface Session {
@@ -17,19 +19,18 @@ declare module 'express-session' {
         // favoriteResidency
     }
 }
-
+@Service()
 @Resolver(User)
 export class UserResolver {
+    constructor(private readonly pg: postgresHandler) {}
     // Me Query
     @Query(() => SingleUserResponse)
-    async me(
-        @Ctx() { req, dataSources }: MyContext
-    ): Promise<SingleUserResponse> {
+    async me(@Ctx() { req }: MyContext): Promise<SingleUserResponse> {
         const userId = req.session.userId;
         if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
-        const response = await dataSources.pgHandler.getUsersById([userId]);
+        const response = await this.pg.getUsersById([userId]);
         if (response.users && response.users.length == 0) {
             return {
                 errors: [{ field: 'query', message: 'no user with this id' }],
@@ -45,13 +46,13 @@ export class UserResolver {
     @Mutation(() => SingleUserResponse)
     async register(
         @Arg('options') options: RegisterInput,
-        @Ctx() { req, dataSources }: MyContext
+        @Ctx() { req }: MyContext
     ): Promise<SingleUserResponse> {
         const errors = validateRegister(options);
         if (errors) {
             return { errors };
         }
-        const response = await dataSources.pgHandler.createUser(options);
+        const response = await this.pg.createUser(options);
         if (response.users) {
             req.session.userId = response.users[0].user_id;
         }
@@ -63,9 +64,7 @@ export class UserResolver {
 
     // Logout User
     @Mutation(() => SingleUserResponse)
-    async logout(
-        @Ctx() { dataSources, req, res }: MyContext
-    ): Promise<SingleUserResponse> {
+    async logout(@Ctx() { req, res }: MyContext): Promise<SingleUserResponse> {
         return new Promise(async (resolve) => {
             const userId = req.session.userId;
             if (userId === undefined) {
@@ -73,12 +72,11 @@ export class UserResolver {
                     errors: [{ field: 'session', message: 'not logged in' }],
                 });
             }
-            const response = await dataSources.pgHandler.getUsersById([userId]);
+            const response = await this.pg.getUsersById([userId]);
             if (response.users) {
                 req.session.destroy((err) => {
                     res.clearCookie('oreo');
                     if (err) {
-                        console.log(err);
                         resolve({
                             errors: [
                                 {
@@ -102,9 +100,9 @@ export class UserResolver {
     @Mutation(() => SingleUserResponse)
     async login(
         @Arg('input') input: LoginInput,
-        @Ctx() { dataSources, req }: MyContext
+        @Ctx() { req }: MyContext
     ): Promise<SingleUserResponse> {
-        const response = await dataSources.pgHandler.getUsersGeneric(
+        const response = await this.pg.getUsersGeneric(
             (({ email }) => ({ email }))(input)
         );
         if (response.users) {
@@ -146,14 +144,14 @@ export class UserResolver {
     @Mutation(() => UserResponse)
     async changeMyPassword(
         @Arg('args') args: ChangePasswordInput,
-        @Ctx() { dataSources, req }: MyContext
+        @Ctx() { req }: MyContext
     ): Promise<UserResponse> {
         // ensure logged in
         const userId = req.session.userId;
         if (userId === undefined) {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
-        const response = await dataSources.pgHandler.getUsersById([userId]);
+        const response = await this.pg.getUsersById([userId]);
         // type guards, ensure users
         if (response.errors !== undefined || response.users === undefined) {
             return {
@@ -181,7 +179,7 @@ export class UserResolver {
             };
         }
         const newPass = await argon2.hash(args.new_password);
-        const res = await dataSources.pgHandler.changePassword(
+        const res = await this.pg.changePassword(
             newPass,
             response.users[0].user_id
         );
@@ -201,11 +199,8 @@ export class UserResolver {
 
     // Delete User
     @Mutation(() => SingleUserResponse)
-    async deleteUser(
-        @Arg('id') id: number,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<SingleUserResponse> {
-        const response = await dataSources.pgHandler.deleteUser(id);
+    async deleteUser(@Arg('id') id: number): Promise<SingleUserResponse> {
+        const response = await this.pg.deleteUser(id);
         return {
             errors: response.errors,
             user: response.users ? response.users[0] : undefined,
@@ -215,23 +210,21 @@ export class UserResolver {
     // Query Users
     @Query(() => UserResponse)
     async getUsersbyId(
-        @Arg('user_ids', () => [Int]) ids: [number],
-        @Ctx() { dataSources }: MyContext
+        @Arg('user_ids', () => [Int]) ids: [number]
     ): Promise<UserResponse> {
-        return await dataSources.pgHandler.getUsersById(ids);
+        return await this.pg.getUsersById(ids);
     }
 
     @Query(() => UserResponse) // return number of rows returned? everywhere?
     async getUsersGeneric(
-        @Arg('options', { nullable: true }) options: UserQueryOptions,
-        @Ctx() { dataSources }: MyContext
+        @Arg('options', { nullable: true }) options: UserQueryOptions
     ): Promise<UserResponse> {
         return options
-            ? await dataSources.pgHandler.getUsersGeneric(
+            ? await this.pg.getUsersGeneric(
                   options.partial_user ? options.partial_user : undefined,
                   options.sort_params ? options.sort_params : undefined,
                   options.limit ? options.limit : undefined
               )
-            : await dataSources.pgHandler.getUsersGeneric();
+            : await this.pg.getUsersGeneric();
     }
 }

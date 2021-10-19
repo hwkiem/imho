@@ -10,8 +10,11 @@ import {
 } from '../User/user_db_handler';
 import {
     createResidence,
+    createResidenceIfNotExists,
     getResidencesById,
     getResidencesGeneric,
+    getSingleResidenceById,
+    residenceExists,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByPrimaryKeyTuple,
@@ -29,8 +32,12 @@ import {
     getLocationsGeneric,
     getLocationsBoundingBox,
     locationExists,
+    getSingleLocationById,
+    createLocationIfNotExists,
 } from '../Location/location_db_handler';
+import { Service } from 'typedi';
 
+@Service()
 export class postgresHandler extends SQLDataSource {
     protected knexPostgis: KnexPostgis.KnexPostgis;
 
@@ -54,7 +61,11 @@ export class postgresHandler extends SQLDataSource {
 
     public getLocationsById = getLocationsById;
 
+    public getSingleLocationById = getSingleLocationById;
+
     public createLocation = createLocation;
+
+    public createLocationIfNotExists = createLocationIfNotExists;
 
     public getLocationsNearArea = getLocationsNearArea;
 
@@ -67,9 +78,15 @@ export class postgresHandler extends SQLDataSource {
     // Residences
     public createResidence = createResidence;
 
+    public createResidenceIfNotExists = createResidenceIfNotExists;
+
     public getResidencesGeneric = getResidencesGeneric;
 
     public getResidencesById = getResidencesById;
+
+    public getSingleResidenceById = getSingleResidenceById;
+
+    public residenceExists = residenceExists;
 
     // Reviews
     public writeReview = writeReview;

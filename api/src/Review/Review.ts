@@ -1,8 +1,6 @@
-import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
-import { Residence } from '../Residence/Residence';
+import { ObjectType, Field, Float } from 'type-graphql';
 import { LaundryType, StoveType } from '../types/enum_types';
 import { DateRange } from '../types/object_types';
-import { MyContext } from '../types/types';
 
 @ObjectType()
 export class Review {
@@ -17,20 +15,6 @@ export class Review {
 
     @Field({ nullable: true })
     rent?: number;
-
-    @Field(() => Residence, { nullable: true })
-    async myResidence(
-        @Root() review: Review,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<Residence | undefined> {
-        const res = await dataSources.pgHandler.getResidencesById([
-            review.res_id,
-        ]);
-        if (res.errors === undefined && res.residences !== undefined) {
-            return res.residences[0];
-        }
-        return;
-    }
 
     // new bools
     @Field({ nullable: true })
