@@ -2,7 +2,6 @@ import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ResidenceSortBy } from '../types/enum_types';
 import { ResidenceSortByInput } from '../types/input_types';
 import {
-    FieldError,
     ResidenceResponse,
     SingleResidenceResponse,
 } from '../types/object_types';
@@ -14,6 +13,7 @@ export async function createResidence(
     unit: string
 ): Promise<SingleResidenceResponse> {
     let r: SingleResidenceResponse = {};
+    const { google_place_id, ...args } = input;
     await this.knex<Residence>('residences')
         .insert({ loc_id: loc_id, unit: unit })
         .returning('res_id')

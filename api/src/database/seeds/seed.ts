@@ -135,6 +135,8 @@ export async function seed(knex: Knex): Promise<void> {
     const resStart = (await knex.raw('select min(res_id) from residences'))
         .rows[0].min;
 
+    // var Range = require('pg-range').Range;
+
     await knex<Review>('reviews').insert([
         // 1
         {
