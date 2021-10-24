@@ -8,6 +8,8 @@ import type { AppProps } from 'next/app';
 import { Fragment } from 'react';
 import type { Page } from '../types/page';
 
+import 'react-month-picker/scss/month-picker.scss';
+
 // this should give a better typing
 type Props = AppProps & {
     Component: Page;

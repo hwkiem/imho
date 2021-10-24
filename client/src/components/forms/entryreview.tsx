@@ -11,19 +11,29 @@ import {
 import { Form, useFormik, yupToFormErrors } from 'formik';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
-import { useWriteReviewMutation } from '../../generated/graphql';
+import {
+    useWriteReviewMutation,
+    WriteReviewInput,
+} from '../../generated/graphql';
 import { Map } from '../maps/map';
 
 export const EntryReview: React.FC = () => {
     const [review, { data }] = useWriteReviewMutation();
     const router = useRouter();
 
+    const initialValues: WriteReviewInput = {
+        google_place_id: '',
+        unit: '0',
+    };
+
     const formik = useFormik({
-        initialValues: { address: '' },
+        initialValues: initialValues,
         onSubmit: async () => {
             const res = await review({
                 variables: {
-                    options: { google_place_id: formik.values.address },
+                    options: {
+                        ...formik.values,
+                    },
                 },
             });
             router.push('/diver');

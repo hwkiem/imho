@@ -10,6 +10,7 @@ import { Marker } from './marker';
 import { SearchBar } from './searchbar';
 import { SideBar } from './sidebar';
 import { RiHomeSmileFill } from 'react-icons/ri';
+import DetailModal from './detail';
 
 type SearchTypes = 'geocode' | 'address';
 
@@ -108,6 +109,11 @@ export const Map: React.FC<MapProps> = ({
 
     const [hover, setHover] = useState(-1);
 
+    const [
+        detailLocation,
+        setDetailLocation,
+    ] = useState<null | RegularLocationFragment>(null);
+
     return (
         <Box w={'100%'} h={'100%'} position="relative">
             {apiFlag && withSearchBar && (
@@ -135,6 +141,13 @@ export const Map: React.FC<MapProps> = ({
                     hover={hover}
                     setHover={setHover}
                     setCenter={setCenter}
+                    setDetailLocation={setDetailLocation}
+                />
+            )}
+            {detailLocation && (
+                <DetailModal
+                    location={detailLocation}
+                    setLocation={setDetailLocation}
                 />
             )}
             <GoogleMap
@@ -180,6 +193,7 @@ export const Map: React.FC<MapProps> = ({
                                 setHover={setHover}
                                 onClick={() => {
                                     setCenter(loc.coords);
+                                    setDetailLocation(loc);
                                 }}
                             />
                         );

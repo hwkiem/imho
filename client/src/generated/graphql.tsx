@@ -16,36 +16,20 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type AllAttributes = {
-  rating?: Maybe<Scalars['Float']>;
-  rent?: Maybe<Scalars['Float']>;
-  air_conditioning?: Maybe<Scalars['Boolean']>;
-  heat?: Maybe<Scalars['Boolean']>;
-  stove?: Maybe<StoveType>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  garbage_disposal?: Maybe<Scalars['Boolean']>;
-  dishwasher?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  lease_term: DateRangeInput;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
-  backyard?: Maybe<Scalars['Boolean']>;
-  bath_count?: Maybe<Scalars['Float']>;
-  bedroom_count?: Maybe<Scalars['Int']>;
-};
-
 export type ChangePasswordInput = {
   email: Scalars['String'];
-  old_password: Scalars['String'];
   new_password: Scalars['String'];
+  old_password: Scalars['String'];
 };
 
 export type Coords = {
   __typename?: 'Coords';
   lat: Scalars['Float'];
   lng: Scalars['Float'];
+};
+
+export type CreateLocationInput = {
+  google_place_id: Scalars['String'];
 };
 
 export type CreateResidenceInput = {
@@ -55,15 +39,14 @@ export type CreateResidenceInput = {
 
 export type DateRange = {
   __typename?: 'DateRange';
-  start_date: Scalars['DateTime'];
   end_date: Scalars['DateTime'];
+  start_date: Scalars['DateTime'];
 };
 
 export type DateRangeInput = {
-  start_date: Scalars['DateTime'];
   end_date: Scalars['DateTime'];
+  start_date: Scalars['DateTime'];
 };
-
 
 export type FieldError = {
   __typename?: 'FieldError';
@@ -80,38 +63,31 @@ export type GeoBoundaryInput = {
 
 /** Laundry options */
 export enum LaundryType {
-  InUnit = 'IN_UNIT',
   Building = 'BUILDING',
+  InUnit = 'IN_UNIT',
   None = 'NONE'
 }
 
 export type Location = {
   __typename?: 'Location';
-  loc_id: Scalars['Float'];
-  google_place_id: Scalars['String'];
-  full_address: Scalars['String'];
-  street_num: Scalars['String'];
-  route: Scalars['String'];
-  city: Scalars['String'];
-  state: Scalars['String'];
-  postal_code: Scalars['String'];
-  coords: Coords;
-  avg_rent?: Maybe<Scalars['Float']>;
   avg_rating?: Maybe<Scalars['Float']>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
-  backyard?: Maybe<Scalars['Boolean']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  city: Scalars['String'];
+  coords: Coords;
+  full_address: Scalars['String'];
+  google_place_id: Scalars['String'];
+  loc_id: Scalars['Float'];
   myResidences?: Maybe<Array<Residence>>;
+  postal_code: Scalars['String'];
+  route: Scalars['String'];
+  state: Scalars['String'];
+  street_num: Scalars['String'];
 };
 
 export type LocationQueryOptions = {
   limit?: Maybe<Scalars['Int']>;
-  sort_params?: Maybe<LocationSortByInput>;
   partial_location?: Maybe<PartialLocation>;
+  sort_params?: Maybe<LocationSortByInput>;
 };
 
 export type LocationResponse = {
@@ -122,9 +98,9 @@ export type LocationResponse = {
 
 /** Field by which to sort location query results */
 export enum LocationSortBy {
-  Rent = 'RENT',
+  Id = 'ID',
   Rating = 'RATING',
-  Id = 'ID'
+  Rent = 'RENT'
 }
 
 export type LocationSortByInput = {
@@ -139,26 +115,16 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  register: SingleUserResponse;
-  logout: SingleUserResponse;
-  login: SingleUserResponse;
   changeMyPassword: UserResponse;
-  deleteUser: SingleUserResponse;
-  createResidence: SingleResidenceResponse;
-  writeReview: SingleReviewResponse;
-  updateMyReviewOverwrite: SingleReviewResponse;
-  updateMyReviewGeneric: ReviewResponse;
   createLocation: SingleLocationResponse;
-};
-
-
-export type MutationRegisterArgs = {
-  options: RegisterInput;
-};
-
-
-export type MutationLoginArgs = {
-  input: LoginInput;
+  createResidence: SingleResidenceResponse;
+  deleteUser: SingleUserResponse;
+  login: SingleUserResponse;
+  logout: SingleUserResponse;
+  register: SingleUserResponse;
+  updateMyReviewGeneric: ReviewResponse;
+  updateMyReviewOverwrite: SingleReviewResponse;
+  writeReview: SingleReviewResponse;
 };
 
 
@@ -167,8 +133,8 @@ export type MutationChangeMyPasswordArgs = {
 };
 
 
-export type MutationDeleteUserArgs = {
-  id: Scalars['Float'];
+export type MutationCreateLocationArgs = {
+  options: CreateLocationInput;
 };
 
 
@@ -177,68 +143,78 @@ export type MutationCreateResidenceArgs = {
 };
 
 
-export type MutationWriteReviewArgs = {
-  options: WriteReviewInput;
+export type MutationDeleteUserArgs = {
+  id: Scalars['Float'];
 };
 
 
-export type MutationUpdateMyReviewOverwriteArgs = {
-  res_id: Scalars['Float'];
-  changes: AllAttributes;
+export type MutationLoginArgs = {
+  input: LoginInput;
+};
+
+
+export type MutationRegisterArgs = {
+  options: RegisterInput;
 };
 
 
 export type MutationUpdateMyReviewGenericArgs = {
+  changes: PartialReview;
   res_id: Scalars['Float'];
-  changes: AllAttributes;
 };
 
 
-export type MutationCreateLocationArgs = {
-  place_id: Scalars['String'];
+export type MutationUpdateMyReviewOverwriteArgs = {
+  changes: PartialReview;
+  res_id: Scalars['Float'];
+};
+
+
+export type MutationWriteReviewArgs = {
+  options: WriteReviewInput;
 };
 
 export type PartialLocation = {
-  loc_id?: Maybe<Scalars['Float']>;
-  google_place_id?: Maybe<Scalars['String']>;
-  street_num?: Maybe<Scalars['String']>;
-  route?: Maybe<Scalars['String']>;
   city?: Maybe<Scalars['String']>;
+  google_place_id?: Maybe<Scalars['String']>;
+  loc_id?: Maybe<Scalars['Float']>;
   postal_code?: Maybe<Scalars['String']>;
+  route?: Maybe<Scalars['String']>;
   state?: Maybe<Scalars['String']>;
+  street_num?: Maybe<Scalars['String']>;
 };
 
 export type PartialResidence = {
-  res_id?: Maybe<Scalars['Float']>;
-  google_place_id?: Maybe<Scalars['String']>;
   apt_num?: Maybe<Scalars['String']>;
-  street_num?: Maybe<Scalars['String']>;
-  route?: Maybe<Scalars['String']>;
-  city?: Maybe<Scalars['String']>;
-  postal_code?: Maybe<Scalars['String']>;
-  state?: Maybe<Scalars['String']>;
-  avg_rent?: Maybe<Scalars['Float']>;
   avg_rating?: Maybe<Scalars['Float']>;
+  avg_rent?: Maybe<Scalars['Float']>;
+  city?: Maybe<Scalars['String']>;
+  google_place_id?: Maybe<Scalars['String']>;
+  postal_code?: Maybe<Scalars['String']>;
+  res_id?: Maybe<Scalars['Float']>;
+  route?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+  street_num?: Maybe<Scalars['String']>;
 };
 
 export type PartialReview = {
-  rating?: Maybe<Scalars['Float']>;
-  rent?: Maybe<Scalars['Float']>;
   air_conditioning?: Maybe<Scalars['Boolean']>;
-  heat?: Maybe<Scalars['Boolean']>;
-  stove?: Maybe<StoveType>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  garbage_disposal?: Maybe<Scalars['Boolean']>;
-  dishwasher?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
   backyard?: Maybe<Scalars['Boolean']>;
   bath_count?: Maybe<Scalars['Float']>;
   bedroom_count?: Maybe<Scalars['Float']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
   lease_term?: Maybe<DateRangeInput>;
+  parking?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  pool?: Maybe<Scalars['Boolean']>;
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  stove?: Maybe<StoveType>;
 };
 
 export type PartialUser = {
@@ -254,29 +230,41 @@ export type PlaceIdResponse = {
 
 export type Query = {
   __typename?: 'Query';
-  me: SingleUserResponse;
-  getUsersbyId: UserResponse;
-  getUsersGeneric: UserResponse;
+  getLocationsBoundingBox: LocationResponse;
+  getLocationsByGeoScope: LocationResponse;
+  getLocationsById: LocationResponse;
+  getLocationsGeneric: LocationResponse;
   getResidencesById: ResidenceResponse;
   getResidencesGeneric: ResidenceResponse;
-  getReviewsGeneric: ReviewResponse;
-  getReviewsByUserId: ReviewResponse;
   getReviewsByResidenceId: ReviewResponse;
-  getLocationsById: LocationResponse;
-  getLocationsByGeoScope: LocationResponse;
-  getLocationsGeneric: LocationResponse;
-  getLocationsBoundingBox: LocationResponse;
+  getReviewsByUserId: ReviewResponse;
+  getReviewsGeneric: ReviewResponse;
+  getUsersGeneric: UserResponse;
+  getUsersbyId: UserResponse;
+  me: SingleUserResponse;
   placeIdFromAddress: PlaceIdResponse;
 };
 
 
-export type QueryGetUsersbyIdArgs = {
-  user_ids: Array<Scalars['Int']>;
+export type QueryGetLocationsBoundingBoxArgs = {
+  options?: Maybe<LocationQueryOptions>;
+  perimeter: GeoBoundaryInput;
 };
 
 
-export type QueryGetUsersGenericArgs = {
-  options?: Maybe<UserQueryOptions>;
+export type QueryGetLocationsByGeoScopeArgs = {
+  options?: Maybe<LocationQueryOptions>;
+  place_id: Scalars['String'];
+};
+
+
+export type QueryGetLocationsByIdArgs = {
+  loc_ids: Array<Scalars['Int']>;
+};
+
+
+export type QueryGetLocationsGenericArgs = {
+  options?: Maybe<LocationQueryOptions>;
 };
 
 
@@ -290,8 +278,8 @@ export type QueryGetResidencesGenericArgs = {
 };
 
 
-export type QueryGetReviewsGenericArgs = {
-  options?: Maybe<ReviewQueryOptions>;
+export type QueryGetReviewsByResidenceIdArgs = {
+  residence_ids: Array<Scalars['Int']>;
 };
 
 
@@ -300,30 +288,18 @@ export type QueryGetReviewsByUserIdArgs = {
 };
 
 
-export type QueryGetReviewsByResidenceIdArgs = {
-  residence_ids: Array<Scalars['Int']>;
+export type QueryGetReviewsGenericArgs = {
+  options?: Maybe<ReviewQueryOptions>;
 };
 
 
-export type QueryGetLocationsByIdArgs = {
-  loc_ids: Array<Scalars['Int']>;
+export type QueryGetUsersGenericArgs = {
+  options?: Maybe<UserQueryOptions>;
 };
 
 
-export type QueryGetLocationsByGeoScopeArgs = {
-  options?: Maybe<LocationQueryOptions>;
-  place_id: Scalars['String'];
-};
-
-
-export type QueryGetLocationsGenericArgs = {
-  options?: Maybe<LocationQueryOptions>;
-};
-
-
-export type QueryGetLocationsBoundingBoxArgs = {
-  options?: Maybe<LocationQueryOptions>;
-  perimeter: GeoBoundaryInput;
+export type QueryGetUsersbyIdArgs = {
+  user_ids: Array<Scalars['Int']>;
 };
 
 
@@ -346,34 +322,20 @@ export type RegisterInput = {
 
 export type Residence = {
   __typename?: 'Residence';
-  res_id: Scalars['Float'];
-  loc_id: Scalars['Float'];
-  unit: Scalars['String'];
   avg_rating?: Maybe<Scalars['Float']>;
   avg_rent?: Maybe<Scalars['Float']>;
-  air_conditioning?: Maybe<Scalars['Boolean']>;
-  heat?: Maybe<Scalars['Boolean']>;
-  stove?: Maybe<StoveType>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  garbage_disposal?: Maybe<Scalars['Boolean']>;
-  dishwasher?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
-  backyard?: Maybe<Scalars['Boolean']>;
-  bath_count?: Maybe<Scalars['Float']>;
-  bedroom_count?: Maybe<Scalars['Float']>;
-  myReviews?: Maybe<Array<Review>>;
   created_at: Scalars['String'];
+  loc_id: Scalars['Float'];
+  myReviews?: Maybe<Array<Review>>;
+  res_id: Scalars['Float'];
+  unit: Scalars['String'];
   updated_at: Scalars['String'];
 };
 
 export type ResidenceQueryOptions = {
   limit?: Maybe<Scalars['Int']>;
-  sort_params?: Maybe<ResidenceSortByInput>;
   partial_residence?: Maybe<PartialResidence>;
+  sort_params?: Maybe<ResidenceSortByInput>;
 };
 
 export type ResidenceResponse = {
@@ -384,9 +346,9 @@ export type ResidenceResponse = {
 
 /** Field by which to sort residence query results */
 export enum ResidenceSortBy {
-  Rent = 'RENT',
+  Id = 'ID',
   Rating = 'RATING',
-  Id = 'ID'
+  Rent = 'RENT'
 }
 
 export type ResidenceSortByInput = {
@@ -396,34 +358,34 @@ export type ResidenceSortByInput = {
 
 export type Review = {
   __typename?: 'Review';
-  res_id: Scalars['Float'];
-  user_id: Scalars['Float'];
-  rating: Scalars['Float'];
-  rent?: Maybe<Scalars['Float']>;
-  myResidence?: Maybe<Residence>;
   air_conditioning?: Maybe<Scalars['Boolean']>;
-  heat?: Maybe<Scalars['Boolean']>;
-  stove?: Maybe<StoveType>;
-  pool?: Maybe<Scalars['Boolean']>;
-  gym?: Maybe<Scalars['Boolean']>;
-  garbage_disposal?: Maybe<Scalars['Boolean']>;
-  dishwasher?: Maybe<Scalars['Boolean']>;
-  parking?: Maybe<Scalars['Boolean']>;
-  doorman?: Maybe<Scalars['Boolean']>;
-  pet_friendly?: Maybe<Scalars['Boolean']>;
-  laundry?: Maybe<LaundryType>;
   backyard?: Maybe<Scalars['Boolean']>;
   bath_count?: Maybe<Scalars['Float']>;
   bedroom_count?: Maybe<Scalars['Float']>;
-  lease_term?: Maybe<DateRange>;
   created_at: Scalars['String'];
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
+  gym?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  lease_term?: Maybe<DateRange>;
+  myResidence?: Maybe<Residence>;
+  parking?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  pool?: Maybe<Scalars['Boolean']>;
+  rating: Scalars['Float'];
+  rent?: Maybe<Scalars['Float']>;
+  res_id: Scalars['Float'];
+  stove?: Maybe<StoveType>;
   updated_at: Scalars['String'];
+  user_id: Scalars['Float'];
 };
 
 export type ReviewQueryOptions = {
   limit?: Maybe<Scalars['Int']>;
-  sort_params?: Maybe<ReviewSortByInput>;
   partial_review?: Maybe<PartialReview>;
+  sort_params?: Maybe<ReviewSortByInput>;
 };
 
 export type ReviewResponse = {
@@ -434,8 +396,8 @@ export type ReviewResponse = {
 
 /** Field by which to sort review query results */
 export enum ReviewSortBy {
-  Rent = 'RENT',
   Rating = 'RATING',
+  Rent = 'RENT',
   UserId = 'USER_ID'
 }
 
@@ -470,26 +432,26 @@ export type SingleUserResponse = {
 
 /** Stove options */
 export enum StoveType {
-  Gas = 'GAS',
-  Electric = 'ELECTRIC'
+  Electric = 'ELECTRIC',
+  Gas = 'GAS'
 }
 
 export type User = {
   __typename?: 'User';
-  user_id: Scalars['Float'];
+  created_at: Scalars['String'];
+  email: Scalars['String'];
   first_name: Scalars['String'];
   last_name: Scalars['String'];
-  email: Scalars['String'];
-  profession?: Maybe<Scalars['String']>;
   myReviews?: Maybe<Array<Review>>;
-  created_at: Scalars['String'];
+  profession?: Maybe<Scalars['String']>;
   updated_at: Scalars['String'];
+  user_id: Scalars['Float'];
 };
 
 export type UserQueryOptions = {
   limit?: Maybe<Scalars['Int']>;
-  sort_params?: Maybe<UserSortByInput>;
   partial_user?: Maybe<PartialUser>;
+  sort_params?: Maybe<UserSortByInput>;
 };
 
 export type UserResponse = {
@@ -509,52 +471,68 @@ export type UserSortByInput = {
 };
 
 export type WriteReviewInput = {
+  air_conditioning?: Maybe<Scalars['Boolean']>;
+  backyard?: Maybe<Scalars['Boolean']>;
+  bath_count?: Maybe<Scalars['Float']>;
+  bedroom_count?: Maybe<Scalars['Int']>;
+  dishwasher?: Maybe<Scalars['Boolean']>;
+  doorman?: Maybe<Scalars['Boolean']>;
+  garbage_disposal?: Maybe<Scalars['Boolean']>;
   google_place_id: Scalars['String'];
+  gym?: Maybe<Scalars['Boolean']>;
+  heat?: Maybe<Scalars['Boolean']>;
+  laundry?: Maybe<LaundryType>;
+  lease_term?: Maybe<DateRangeInput>;
+  parking?: Maybe<Scalars['Boolean']>;
+  pet_friendly?: Maybe<Scalars['Boolean']>;
+  pool?: Maybe<Scalars['Boolean']>;
+  rating?: Maybe<Scalars['Float']>;
+  rent?: Maybe<Scalars['Float']>;
+  stove?: Maybe<StoveType>;
   unit: Scalars['String'];
-  review_details: AllAttributes;
 };
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type RegularLocationFragment = { __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: Maybe<number>, avg_rating?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, myReviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> }>> };
+export type RegularLocationFragment = { __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: number | null | undefined, avg_rating?: number | null | undefined, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: number | null | undefined, avg_rent?: number | null | undefined, myReviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined }> | null | undefined };
 
-export type RegularLocationResponseFragment = { __typename?: 'LocationResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, locations?: Maybe<Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: Maybe<number>, avg_rating?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, myReviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> }>> }>> };
+export type RegularLocationResponseFragment = { __typename?: 'LocationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, locations?: Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: number | null | undefined, avg_rating?: number | null | undefined, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: number | null | undefined, avg_rent?: number | null | undefined, myReviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined }> | null | undefined }> | null | undefined };
 
-export type RegularResidenceFragment = { __typename?: 'Residence', res_id: number, unit: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, myReviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> };
+export type RegularResidenceFragment = { __typename?: 'Residence', res_id: number, unit: string, avg_rating?: number | null | undefined, avg_rent?: number | null | undefined, myReviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined };
 
-export type RegularReviewFragment = { __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number };
+export type RegularReviewFragment = { __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number };
 
-export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, reviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> };
+export type RegularReviewResponseFragment = { __typename?: 'ReviewResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, reviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined };
 
 export type RegularUserFragment = { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string };
 
-export type RegularUserResponseFragment = { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> };
+export type RegularUserResponseFragment = { __typename?: 'SingleUserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string } | null | undefined };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'SingleUserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string } | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'SingleUserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string } | null | undefined } };
 
 export type RegisterMutationVariables = Exact<{
   options: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'SingleUserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string } | null | undefined } };
 
 export type WriteReviewMutationVariables = Exact<{
   options: WriteReviewInput;
 }>;
 
 
-export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'SingleReviewResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, review?: Maybe<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }> } };
+export type WriteReviewMutation = { __typename?: 'Mutation', writeReview: { __typename?: 'SingleReviewResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, review?: { __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number } | null | undefined } };
 
 export type GetLocationsBoundingBoxQueryVariables = Exact<{
   options?: Maybe<LocationQueryOptions>;
@@ -562,7 +540,7 @@ export type GetLocationsBoundingBoxQueryVariables = Exact<{
 }>;
 
 
-export type GetLocationsBoundingBoxQuery = { __typename?: 'Query', getLocationsBoundingBox: { __typename?: 'LocationResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, locations?: Maybe<Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: Maybe<number>, avg_rating?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, myReviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> }>> }>> } };
+export type GetLocationsBoundingBoxQuery = { __typename?: 'Query', getLocationsBoundingBox: { __typename?: 'LocationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, locations?: Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: number | null | undefined, avg_rating?: number | null | undefined, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: number | null | undefined, avg_rent?: number | null | undefined, myReviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined }> | null | undefined }> | null | undefined } };
 
 export type GetLocationsByGeoScopeQueryVariables = Exact<{
   options?: Maybe<LocationQueryOptions>;
@@ -570,12 +548,12 @@ export type GetLocationsByGeoScopeQueryVariables = Exact<{
 }>;
 
 
-export type GetLocationsByGeoScopeQuery = { __typename?: 'Query', getLocationsByGeoScope: { __typename?: 'LocationResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, locations?: Maybe<Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: Maybe<number>, avg_rating?: Maybe<number>, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Maybe<Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: Maybe<number>, avg_rent?: Maybe<number>, myReviews?: Maybe<Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: Maybe<number>, rating: number }>> }>> }>> } };
+export type GetLocationsByGeoScopeQuery = { __typename?: 'Query', getLocationsByGeoScope: { __typename?: 'LocationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, locations?: Array<{ __typename?: 'Location', loc_id: number, full_address: string, avg_rent?: number | null | undefined, avg_rating?: number | null | undefined, coords: { __typename?: 'Coords', lat: number, lng: number }, myResidences?: Array<{ __typename?: 'Residence', res_id: number, unit: string, avg_rating?: number | null | undefined, avg_rent?: number | null | undefined, myReviews?: Array<{ __typename?: 'Review', res_id: number, user_id: number, rent?: number | null | undefined, rating: number }> | null | undefined }> | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'SingleUserResponse', errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>>, user?: Maybe<{ __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string }> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'SingleUserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', user_id: number, first_name: string, last_name: string, email: string, created_at: string, updated_at: string } | null | undefined } };
 
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
