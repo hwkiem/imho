@@ -1,31 +1,42 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "lib": ["dom", "dom.iterable", "esnext"],
-        "types": ["node", "googlemaps"],
-        "skipLibCheck": true,
-        "strict": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "noImplicitThis": true,
-        "noEmit": false,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "forceConsistentCasingInFileNames": true,
-        "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "jsx": "preserve"
-    },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "src/lib/apollo.js",
-        "src/components/utils/monthPicker.jsx"
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
-    "exclude": ["node_modules", ".next"]
+    "types": [
+      "node",
+      "googlemaps"
+    ],
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noEmit": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "allowJs": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "src/lib/apollo.js",
+    "src/components/utils/monthPicker.jsx"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
 }
