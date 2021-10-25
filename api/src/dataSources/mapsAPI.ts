@@ -1,15 +1,15 @@
 import { Client, GeocodeResult } from '@googlemaps/google-maps-services-js';
-import { DataSource } from 'apollo-datasource';
+
+
 import { Service } from 'typedi';
 import { FieldError, PlaceIDResponse } from '../types/object_types';
 import { geoToData } from '../utils/mapUtils';
 
 @Service()
-export class googleMapsHandler extends DataSource {
+export class googleMapsHandler {
     #client: Client;
     #apiKey: string;
     constructor() {
-        super();
         if (!process.env.GOOGLE_MAPS_API_KEY) {
             throw Error('NO GCP API KEY');
         }

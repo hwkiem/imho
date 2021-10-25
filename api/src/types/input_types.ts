@@ -133,29 +133,6 @@ export class PartialLocation implements Partial<Location> {
 }
 
 @InputType()
-export class PartialLocation implements Partial<Location> {
-    @Field({ nullable: true })
-    loc_id?: number;
-    @Field({ nullable: true })
-    google_place_id?: string;
-    @Field({ nullable: true })
-    street_num?: string;
-    @Field({ nullable: true })
-    route?: string;
-    @Field({ nullable: true })
-    city?: string;
-    @Field({ nullable: true })
-    postal_code?: string;
-    @Field({ nullable: true })
-    state?: string;
-    // averages on locations? fewer than on residences?
-    // @Field({ nullable: true })
-    // avg_rent?: number;
-    // @Field(() => Float, { nullable: true })
-    // avg_rating?: number;
-}
-
-@InputType()
 export class ResidenceSortByInput {
     @Field(() => ResidenceSortBy)
     attribute: ResidenceSortBy;
@@ -197,16 +174,6 @@ export class ResidenceQueryOptions {
     partial_residence?: PartialResidence;
 
     loc_id: number; // field resolver
-}
-
-@InputType()
-export class LocationQueryOptions {
-    @Field(() => Int, { nullable: true })
-    limit?: number;
-    @Field(() => LocationSortByInput, { nullable: true })
-    sort_params?: LocationSortByInput;
-    @Field(() => PartialLocation, { nullable: true })
-    partial_location?: PartialLocation;
 }
 
 @InputType()
@@ -289,19 +256,6 @@ export class ReviewQueryInput {
 
 @InputType()
 export class CreateResidenceInput {
-    // not in db
-    @Field()
-    google_place_id: string;
-
-    //in db
-    @Field()
-    unit: string;
-
-    loc_id: number;
-}
-
-@InputType()
-export class CreateLocationInput {
     @Field()
     google_place_id: string;
 

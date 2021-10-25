@@ -1,16 +1,14 @@
 import 'reflect-metadata';
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import { Residence } from '../../Residence/Residence';
 import { Review } from '../../Review/Review';
 import { User } from '../../User/User';
 import KnexPostgis from 'knex-postgis';
-import knexConfig from '../knexfile';
+
 import { StoveType } from '../../types/enum_types';
 
-const knex = new Knex.Client(knexConfig);
-const knexPostgis = KnexPostgis(knex);
-
 export async function seed(knex: Knex): Promise<void> {
+    const knexPostgis = KnexPostgis(knex);
     // Deletes ALL existing entries
     await knex('reviews').del();
     await knex('users').del();
@@ -134,8 +132,6 @@ export async function seed(knex: Knex): Promise<void> {
         .min;
     const resStart = (await knex.raw('select min(res_id) from residences'))
         .rows[0].min;
-
-    // var Range = require('pg-range').Range;
 
     await knex<Review>('reviews').insert([
         // 1

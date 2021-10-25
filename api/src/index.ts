@@ -10,17 +10,10 @@ import { UserResolver } from './User/user_resolver';
 import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { ReviewResolver } from './Review/review_resolver';
-<<<<<<< HEAD
 import { LocationResolver } from './Location/location_resolver';
 import { Container } from 'typedi';
 
 // var morgan = require('morgan')
-=======
-import { googleMapsHandler } from './dataSources/mapsAPI';
-import { LocationResolver } from './Location/location_resolver';
-
-var morgan = require('morgan')
->>>>>>> cards
 
 const main = async () => {
     const app = express();
@@ -30,11 +23,7 @@ const main = async () => {
     const redis = new Redis(process.env.REDIS_URL);
 
     app.set('trust proxy', 1);
-<<<<<<< HEAD
     // app.use(morgan("combined"))
-=======
-    app.use(morgan("combined"))
->>>>>>> cards
     app.use(
         cors({
             origin: process.env.CORS_ORIGIN,
@@ -70,10 +59,7 @@ const main = async () => {
                 ReviewResolver,
                 LocationResolver,
             ],
-<<<<<<< HEAD
             container: Container,
-=======
->>>>>>> cards
             validate: false,
         }),
         context: ({ req, res }) => ({

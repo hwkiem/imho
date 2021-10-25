@@ -17,13 +17,11 @@
     },
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
-        "apollo-datasource": "^3.0.3",
         "apollo-server": "^3.1.2",
         "argon2": "^0.28.2",
         "class-validator": "^0.13.1",
         "connect-redis": "^6.0.0",
         "cors": "^2.8.5",
-        "datasource-sql": "^1.5.0",
         "dotenv-cli": "^4.0.0",
         "express": "^4.17.1",
         "express-session": "^1.17.2",

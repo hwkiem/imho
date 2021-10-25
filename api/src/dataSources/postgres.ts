@@ -1,4 +1,3 @@
-import { SQLDataSource } from 'datasource-sql';
 import KnexPostgis from 'knex-postgis';
 import knexConfig from '../database/knexfile';
 import {
@@ -36,13 +35,15 @@ import {
     createLocationIfNotExists,
 } from '../Location/location_db_handler';
 import { Service } from 'typedi';
+import { Knex, knex } from 'knex';
 
 @Service()
-export class postgresHandler extends SQLDataSource {
+export class postgresHandler {
     protected knexPostgis: KnexPostgis.KnexPostgis;
+    protected knex: Knex;
 
     constructor() {
-        super(knexConfig);
+        this.knex = knex(knexConfig);
         this.knexPostgis = KnexPostgis(this.knex);
     }
 

@@ -1,16 +1,9 @@
 import { postgresHandler } from '../dataSources/postgres';
-<<<<<<< HEAD
-import { Review } from '../Review/Review';
-import KnexPostgis from 'knex-postgis';
-import Knex from 'knex';
-import knexConfig from '../database/knexfile';
-import { Location } from '../Location/Location';
-=======
 import { Review } from '../Review/reviews';
 import KnexPostgis from 'knex-postgis';
-import Knex from 'knex';
+import { Knex, knex } from 'knex';
 import knexConfig from '../database/knexfile';
->>>>>>> cards
+import { Location } from '../Location/Location';
 
 export const assembleReview = (reviews: any): Review[] => {
     return reviews.map((review: any) => {
@@ -25,7 +18,7 @@ export const assembleReview = (reviews: any): Review[] => {
     });
 };
 
-<<<<<<< HEAD
+
 export const assembleLocation = (raw: any): Location[] => {
     return raw.map((r: any) => {
         const { st_x, st_y, ...res } = r;
@@ -33,8 +26,7 @@ export const assembleLocation = (raw: any): Location[] => {
     });
 };
 
-=======
->>>>>>> cards
+
 // used by migrations view
 export function residenceColumns() {
     return [
@@ -45,7 +37,6 @@ export function residenceColumns() {
         'residences.updated_at',
         'avg_rating',
         'avg_rent',
-<<<<<<< HEAD
         'dishwasher',
         'air_conditioning',
         'heat',
@@ -60,14 +51,12 @@ export function residenceColumns() {
         'backyard',
         'bath_count',
         'bedroom_count',
-=======
->>>>>>> cards
     ];
 }
 // used on residences_enhanced outer join locations
 export function locationColumns() {
-    const knex = Knex(knexConfig as Knex.Config);
-    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knex);
+    const knx = knex(knexConfig as Knex.Config);
+    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knx);
     return [
         'loc_id',
         'google_place_id',
@@ -105,13 +94,8 @@ export function reviewColumns(this: postgresHandler) {
         'backyard',
         'bath_count',
         'bedroom_count',
-<<<<<<< HEAD
         this.knex.raw('lower(lease_term) as start'),
         this.knex.raw('upper(lease_term) as end'),
-=======
-        this.knex.raw('lower(lease_term_) as start'),
-        this.knex.raw('upper(lease_term_) as end'),
->>>>>>> cards
         'created_at',
         'updated_at',
     ];

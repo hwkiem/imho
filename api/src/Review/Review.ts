@@ -1,9 +1,4 @@
-<<<<<<< HEAD:api/src/Review/Review.ts
 import { ObjectType, Field, Float } from 'type-graphql';
-=======
-import { ObjectType, Field, Float, Ctx, Root } from 'type-graphql';
-import { Residence } from '../Residence/Residence';
->>>>>>> cards:api/src/Review/reviews.ts
 import { LaundryType, StoveType } from '../types/enum_types';
 import { DateRange } from '../types/object_types';
 
@@ -20,24 +15,7 @@ export class Review {
 
     @Field({ nullable: true })
     rent?: number;
-
-<<<<<<< HEAD:api/src/Review/Review.ts
-=======
-    @Field(() => Residence, { nullable: true })
-    async myResidence(
-        @Root() review: Review,
-        @Ctx() { dataSources }: MyContext
-    ): Promise<Residence | undefined> {
-        const res = await dataSources.pgHandler.getResidencesById([
-            review.res_id,
-        ]);
-        if (res.errors === undefined && res.residences !== undefined) {
-            return res.residences[0];
-        }
-        return;
-    }
-
->>>>>>> cards:api/src/Review/reviews.ts
+  
     // new bools
     @Field({ nullable: true })
     air_conditioning?: boolean;
