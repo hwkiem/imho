@@ -36,17 +36,17 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
     values,
     setFieldValue,
 }) => {
+    const { review_details } = values;
+
     const {
-        google_place_id,
         bath_count,
         bedroom_count,
         heat,
         lease_term,
         rating,
         rent,
-        unit,
         ...ammenities
-    } = values;
+    } = review_details;
 
     const laundryDisclosure = useDisclosure();
     const stoveDisclosure = useDisclosure();
@@ -73,7 +73,8 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                             onChange={() => {
                                                 if (
                                                     k == 'laundry' &&
-                                                    !values.laundry
+                                                    !values.review_details
+                                                        .laundry
                                                 ) {
                                                     laundryDisclosure.onOpen();
                                                 } else if (k == 'stove' && !v)
