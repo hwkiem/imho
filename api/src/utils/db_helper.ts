@@ -1,7 +1,7 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/Review';
 import KnexPostgis from 'knex-postgis';
-import Knex from 'knex';
+import { Knex, knex } from 'knex';
 import knexConfig from '../database/knexfile';
 import { Location } from '../Location/Location';
 
@@ -53,8 +53,8 @@ export function residenceColumns() {
 }
 // used on residences_enhanced outer join locations
 export function locationColumns() {
-    const knex = Knex(knexConfig as Knex.Config);
-    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knex);
+    const knx = knex(knexConfig as Knex.Config);
+    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knx);
     return [
         'loc_id',
         'google_place_id',

@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import {
     CREATE_ENHANCED_LOCATION_VIEW,
     CREATE_ENHANCED_RESIDENCE_VIEW,

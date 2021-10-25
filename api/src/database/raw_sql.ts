@@ -1,4 +1,4 @@
-import * as Knex from 'knex';
+import { Knex } from 'knex';
 import { Residence } from '../Residence/Residence';
 import { locationColumns, residenceColumns } from '../utils/db_helper';
 export const ON_UPDATE_TIMESTAMP_FUNCTION = `
