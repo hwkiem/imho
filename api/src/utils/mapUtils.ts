@@ -33,3 +33,4 @@ export const unpackLocation = (location: GeocodeResult): Partial<Location> => {
 
     return r;
 };
+

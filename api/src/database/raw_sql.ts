@@ -11,6 +11,33 @@ export const ON_UPDATE_TIMESTAMP_FUNCTION = `
         END; $$;
     `;
 
+// export const USER_LOCATION_UNIQUE_REVIEW_TUPLE = `
+//         CREATE OR REPLACE FUNCTION uniqueUserLocationTuple(res_id int, user_id int)
+//         RETURNS boolean AS
+//         $$
+//         DECLARE
+//         i int;
+//         BEGIN
+//         SELECT loc_id INTO i FROM residences WHERE res_id = residences.res_id;
+//         int j;
+//         SELECT count(*) INTO j FROM
+//         IF (i = user_id) THEN
+//         RETURN true;
+//         END IF;
+
+//         RETURN false;
+//         END
+//         $$ LANGUAGE plpgsql;
+// `;
+
+// export const onInsertReview = (): string => {
+//     return `CREATE TRIGGER
+//     BEFORE INSERT ON reviews
+//     FOR EACH ROW
+//     EXECUTE PROCEDURE uniqueUserLocationTuple(ROW.res_id, ROW.user_id);
+//     `;
+// };
+
 export const DROP_ENHANCED_RES_VIEW = `DROP VIEW IF EXISTS residences_enhanced`;
 export const DROP_ENHANCED_LOC_VIEW = `DROP VIEW IF EXISTS locations_enhanced`;
 

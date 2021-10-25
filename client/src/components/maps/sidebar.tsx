@@ -17,6 +17,7 @@ interface SideBarProps extends ChakraProps {
     hover: number;
     setHover: Dispatch<SetStateAction<number>>; // updating the hovered id
     setCenter: Dispatch<SetStateAction<GoogleMap.Coords>>;
+    setDetailLocation: Dispatch<SetStateAction<null | RegularLocationFragment>>;
 }
 
 export const SideBar: React.FC<SideBarProps> = ({
@@ -24,6 +25,7 @@ export const SideBar: React.FC<SideBarProps> = ({
     hover,
     setHover,
     setCenter,
+    setDetailLocation,
 }) => {
     return (
         <Box
@@ -40,7 +42,9 @@ export const SideBar: React.FC<SideBarProps> = ({
             overflowY={'scroll'}
             style={{ scrollbarWidth: 'none' }}
         >
-            <Heading mt={2}>Locations</Heading>
+            <Heading mt={2} size={'md'}>
+                Locations
+            </Heading>
             <VStack padding={3}>
                 {locations.map((loc) => (
                     <LocationCard
@@ -49,6 +53,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                         setHover={setHover}
                         onClick={() => {
                             setCenter({ ...loc.coords });
+                            setDetailLocation(loc);
                         }}
                     />
                 ))}

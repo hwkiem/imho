@@ -36,6 +36,7 @@ import {
 } from '../Location/location_db_handler';
 import { Service } from 'typedi';
 import { Knex, knex } from 'knex';
+
 @Service()
 export class postgresHandler {
     protected knexPostgis: KnexPostgis.KnexPostgis;

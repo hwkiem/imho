@@ -1,5 +1,5 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { Review } from '../Review/Review';
+import { Review } from '../Review/reviews';
 import KnexPostgis from 'knex-postgis';
 import { Knex, knex } from 'knex';
 import knexConfig from '../database/knexfile';
@@ -18,12 +18,14 @@ export const assembleReview = (reviews: any): Review[] => {
     });
 };
 
+
 export const assembleLocation = (raw: any): Location[] => {
     return raw.map((r: any) => {
         const { st_x, st_y, ...res } = r;
         return { coords: { lat: st_y, lng: st_x }, ...res };
     });
 };
+
 
 // used by migrations view
 export function residenceColumns() {

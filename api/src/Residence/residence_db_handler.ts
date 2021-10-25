@@ -1,11 +1,7 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ResidenceSortBy } from '../types/enum_types';
 import { ResidenceSortByInput } from '../types/input_types';
-import {
-    FieldError,
-    ResidenceResponse,
-    SingleResidenceResponse,
-} from '../types/object_types';
+import { FieldError } from '../types/object_types';
 import { Residence } from './Residence';
 
 export async function createResidence(
