@@ -24,6 +24,9 @@ export const EntryReview: React.FC = () => {
     const initialValues: WriteReviewInput = {
         google_place_id: '',
         unit: '0',
+        review_details: {
+            lease_term: { start_date: undefined, end_date: undefined },
+        },
     };
 
     const formik = useFormik({

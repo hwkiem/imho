@@ -82,7 +82,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                     options: { email, first_name, last_name, password },
                 },
                 update: (cache, { data }) => {
-                    if (data?.register.users)
+                    if (data?.register.user)
                         cache.writeQuery<MeQuery>({
                             query: MeDocument,
                             data: {
@@ -92,7 +92,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                 },
             });
 
-            if (res.data?.register.users) {
+            if (res.data?.register.user) {
                 setstepNum(1);
             } else if (res.data?.register.errors) {
                 console.log(res.data.register.errors);

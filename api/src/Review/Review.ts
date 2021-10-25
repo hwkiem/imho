@@ -15,7 +15,7 @@ export class Review {
 
     @Field({ nullable: true })
     rent?: number;
-  
+
     // new bools
     @Field({ nullable: true })
     air_conditioning?: boolean;

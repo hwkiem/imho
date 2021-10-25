@@ -21,12 +21,6 @@
         "jsx": "preserve",
         "allowJs": true
     },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "src/lib/apollo.js",
-        "src/components/utils/monthPicker.jsx"
-    ],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/apollo.js"],
     "exclude": ["node_modules", ".next"]
 }

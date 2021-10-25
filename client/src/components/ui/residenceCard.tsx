@@ -50,7 +50,7 @@ export const ResidenceCard: React.FC<ResidenceCardProps> = ({
                         fontSize={'sm'}
                         textTransform={'uppercase'}
                     >
-                        {residence.full_address.split(',')[0]}
+                        Unit: {residence.unit}
                     </Text>
 
                     <Stack direction={'row'} align={'center'}>
