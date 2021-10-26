@@ -21,7 +21,7 @@ export const NpsForm: React.FC<FormikProps<WriteReviewInput>> = ({
                     step={1}
                     handleChange={(val) => {
                         setRating(val);
-                        setFieldValue('rating', val);
+                        setFieldValue('review_details.rating', val);
                     }}
                 />
                 <FormHelperText>

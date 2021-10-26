@@ -46,7 +46,7 @@ export const RentTermForm: React.FC<FormikProps<WriteReviewInput>> = ({
                     <FormLabel>How long is this home?</FormLabel>
                     <Picker
                         onChange={(startDate: Date, endDate: Date) => {
-                            setFieldValue('lease_term', {
+                            setFieldValue('review_details.lease_term', {
                                 start_date: startDate,
                                 end_date: endDate,
                             });

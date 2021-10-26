@@ -79,7 +79,11 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                                     laundryDisclosure.onOpen();
                                                 } else if (k == 'stove' && !v)
                                                     stoveDisclosure.onOpen();
-                                                else setFieldValue(k, !v);
+                                                else
+                                                    setFieldValue(
+                                                        `review_details.${k}`,
+                                                        !v
+                                                    );
                                             }}
                                         />
                                     </FormControl>
@@ -99,7 +103,7 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                 <Button
                                     onClick={() => {
                                         setFieldValue(
-                                            'laundry',
+                                            'review_details.laundry',
                                             LaundryType.InUnit
                                         );
                                         laundryDisclosure.onClose();
@@ -110,7 +114,7 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                 <Button
                                     onClick={() => {
                                         setFieldValue(
-                                            'laundry',
+                                            'review_details.laundry',
                                             LaundryType.Building
                                         );
                                         laundryDisclosure.onClose();
@@ -133,7 +137,7 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                 <Button
                                     onClick={() => {
                                         setFieldValue(
-                                            'stove',
+                                            'review_details.stove',
                                             StoveType.Electric
                                         );
                                         stoveDisclosure.onClose();
@@ -143,7 +147,10 @@ export const AmmenityForm: React.FC<FormikProps<WriteReviewInput>> = ({
                                 </Button>
                                 <Button
                                     onClick={() => {
-                                        setFieldValue('stove', StoveType.Gas);
+                                        setFieldValue(
+                                            'review_details.stove',
+                                            StoveType.Gas
+                                        );
                                         stoveDisclosure.onClose();
                                     }}
                                 >
