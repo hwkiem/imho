@@ -34,7 +34,7 @@ export const RentTermForm: React.FC<FormikProps<WriteReviewInput>> = ({
                         value={rent}
                         handleChange={(val) => {
                             setRent(val);
-                            setFieldValue('rent', val);
+                            setFieldValue('review_details.rent', val);
                         }}
                     />
                     <FormHelperText>
