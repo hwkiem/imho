@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      dockerfile: ./api/Dockerfile
+      context: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api/:/app/
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./api/.env
+    command: yarn npm-run-all -p watch start
+    restart: on-failure
+
+  client:
+    build:
+      dockerfile: ./client/Dockerfile
+      context: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./client/:/app/
+      - /app/node_modules
+      - /app/dist
+      - /app/.next
+    depends_on:
+      - api
+    env_file:
+      - ./client/.env.local
+    command: yarn dev
+    restart: on-failure
+
+  postgres:
+    image: postgis/postgis:14-3.1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: imho
+      POSTGRES_PASSWORD: imho
+      POSTGRES_DB: imho
+
+  redis:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
