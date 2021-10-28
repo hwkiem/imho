@@ -1,5 +1,5 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { Review } from '../Review/review';
+import { Review } from '../Review/Review';
 import KnexPostgis from 'knex-postgis';
 import { Knex, knex } from 'knex';
 import knexConfig from '../database/knexfile';
