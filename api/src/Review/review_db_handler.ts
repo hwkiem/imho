@@ -18,7 +18,7 @@ export async function writeReview(
             res_id: res_id,
             user_id: user_id,
             ...attr,
-            lease_term: require('pg-range').Range(
+            lease_term: require('pg-range').Range( // eslint-disable-line @typescript-eslint/no-var-requires
                 lease_term.start_date,
                 lease_term.end_date
             ),

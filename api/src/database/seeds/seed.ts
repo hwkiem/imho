@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import 'reflect-metadata';
 import { Knex } from 'knex';
 import { Residence } from '../../Residence/Residence';
