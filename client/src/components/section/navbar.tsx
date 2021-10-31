@@ -18,7 +18,7 @@ import {
     Tab,
     TabList,
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { RiHomeSmileFill } from 'react-icons/ri';
 import { useMeQuery, useLogoutMutation } from '../../generated/graphql';
 import { useRouter } from 'next/router';
@@ -33,7 +33,7 @@ interface NavLinkProps {
     children: ReactNode;
     path: string;
 }
-const NavLink: React.FC<NavLinkProps> = ({ children, path }) => {
+const NavLink: React.FC<NavLinkProps> = ({ children, path }: NavLinkProps) => {
     return (
         <Link
             as={NextLink}

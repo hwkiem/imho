@@ -2,10 +2,8 @@ import {
     Box,
     Center,
     useColorModeValue,
-    Heading,
     Text,
     Stack,
-    Image,
 } from '@chakra-ui/react';
 import { RegularResidenceFragment } from '../../generated/graphql';
 import { Dispatch, SetStateAction } from 'react';
@@ -23,7 +21,7 @@ export const ResidenceCard: React.FC<ResidenceCardProps> = ({
     hover,
     setHover,
     residence,
-}) => {
+}: ResidenceCardProps) => {
     return (
         <Center py={12}>
             <Box

@@ -1,10 +1,7 @@
 import {
     Box,
-    Button,
     ChakraProps,
     Heading,
-    Icon,
-    Stack,
     VStack,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
@@ -26,7 +23,7 @@ export const SideBar: React.FC<SideBarProps> = ({
     setHover,
     setCenter,
     setDetailLocation,
-}) => {
+}: SideBarProps) => {
     return (
         <Box
             bg={'gray.100'}
@@ -48,6 +45,7 @@ export const SideBar: React.FC<SideBarProps> = ({
             <VStack padding={3}>
                 {locations.map((loc) => (
                     <LocationCard
+                        key={loc.loc_id}
                         location={loc}
                         hover={loc.loc_id == hover}
                         setHover={setHover}

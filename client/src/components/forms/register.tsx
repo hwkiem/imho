@@ -11,14 +11,8 @@ import {
     Stack,
     useColorModeValue,
     FormErrorMessage,
-    Drawer,
-    DrawerBody,
-    DrawerHeader,
-    DrawerContent,
-    DrawerOverlay,
-    useDisclosure,
 } from '@chakra-ui/react';
-import { Form, Formik, Field, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import {
     useRegisterMutation,
@@ -38,7 +32,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
     const [stepNum, setstepNum] = useState(0);
 
     // Use the codegen register mutation and data state
-    const [register, { loading, data, error }] = useRegisterMutation();
+    const [register, { error }] = useRegisterMutation();
 
     // Define validation schema for login form using Yup
     const validationSchema: yup.SchemaOf<
@@ -102,6 +96,9 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
         },
     });
 
+    const outerBg = useColorModeValue('gray.50', 'gray.800');
+    const innerBg = useColorModeValue('white', 'gray.700');
+
     return (
         <>
             {stepNum == 0 && (
@@ -109,7 +106,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                     minH={'100vh'}
                     align={'center'}
                     justify={'center'}
-                    bg={useColorModeValue('gray.50', 'gray.800')}
+                    bg={outerBg}
                 >
                     <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
                         <Stack align={'center'}>
@@ -123,7 +120,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                         </Stack>
                         <Box
                             rounded={'lg'}
-                            bg={useColorModeValue('white', 'gray.700')}
+                            bg={innerBg}
                             boxShadow={'lg'}
                             p={8}
                         >

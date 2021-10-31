@@ -1,10 +1,15 @@
+import React from 'react';
 import { Box, Heading, Button, Icon } from '@chakra-ui/react';
 import { RiRefreshLine } from 'react-icons/ri';
 import { chakra } from '@chakra-ui/react';
 
 const CRiRefreshLine = chakra(RiRefreshLine);
 
-const Sidebar: React.FC = ({ children }) => {
+interface SidebarProps {
+    children: React.ReactNode;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ children }: SidebarProps) => {
     return (
         <Box
             bg={'gray.100'}

@@ -1,25 +1,20 @@
 import {
     Box,
-    Button,
     FormControl,
     FormHelperText,
     FormLabel,
-    HStack,
     VStack,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { SliderInput } from '../../../utils/sliderInput';
 import { FormikProps } from 'formik';
 import { WriteReviewInput } from '../../../../generated/graphql';
 import { Picker } from '../../../utils/monthPicker';
 
-const MonthBox: React.FC = () => {
-    return <Box>{}</Box>;
-};
 
 export const RentTermForm: React.FC<FormikProps<WriteReviewInput>> = ({
     setFieldValue,
-}) => {
+}: FormikProps<WriteReviewInput>) => {
     const [rent, setRent] = useState(1500);
 
     return (

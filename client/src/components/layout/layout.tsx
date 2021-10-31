@@ -1,7 +1,11 @@
 import { Box } from '@chakra-ui/react';
 import { NavBar } from '../section/navbar';
 
-export const Layout: React.FC = ({ children }) => {
+interface LayoutProps {
+    children: React.ReactNode;
+}
+
+export const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => {
     console;
     return (
         <Box height={'100vh'}>

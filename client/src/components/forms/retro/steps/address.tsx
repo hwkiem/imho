@@ -1,14 +1,10 @@
 import {
     Box,
-    Button,
-    Flex,
     FormControl,
-    FormHelperText,
     FormLabel,
     Heading,
     HStack,
     Input,
-    InputGroup,
     Stack,
     useRadio,
     useRadioGroup,
@@ -20,9 +16,11 @@ import { ChangeEvent, useState } from 'react';
 import { WriteReviewInput } from '../../../../generated/graphql';
 import { Map } from '../../../maps/map';
 
-type RadioButtonProps = UseRadioProps
+interface RadioButtonProps extends UseRadioProps {
+    children: React.ReactNode;
+}
 
-const RadioButton: React.FC<RadioButtonProps> = (props) => {
+const RadioButton: React.FC<RadioButtonProps> = (props: RadioButtonProps) => {
     const { getInputProps, getCheckboxProps } = useRadio(props);
 
     const input = getInputProps();
@@ -60,7 +58,7 @@ interface LocationTypeSelectProps {
 
 const LocationTypeSelect: React.FC<LocationTypeSelectProps> = ({
     onChange,
-}) => {
+}: LocationTypeSelectProps) => {
     const options = ['house', 'multi-unit'];
     const [showUnit, setShowUnit] = useState(false);
     const [unit, setUnit] = useState('0');
@@ -109,7 +107,7 @@ const LocationTypeSelect: React.FC<LocationTypeSelectProps> = ({
 
 export const AddressForm: React.FC<FormikProps<WriteReviewInput>> = ({
     setFieldValue,
-}) => {
+}: FormikProps<WriteReviewInput>) => {
     return (
         <Stack align={'center'}>
             <Heading fontSize={'2xl'}>Where do you call home?</Heading>

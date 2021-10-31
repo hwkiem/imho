@@ -11,7 +11,7 @@ interface ProfileProps {
     reviews?: RegularReviewFragment[];
 }
 
-const Profile: Page<ProfileProps> = ({ me, reviews }) => {
+const Profile: Page<ProfileProps> = ({ reviews }: ProfileProps) => {
     return (
         <Flex minH={'100vh'} bg={'gray.50'}>
             <Stack
@@ -32,7 +32,7 @@ const Profile: Page<ProfileProps> = ({ me, reviews }) => {
                 <Stack direction={'row'} spacing={10} p={2}>
                     {reviews &&
                         reviews.map((review) => (
-                            <Box bg={'lightblue'} h={'200px'} w={'200px'}>
+                            <Box key={`${review.res_id}-${review.user_id}`} bg={'lightblue'} h={'200px'} w={'200px'}>
                                 Review ID: {review.res_id}
                                 Rent: {review.rent}
                                 Rating: {review.rating}
