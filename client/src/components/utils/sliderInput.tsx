@@ -14,7 +14,7 @@ import {
 import React from 'react';
 
 interface SliderInputProps extends NumberInputProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     handleChange: (val: number) => void;
 }
 
