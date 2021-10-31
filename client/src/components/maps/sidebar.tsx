@@ -1,9 +1,4 @@
-import {
-    Box,
-    ChakraProps,
-    Heading,
-    VStack,
-} from '@chakra-ui/react';
+import { Box, ChakraProps, Heading, VStack } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { RegularLocationFragment } from '../../generated/graphql';
 import { LocationCard } from './loccard';

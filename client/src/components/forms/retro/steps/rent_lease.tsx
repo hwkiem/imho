@@ -11,7 +11,6 @@ import { FormikProps } from 'formik';
 import { WriteReviewInput } from '../../../../generated/graphql';
 import { Picker } from '../../../utils/monthPicker';
 
-
 export const RentTermForm: React.FC<FormikProps<WriteReviewInput>> = ({
     setFieldValue,
 }: FormikProps<WriteReviewInput>) => {

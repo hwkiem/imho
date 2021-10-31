@@ -11,7 +11,9 @@ const Index: Page = () => {
 
 export const getServerSideProps = async ({
     req,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Record<string, unknown>>> => {
+}: GetServerSidePropsContext): Promise<
+    GetServerSidePropsResult<Record<string, unknown>>
+> => {
     const apollo = initializeApollo({
         headers: req.headers,
     });

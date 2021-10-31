@@ -18,7 +18,9 @@ interface SliderInputProps extends NumberInputProps {
     handleChange: (val: number) => void;
 }
 
-export const SliderInput: React.FC<SliderInputProps> = (props: SliderInputProps) => {
+export const SliderInput: React.FC<SliderInputProps> = (
+    props: SliderInputProps
+) => {
     return (
         <Flex>
             <NumberInput
@@ -54,10 +56,7 @@ export const SliderInput: React.FC<SliderInputProps> = (props: SliderInputProps)
                 <SliderTrack>
                     <SliderFilledTrack />
                 </SliderTrack>
-                <SliderThumb
-                    fontSize="sm"
-                    boxSize="32px"
-                >
+                <SliderThumb fontSize="sm" boxSize="32px">
                     {props.children}
                 </SliderThumb>
             </Slider>

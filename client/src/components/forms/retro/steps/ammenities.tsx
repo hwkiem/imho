@@ -16,10 +16,7 @@ import {
     Switch,
     useDisclosure,
 } from '@chakra-ui/react';
-import {
-    Form,
-    FormikProps,
-} from 'formik';
+import { Form, FormikProps } from 'formik';
 import React from 'react';
 import {
     LaundryType,

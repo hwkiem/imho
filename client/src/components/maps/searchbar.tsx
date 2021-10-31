@@ -1,9 +1,5 @@
 import { SearchIcon } from '@chakra-ui/icons';
-import {
-    Input,
-    InputGroup,
-    InputLeftElement,
-} from '@chakra-ui/react';
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 // import { RiHomeSmileFill } from 'react-icons/ri';
 
 // const HomeIcon = chakra(RiHomeSmileFill);

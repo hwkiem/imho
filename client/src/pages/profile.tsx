@@ -32,7 +32,12 @@ const Profile: Page<ProfileProps> = ({ reviews }: ProfileProps) => {
                 <Stack direction={'row'} spacing={10} p={2}>
                     {reviews &&
                         reviews.map((review) => (
-                            <Box key={`${review.res_id}-${review.user_id}`} bg={'lightblue'} h={'200px'} w={'200px'}>
+                            <Box
+                                key={`${review.res_id}-${review.user_id}`}
+                                bg={'lightblue'}
+                                h={'200px'}
+                                w={'200px'}
+                            >
                                 Review ID: {review.res_id}
                                 Rent: {review.rent}
                                 Rating: {review.rating}

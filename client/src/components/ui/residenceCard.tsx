@@ -1,10 +1,4 @@
-import {
-    Box,
-    Center,
-    useColorModeValue,
-    Text,
-    Stack,
-} from '@chakra-ui/react';
+import { Box, Center, useColorModeValue, Text, Stack } from '@chakra-ui/react';
 import { RegularResidenceFragment } from '../../generated/graphql';
 import { Dispatch, SetStateAction } from 'react';
 

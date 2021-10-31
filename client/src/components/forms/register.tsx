@@ -118,12 +118,7 @@ export const RegisterForm: React.FC<LoginFormProps> = () => {
                                 <Link color={'blue.400'}>features</Link> ✌️
                             </Text>
                         </Stack>
-                        <Box
-                            rounded={'lg'}
-                            bg={innerBg}
-                            boxShadow={'lg'}
-                            p={8}
-                        >
+                        <Box rounded={'lg'} bg={innerBg} boxShadow={'lg'} p={8}>
                             <Stack spacing={4}>
                                 <form onSubmit={formik.handleSubmit}>
                                     <FormControl
