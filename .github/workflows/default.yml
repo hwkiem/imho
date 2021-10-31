@@ -19,7 +19,7 @@ jobs:
         with:
           args: --check api/ client/
 
-  eslint/api:
+  eslint-api:
     name: api/eslint
     runs-on: ubuntu-20.04
     steps:
@@ -37,7 +37,7 @@ jobs:
       - run: yarn eslint ./
         working-directory: api/
 
-  eslint/client:
+  eslint-client:
     name: client/eslint
     runs-on: ubuntu-20.04
     steps:
