@@ -109,10 +109,8 @@ export const Map: React.FC<MapProps> = ({
 
     const [hover, setHover] = useState(-1);
 
-    const [
-        detailLocation,
-        setDetailLocation,
-    ] = useState<null | RegularLocationFragment>(null);
+    const [detailLocation, setDetailLocation] =
+        useState<null | RegularLocationFragment>(null);
 
     return (
         <Box w={'100%'} h={'100%'} position="relative">
