@@ -20,7 +20,7 @@ import { ChangeEvent, useState } from 'react';
 import { WriteReviewInput } from '../../../../generated/graphql';
 import { Map } from '../../../maps/map';
 
-interface RadioButtonProps extends UseRadioProps {}
+type RadioButtonProps = UseRadioProps
 
 const RadioButton: React.FC<RadioButtonProps> = (props) => {
     const { getInputProps, getCheckboxProps } = useRadio(props);

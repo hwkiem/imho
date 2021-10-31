@@ -13,7 +13,7 @@ export async function createResidence(
     loc_id: number,
     unit: string
 ): Promise<SingleResidenceResponse> {
-    let r: SingleResidenceResponse = {};
+    const r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences')
         .insert({ loc_id: loc_id, unit: unit })
         .returning('res_id')
@@ -57,9 +57,9 @@ export async function getResidencesGeneric(
         attribute: ResidenceSortBy.ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
+    const r: ResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')
         .select('*')
         .where(obj)
@@ -82,7 +82,7 @@ export async function getResidencesById(
     this: postgresHandler,
     ids: number[]
 ): Promise<ResidenceResponse> {
-    let r: ResidenceResponse = {};
+    const r: ResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')
         .select('*')
         .where('res_id', 'in', ids)
@@ -103,7 +103,7 @@ export async function getSingleResidenceById(
     this: postgresHandler,
     ids: number[]
 ): Promise<SingleResidenceResponse> {
-    let r: SingleResidenceResponse = {};
+    const r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')
         .select('*')
         .where('res_id', 'in', ids)
@@ -126,7 +126,7 @@ export async function residenceExists(
     loc_id: number,
     unit: string
 ): Promise<number | null> {
-    var r: number | null = null;
+    let r: number | null = null;
     await this.knex('residences')
         .select('res_id')
         .where({ loc_id: loc_id, unit: unit })

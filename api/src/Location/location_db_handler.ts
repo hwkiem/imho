@@ -48,7 +48,7 @@ export async function createLocation(
         };
     }
 
-    let r: SingleLocationResponse = {};
+    const r: SingleLocationResponse = {};
     await this.knex<Location>('locations')
         .insert(args)
         .returning('loc_id')
@@ -90,7 +90,7 @@ export async function getLocationsById(
     this: postgresHandler,
     ids: number[]
 ): Promise<LocationResponse> {
-    let r: LocationResponse = {};
+    const r: LocationResponse = {};
     await this.knex<Location>('locations_enhanced')
         .select('*')
         .where('loc_id', 'in', ids)
@@ -111,7 +111,7 @@ export async function getSingleLocationById(
     this: postgresHandler,
     ids: number[]
 ): Promise<SingleLocationResponse> {
-    let r: SingleLocationResponse = {};
+    const r: SingleLocationResponse = {};
     await this.knex<Location>('locations_enhanced')
         .select('*')
         .where('loc_id', 'in', ids)
@@ -137,13 +137,13 @@ export async function getLocationsNearArea(
         attribute: LocationSortBy.ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<LocationResponse> {
     const maps = Container.get(googleMapsHandler);
     const geocode = await maps.locationFromPlaceID(place_id);
     if (geocode instanceof FieldError) return { errors: [geocode] };
 
-    let r: LocationResponse = {};
+    const r: LocationResponse = {};
     await this.knex<Location>('locations_enhanced')
         .select('*')
         .where(obj)
@@ -176,9 +176,9 @@ export async function getLocationsGeneric(
         attribute: LocationSortBy.ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<LocationResponse> {
-    let r: LocationResponse = {};
+    const r: LocationResponse = {};
     await this.knex<Location>('locations_enhanced')
         .select('*')
         .where(obj)
@@ -205,9 +205,9 @@ export async function getLocationsBoundingBox(
         attribute: LocationSortBy.ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<LocationResponse> {
-    let r: LocationResponse = {};
+    const r: LocationResponse = {};
 
     await this.knex('locations_enhanced')
         .select('*')
@@ -244,7 +244,7 @@ export async function locationExists(
     this: postgresHandler,
     place_id: string
 ): Promise<number | null> {
-    var r: number | null = null;
+    let r: number | null = null;
     await this.knex('locations')
         .select('loc_id')
         .where({ google_place_id: place_id })

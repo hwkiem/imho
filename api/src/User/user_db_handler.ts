@@ -9,7 +9,7 @@ export async function getUsersById(
     this: postgresHandler,
     ids: [number]
 ): Promise<UserResponse> {
-    let r: UserResponse = {};
+    const r: UserResponse = {};
     await this.knex<User>('users')
         .select('*')
         .where('user_id', 'in', ids)
@@ -27,9 +27,9 @@ export async function getUsersGeneric(
         attribute: UserSortBy.ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<UserResponse> {
-    let r: UserResponse = {};
+    const r: UserResponse = {};
     await this.knex<User>('users')
         .select('*')
         .where(obj)
@@ -47,7 +47,7 @@ export async function createUser(
     this: postgresHandler,
     input: RegisterInput
 ): Promise<UserResponse> {
-    let r: UserResponse = {};
+    const r: UserResponse = {};
     input.password = await argon2.hash(input.password);
     await this.knex<User>('users')
         .insert(input)
@@ -69,7 +69,7 @@ export async function deleteUser(
     this: postgresHandler,
     id: number
 ): Promise<UserResponse> {
-    let r: UserResponse = {};
+    const r: UserResponse = {};
     await this.knex<User>('users')
         .where('user_id', '=', id)
         .del()
@@ -87,7 +87,7 @@ export async function changePassword(
     new_password: string,
     user_id: number
 ): Promise<UserResponse> {
-    let r: UserResponse = {};
+    const r: UserResponse = {};
 
     await this.knex<User>('users')
         .where('user_id', '=', user_id)

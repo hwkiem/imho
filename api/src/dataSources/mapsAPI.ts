@@ -34,7 +34,7 @@ export class googleMapsHandler {
     };
 
     placeIdFromAddress = async (address: string): Promise<PlaceIDResponse> => {
-        let r: PlaceIDResponse = {};
+        const r: PlaceIDResponse = {};
         try {
             const result = geoToData(
                 await this.#client.geocode({

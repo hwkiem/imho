@@ -13,7 +13,7 @@ export const unpackLocation = (location: GeocodeResult): Partial<Location> => {
         throw Error('Not a valid location, cannot unpack');
     }
 
-    let r: Partial<Location> = {
+    const r: Partial<Location> = {
         full_address: location.formatted_address,
     };
 
