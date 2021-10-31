@@ -20,7 +20,7 @@ jobs:
           args: --check api/ client/
 
   eslint-api:
-    name: api/eslint
+    name: eslint / api
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
         working-directory: api/
 
   eslint-client:
-    name: client/eslint
+    name: eslint / client
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
