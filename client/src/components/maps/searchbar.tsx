@@ -1,16 +1,8 @@
 import { SearchIcon } from '@chakra-ui/icons';
-import {
-    chakra,
-    Box,
-    Center,
-    Input,
-    InputGroup,
-    InputLeftElement,
-} from '@chakra-ui/react';
-import { Fragment, useEffect } from 'react';
-import { RiHomeSmileFill } from 'react-icons/ri';
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
+// import { RiHomeSmileFill } from 'react-icons/ri';
 
-const HomeIcon = chakra(RiHomeSmileFill);
+// const HomeIcon = chakra(RiHomeSmileFill);
 
 interface SearchBarProps {
     options: google.maps.places.AutocompleteOptions;
@@ -22,7 +14,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     options,
     searchHandler,
     variant,
-}) => {
+}: SearchBarProps) => {
     const setInputRef = (node: HTMLInputElement) => {
         const auto = new google.maps.places.Autocomplete(node, options);
         auto.addListener('place_changed', () => {

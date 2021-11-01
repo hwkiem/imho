@@ -53,7 +53,7 @@ export const Map: React.FC<MapProps> = ({
     withSideBar,
     fixed,
     variant,
-}) => {
+}: MapProps) => {
     // Used for panning the map to target Location or search res
     const [center, setCenter] = useState(DAVIS_CENTER);
     // Used for zooming to target residence or search res
@@ -109,10 +109,8 @@ export const Map: React.FC<MapProps> = ({
 
     const [hover, setHover] = useState(-1);
 
-    const [
-        detailLocation,
-        setDetailLocation,
-    ] = useState<null | RegularLocationFragment>(null);
+    const [detailLocation, setDetailLocation] =
+        useState<null | RegularLocationFragment>(null);
 
     return (
         <Box w={'100%'} h={'100%'} position="relative">
@@ -185,6 +183,7 @@ export const Map: React.FC<MapProps> = ({
                     locations.map((loc) => {
                         return (
                             <Marker
+                                key={loc.loc_id}
                                 loc_id={loc.loc_id}
                                 lat={loc.coords.lat}
                                 lng={loc.coords.lng}

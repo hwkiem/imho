@@ -35,7 +35,7 @@ export class Location {
     @Field(() => Coords)
     coords: Coords;
 
-    geog: any;
+    geog: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // aggregates
     // averages

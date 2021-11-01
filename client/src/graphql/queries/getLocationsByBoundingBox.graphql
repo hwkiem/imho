@@ -1,4 +1,7 @@
-query GetLocationsBoundingBox($options: LocationQueryOptions, $perimeter: GeoBoundaryInput!) {
+query GetLocationsBoundingBox(
+    $options: LocationQueryOptions
+    $perimeter: GeoBoundaryInput!
+) {
     getLocationsBoundingBox(options: $options, perimeter: $perimeter) {
         ...RegularLocationResponse
     }

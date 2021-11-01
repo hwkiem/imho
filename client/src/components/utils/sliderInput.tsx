@@ -10,15 +10,17 @@ import {
     SliderFilledTrack,
     SliderThumb,
     SliderTrack,
-    Icon,
 } from '@chakra-ui/react';
 import React from 'react';
 
 interface SliderInputProps extends NumberInputProps {
+    children?: React.ReactNode;
     handleChange: (val: number) => void;
 }
 
-export const SliderInput: React.FC<SliderInputProps> = (props) => {
+export const SliderInput: React.FC<SliderInputProps> = (
+    props: SliderInputProps
+) => {
     return (
         <Flex>
             <NumberInput
@@ -54,11 +56,9 @@ export const SliderInput: React.FC<SliderInputProps> = (props) => {
                 <SliderTrack>
                     <SliderFilledTrack />
                 </SliderTrack>
-                <SliderThumb
-                    fontSize="sm"
-                    boxSize="32px"
-                    children={props.children}
-                />
+                <SliderThumb fontSize="sm" boxSize="32px">
+                    {props.children}
+                </SliderThumb>
             </Slider>
         </Flex>
     );

@@ -3,17 +3,12 @@ import {
     Button,
     ChakraProps,
     Heading,
-    Icon,
-    Stack,
     VStack,
-    Text,
     HStack,
     useColorModeValue,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { RegularLocationFragment } from '../../generated/graphql';
-import { LocationCard } from './loccard';
-import GoogleMap from 'google-map-react';
 
 interface SideBarProps extends ChakraProps {
     location: RegularLocationFragment;
@@ -23,7 +18,7 @@ interface SideBarProps extends ChakraProps {
 export const DetailModal: React.FC<SideBarProps> = ({
     location,
     setLocation,
-}) => {
+}: SideBarProps) => {
     return (
         <Box
             bg={'gray.100'}

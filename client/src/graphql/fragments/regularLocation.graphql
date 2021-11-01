@@ -8,6 +8,6 @@ fragment RegularLocation on Location {
     avg_rent
     avg_rating
     myResidences {
-       ...RegularResidence 
+        ...RegularResidence
     }
 }

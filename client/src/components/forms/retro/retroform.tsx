@@ -1,10 +1,8 @@
-import { Box, Button, Flex, Stack } from '@chakra-ui/react';
-import { Formik, FormikFormProps, FormikProps } from 'formik';
+import { Box, Button, Stack } from '@chakra-ui/react';
+import { Formik, FormikProps } from 'formik';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
-    LaundryType,
-    StoveType,
     useWriteReviewMutation,
     WriteReviewInput,
 } from '../../../generated/graphql';
@@ -14,7 +12,9 @@ import { AmmenityForm } from './steps/ammenities';
 import { NpsForm } from './steps/nps';
 import { RentTermForm } from './steps/rent_lease';
 
-const SubFormRouter: React.FC<FormikProps<WriteReviewInput>> = (props) => {
+const SubFormRouter: React.FC<FormikProps<WriteReviewInput>> = (
+    props: FormikProps<WriteReviewInput>
+) => {
     const [step, setStep] = useState(0);
 
     return (

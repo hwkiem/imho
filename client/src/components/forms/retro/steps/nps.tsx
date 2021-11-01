@@ -6,7 +6,7 @@ import { SliderInput } from '../../../utils/sliderInput';
 
 export const NpsForm: React.FC<FormikProps<WriteReviewInput>> = ({
     setFieldValue,
-}) => {
+}: FormikProps<WriteReviewInput>) => {
     const [rating, setRating] = useState(3);
     return (
         <Box>

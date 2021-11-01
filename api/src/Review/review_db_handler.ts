@@ -12,12 +12,13 @@ export async function writeReview(
     review_details: AllAttributes
 ): Promise<SingleReviewResponse> {
     const { lease_term, ...attr } = review_details;
-    let r: SingleReviewResponse = {};
+    const r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .insert({
             res_id: res_id,
             user_id: user_id,
             ...attr,
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             lease_term: require('pg-range').Range(
                 lease_term.start_date,
                 lease_term.end_date
@@ -68,7 +69,7 @@ export async function getReviewsByPrimaryKeyTuple(
     user_id: number,
     res_id: number
 ): Promise<ReviewResponse> {
-    let r: ReviewResponse = {};
+    const r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where('user_id', '=', user_id)
@@ -86,7 +87,7 @@ export async function getReviewsByUserId(
     this: postgresHandler,
     ids: [number]
 ): Promise<ReviewResponse> {
-    let r: ReviewResponse = {};
+    const r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where('user_id', 'in', ids)
@@ -104,7 +105,7 @@ export async function getReviewsByResidenceId(
     this: postgresHandler,
     ids: [number]
 ): Promise<ReviewResponse> {
-    let r: ReviewResponse = {};
+    const r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where('res_id', 'in', ids)
@@ -125,9 +126,9 @@ export async function getReviewsGeneric(
         attribute: ReviewSortBy.USER_ID,
         sort: QueryOrderChoice.ASC,
     },
-    limit: number = 10
+    limit = 10
 ): Promise<ReviewResponse> {
-    let r: ReviewResponse = {};
+    const r: ReviewResponse = {};
     await this.knex<Review>('reviews')
         .select(this.reviewColumns())
         .where(obj)
@@ -150,7 +151,7 @@ export async function updateReviewGeneric(
     user_id: number,
     changes: Partial<Review>
 ): Promise<SingleReviewResponse> {
-    let r: SingleReviewResponse = {};
+    const r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .update(changes)
         .where('res_id', '=', res_id)

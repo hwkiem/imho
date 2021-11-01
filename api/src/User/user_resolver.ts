@@ -65,6 +65,7 @@ export class UserResolver {
     // Logout User
     @Mutation(() => SingleUserResponse)
     async logout(@Ctx() { req, res }: MyContext): Promise<SingleUserResponse> {
+        // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve) => {
             const userId = req.session.userId;
             if (userId === undefined) {

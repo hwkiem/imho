@@ -9,7 +9,6 @@ import {
     ModalBody,
     ModalCloseButton,
     ModalContent,
-    ModalFooter,
     ModalHeader,
     ModalOverlay,
     SimpleGrid,
@@ -17,15 +16,8 @@ import {
     Switch,
     useDisclosure,
 } from '@chakra-ui/react';
-import {
-    Field,
-    Form,
-    Formik,
-    FormikContextType,
-    FormikProps,
-    FormikProvider,
-} from 'formik';
-import React, { useState } from 'react';
+import { Form, FormikProps } from 'formik';
+import React from 'react';
 import {
     LaundryType,
     StoveType,

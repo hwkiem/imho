@@ -1,20 +1,14 @@
 import {
     Box,
-    Center,
     useColorModeValue,
-    Heading,
     Text,
     Stack,
-    Image,
     VStack,
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
-    Td,
-    TableCaption,
 } from '@chakra-ui/react';
 
 import { RegularLocationFragment } from '../../generated/graphql';
@@ -35,7 +29,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
     setHover,
     location,
     onClick,
-}) => {
+}: LocationCardProps) => {
     console.log(location.myResidences);
     return (
         <Box
@@ -90,7 +84,7 @@ export const LocationCard: React.FC<LocationCardProps> = ({
                             <Tbody>
                                 {location.myResidences.map((res) => {
                                     return (
-                                        <Tr>
+                                        <Tr key={res.res_id}>
                                             <Th>{res.unit}</Th>
                                             <Th>{res.avg_rent}</Th>
                                         </Tr>

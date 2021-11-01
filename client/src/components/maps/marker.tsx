@@ -1,5 +1,4 @@
 import { Icon } from '@chakra-ui/react';
-import GoogleMap from 'google-map-react';
 import { Dispatch, SetStateAction } from 'react';
 import { RiHomeSmile2Fill, RiHomeSmile2Line } from 'react-icons/ri';
 
@@ -18,7 +17,7 @@ export const Marker: React.FC<MarkerProps> = ({
     hover,
     setHover,
     onClick,
-}) => (
+}: MarkerProps) => (
     <Icon
         as={hover ? RiHomeSmile2Fill : RiHomeSmile2Line}
         h={8}

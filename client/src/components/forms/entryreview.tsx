@@ -4,13 +4,11 @@ import {
     Center,
     Flex,
     Heading,
-    Input,
     Stack,
     Text,
 } from '@chakra-ui/react';
-import { Form, useFormik, yupToFormErrors } from 'formik';
+import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
 import {
     useWriteReviewMutation,
     WriteReviewInput,
@@ -18,7 +16,7 @@ import {
 import { Map } from '../maps/map';
 
 export const EntryReview: React.FC = () => {
-    const [review, { data }] = useWriteReviewMutation();
+    const [review] = useWriteReviewMutation();
     const router = useRouter();
 
     const initialValues: WriteReviewInput = {
@@ -32,7 +30,7 @@ export const EntryReview: React.FC = () => {
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: async () => {
-            const res = await review({
+            await review({
                 variables: {
                     options: {
                         ...formik.values,
