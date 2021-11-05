@@ -8,7 +8,7 @@
         "clean": "rimraf dist/",
         "build": "yarn clean && tsc",
         "watch": "tsc -w",
-        "start": "nodemon ./dist/index.js",
+        "start": "nodemon dist/index.js",
         "migrate:make": "knex --knexfile src/database/knexfile.ts migrate:make -x ts",
         "migrate:latest": "knex --knexfile src/database/knexfile.ts migrate:latest",
         "migrate:rollback": "knex --knexfile src/database/knexfile.ts migrate:rollback",
