@@ -18,10 +18,12 @@ import {
 import {
     getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
+    getReviewsByReviewId,
     getReviewsByUserId,
     getReviewsGeneric,
     updateReviewGeneric,
     writeReview,
+    // writeReview,
 } from '../Review/review_db_handler';
 import { reviewColumns } from '../utils/db_helper';
 import {
@@ -33,9 +35,15 @@ import {
     locationExists,
     getSingleLocationById,
     createLocationIfNotExists,
+    getLocationByPlaceId,
 } from '../Location/location_db_handler';
 import { Service } from 'typedi';
 import { Knex, knex } from 'knex';
+import {
+    createFlag,
+    getFlagsById,
+    getFlagsByReviewId,
+} from '../Flag/flag_db_handler';
 
 @Service()
 export class postgresHandler {
@@ -76,6 +84,8 @@ export class postgresHandler {
 
     public locationExists = locationExists;
 
+    public getLocationByPlaceId = getLocationByPlaceId;
+
     // Residences
     public createResidence = createResidence;
 
@@ -100,7 +110,16 @@ export class postgresHandler {
 
     public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
 
+    public getReviewsByReviewId = getReviewsByReviewId;
+
     public updateReviewGeneric = updateReviewGeneric;
+
+    // Flags
+    public createFlag = createFlag;
+
+    public getFlagsById = getFlagsById;
+
+    public getFlagsByReviewId = getFlagsByReviewId;
 
     // Helpers
     public reviewColumns = reviewColumns;

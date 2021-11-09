@@ -9,6 +9,7 @@ import { Location } from './Location';
 import Container, { Service } from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
 import { googleMapsHandler } from '../dataSources/mapsAPI';
+import { LocationCategory } from '../types/enum_types';
 
 @Service()
 @Resolver(Location)
@@ -16,9 +17,13 @@ export class LocationResolver {
     constructor(private readonly pg: postgresHandler) {}
     @Mutation(() => SingleLocationResponse)
     async createLocation(
-        @Arg('place_id') place_id: string
+        @Arg('place_id') place_id: string,
+        @Arg('category', () => LocationCategory)
+        category: LocationCategory,
+        @Arg('landlord_email')
+        landlord_email: string
     ): Promise<SingleLocationResponse> {
-        return await this.pg.createLocation(place_id);
+        return await this.pg.createLocation(place_id, category, landlord_email);
     }
 
     // get by batch of ids
@@ -82,6 +87,15 @@ export class LocationResolver {
                   options.limit ? options.limit : undefined
               )
             : await this.pg.getLocationsBoundingBox(perimeter);
+    }
+
+    // Main entryway
+    //
+    @Query(() => SingleLocationResponse)
+    async getLocationByPlaceId(
+        @Arg('google_place_id') place_id: string
+    ): Promise<SingleLocationResponse> {
+        return await this.pg.getLocationByPlaceId(place_id);
     }
 
     // just for dev

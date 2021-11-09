@@ -1,5 +1,9 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { LocationSortBy, QueryOrderChoice } from '../types/enum_types';
+import {
+    LocationCategory,
+    LocationSortBy,
+    QueryOrderChoice,
+} from '../types/enum_types';
 import {
     GeoBoundaryInput,
     LocationSortByInput,
@@ -11,23 +15,27 @@ import {
     SingleLocationResponse,
 } from '../types/object_types';
 import { assembleLocation } from '../utils/db_helper';
-import { unpackLocation } from '../utils/mapUtils';
 import { Location } from './Location';
 import { Container } from 'typedi';
 import { googleMapsHandler } from '../dataSources/mapsAPI';
+import { unpackLocation } from '../utils/mapUtils';
 
 export async function createLocation(
     this: postgresHandler,
-    google_place_id: string
+    google_place_id: string,
+    category: LocationCategory,
+    landlord_email: string
 ): Promise<SingleLocationResponse> {
     // obtain and validate location from place_id
     const maps = Container.get(googleMapsHandler);
     const geocode = await maps.locationFromPlaceID(google_place_id);
     if (geocode instanceof FieldError) return { errors: [geocode] };
-
+    const addres_components = unpackLocation(geocode);
     const args = {
         google_place_id,
-        ...unpackLocation(geocode),
+        formatted_address: addres_components.formatted_address,
+        category,
+        landlord_email,
         geog: this.knexPostgis.geographyFromText(
             'Point(' +
                 geocode.geometry.location.lng +
@@ -36,17 +44,6 @@ export async function createLocation(
                 ')'
         ),
     };
-
-    if (!args.street_num) {
-        return {
-            errors: [
-                {
-                    field: 'provided location too broad',
-                    message: 'must be street number specefic',
-                },
-            ],
-        };
-    }
 
     const r: SingleLocationResponse = {};
     await this.knex<Location>('locations')
@@ -239,6 +236,31 @@ export async function getLocationsBoundingBox(
     return r;
 }
 
+export async function getLocationByPlaceId(
+    this: postgresHandler,
+    place_id: string
+): Promise<SingleLocationResponse> {
+    const r: SingleLocationResponse = {};
+    await this.knex<Location>('locations_enhanced')
+        .select('*')
+        .where('google_place_id', '=', place_id)
+        .limit(1)
+        .then((locations) => {
+            console.log(locations);
+            r.location = assembleLocation(locations)[0];
+            console.log('after');
+        })
+        .catch(
+            (e) =>
+                (r.errors = [
+                    { field: 'query location', message: e.toString() },
+                ])
+        );
+    console.log('before?');
+    console.log(r);
+    return r;
+}
+
 // returns loc_id if exists
 export async function locationExists(
     this: postgresHandler,
@@ -264,13 +286,19 @@ export async function locationExists(
 
 export async function createLocationIfNotExists(
     this: postgresHandler,
-    place_id: string
+    place_id: string,
+    category: LocationCategory,
+    landlord_email: string
 ): Promise<number | FieldError> {
     const locId = await this.locationExists(place_id);
     // does location exist
     if (locId === null) {
         // create one
-        const res = await this.createLocation(place_id);
+        const res = await this.createLocation(
+            place_id,
+            category,
+            landlord_email
+        );
         if (res.errors) return res.errors[0];
         if (res.location) return res.location.loc_id;
         return { field: 'create location', message: 'empty response' };

@@ -2,7 +2,7 @@ import { Arg, Field, Float, ObjectType, Root } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
 import { Residence } from '../Residence/Residence';
-import { LaundryType, StoveType } from '../types/enum_types';
+import { LocationCategory } from '../types/enum_types';
 import { ResidenceQueryOptions } from '../types/input_types';
 import { Coords } from '../types/object_types';
 
@@ -11,26 +11,20 @@ export class Location {
     @Field()
     loc_id: number;
 
+    @Field(() => Float, { nullable: true })
+    imho_score?: number;
+
+    @Field({ nullable: true })
+    landlord_email?: string;
+
+    @Field(() => LocationCategory)
+    category: LocationCategory;
+
     @Field()
     google_place_id: string;
 
     @Field()
-    full_address: string;
-
-    @Field()
-    street_num: string;
-
-    @Field()
-    route: string;
-
-    @Field()
-    city: string;
-
-    @Field()
-    state: string;
-
-    @Field()
-    postal_code: string;
+    formatted_address: string;
 
     @Field(() => Coords)
     coords: Coords;
@@ -45,47 +39,9 @@ export class Location {
     @Field(() => Float, { nullable: true })
     avg_rating?: number;
 
-    // modes
-
-    @Field({ nullable: true })
-    air_conditioning?: boolean;
-
-    @Field({ nullable: true })
-    heat?: boolean;
-
-    @Field(() => StoveType, { nullable: true })
-    stove?: StoveType;
-
-    @Field({ nullable: true })
-    pool?: boolean;
-
-    @Field({ nullable: true })
-    gym?: boolean;
-
-    @Field({ nullable: true })
-    garbage_disposal?: boolean;
-
-    @Field({ nullable: true })
-    dishwasher?: boolean;
-
-    @Field({ nullable: true })
-    parking?: boolean;
-
-    @Field({ nullable: true })
-    doorman?: boolean;
-
-    @Field({ nullable: true })
-    pet_friendly?: boolean;
-
-    @Field(() => LaundryType, { nullable: true })
-    laundry?: LaundryType;
-
-    @Field({ nullable: true })
-    backyard?: boolean;
-
     // Field Resolvers
     @Field(() => [Residence], { nullable: true })
-    async myResidences(
+    async residences(
         @Root() location: Location,
         @Arg('options', { nullable: true }) options: ResidenceQueryOptions
     ): Promise<Residence[] | undefined> {

@@ -25,6 +25,13 @@ export const assembleLocation = (raw: any): Location[] => {
     });
 };
 
+// export const assembleFlags = (raw: any): Flag[] => {
+//     return raw.map((r: any) => {
+//         const { category, topic, ...res } = r;
+//         return { category: category, ...res };
+//     });
+// };
+
 // used by migrations view
 export function residenceColumns() {
     return [
@@ -35,20 +42,6 @@ export function residenceColumns() {
         'residences.updated_at',
         'avg_rating',
         'avg_rent',
-        'dishwasher',
-        'air_conditioning',
-        'heat',
-        'stove',
-        'pool',
-        'gym',
-        'garbage_disposal',
-        'parking',
-        'doorman',
-        'pet_friendly',
-        'laundry',
-        'backyard',
-        'bath_count',
-        'bedroom_count',
     ];
 }
 // used on residences_enhanced outer join locations
@@ -58,12 +51,9 @@ export function locationColumns() {
     return [
         'loc_id',
         'google_place_id',
-        'full_address',
-        'street_num',
-        'route',
-        'city',
-        'state',
-        'postal_code',
+        'formatted_address',
+        'category',
+        'landlord_email',
         'geog',
         knexPostgis.x(knexPostgis.geometry('geog')),
         knexPostgis.y(knexPostgis.geometry('geog')),
@@ -75,23 +65,12 @@ export function locationColumns() {
 // used by review_db_handler, make a view for this too? with lease term
 export function reviewColumns(this: postgresHandler) {
     return [
+        'rev_id',
         'res_id',
         'user_id',
         'rating',
         'rent',
-        'air_conditioning',
-        'heat',
-        'stove',
-        'pool',
-        'gym',
-        'garbage_disposal',
-        'parking',
-        'doorman',
-        'laundry',
-        'pet_friendly',
-        'backyard',
-        'bath_count',
-        'bedroom_count',
+        'feedback',
         this.knex.raw('lower(lease_term) as start'),
         this.knex.raw('upper(lease_term) as end'),
         'created_at',

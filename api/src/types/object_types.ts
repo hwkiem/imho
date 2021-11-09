@@ -3,6 +3,8 @@ import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
+import { Flag } from '../Flag/Flag';
+import { GreenFlags, RedFlags } from './enum_types';
 
 @ObjectType()
 export class Coords {
@@ -10,6 +12,26 @@ export class Coords {
     lat: number;
     @Field()
     lng: number;
+}
+
+@ObjectType()
+export class AllFlagTopics {
+    @Field(() => GreenFlags, { nullable: true })
+    green_flags?: GreenFlags;
+    @Field(() => RedFlags, { nullable: true })
+    red_flags?: RedFlags;
+}
+
+@ObjectType()
+export class GreenFlagTopics {
+    @Field(() => GreenFlags)
+    green_flags: GreenFlags;
+}
+
+@ObjectType()
+export class RedFlagTopics {
+    @Field(() => RedFlags)
+    red_flags: RedFlags;
 }
 
 @ObjectType()
@@ -36,6 +58,17 @@ export class UserResponse {
     @Field(() => [User], { nullable: true })
     users?: User[];
 }
+
+@ObjectType()
+export class FlagResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => [Flag], { nullable: true })
+    flags?: Flag[];
+}
+
+FlagResponse;
 
 @ObjectType()
 export class SingleUserResponse {

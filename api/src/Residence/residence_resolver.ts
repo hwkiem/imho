@@ -11,6 +11,7 @@ import {
 } from '../types/input_types';
 import { Service } from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
+import { LocationCategory } from '../types/enum_types';
 @Service()
 @Resolver(Residence)
 export class ResidencyResolver {
@@ -20,8 +21,11 @@ export class ResidencyResolver {
         @Arg('options') options: CreateResidenceInput
     ): Promise<SingleResidenceResponse> {
         // ensure location exists
+        // its gonna exist ... right?
         const loc_id = await this.pg.createLocationIfNotExists(
-            options.google_place_id
+            options.google_place_id,
+            LocationCategory.HOUSE,
+            '' // bad code here
         );
         if (loc_id instanceof FieldError) return { errors: [loc_id] };
 

@@ -101,7 +101,7 @@ export async function getResidencesById(
 
 export async function getSingleResidenceById(
     this: postgresHandler,
-    ids: number[]
+    ids: number
 ): Promise<SingleResidenceResponse> {
     const r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')

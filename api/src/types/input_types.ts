@@ -4,14 +4,38 @@ import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
 import {
-    LaundryType,
+    FlagTypes,
+    GreenFlags,
+    LocationCategory,
     LocationSortBy,
     QueryOrderChoice,
+    RedFlags,
     ResidenceSortBy,
     ReviewSortBy,
-    StoveType,
     UserSortBy,
 } from './enum_types';
+import { ReviewFields } from './types';
+
+@InputType()
+export class AllFlagTopicsInput {
+    @Field(() => GreenFlags, { nullable: true })
+    green_flags?: GreenFlags;
+    @Field(() => RedFlags, { nullable: true })
+    red_flags?: RedFlags;
+}
+@InputType()
+export class FlagInput {
+    @Field(() => FlagTypes)
+    category: FlagTypes;
+    @Field(() => RedFlags, { nullable: true })
+    red_topic?: RedFlags;
+    @Field(() => GreenFlags, { nullable: true })
+    green_topic?: GreenFlags;
+    @Field()
+    intensity: number;
+    @Field()
+    rev_id: number;
+}
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -37,48 +61,6 @@ export class PartialReview implements Partial<Review> {
     @Field({ nullable: true })
     rent: number;
 
-    @Field({ nullable: true })
-    air_conditioning?: boolean;
-
-    @Field({ nullable: true })
-    heat?: boolean;
-
-    @Field(() => StoveType, { nullable: true })
-    stove?: StoveType;
-
-    @Field({ nullable: true })
-    pool?: boolean;
-
-    @Field({ nullable: true })
-    gym?: boolean;
-
-    @Field({ nullable: true })
-    garbage_disposal?: boolean;
-
-    @Field({ nullable: true })
-    dishwasher?: boolean;
-
-    @Field({ nullable: true })
-    parking?: boolean;
-
-    @Field({ nullable: true })
-    doorman?: boolean;
-
-    @Field({ nullable: true })
-    pet_friendly?: boolean;
-
-    @Field(() => LaundryType, { nullable: true })
-    laundry?: LaundryType;
-
-    @Field({ nullable: true })
-    backyard?: boolean;
-
-    @Field(() => Float, { nullable: true })
-    bath_count?: number;
-
-    @Field({ nullable: true })
-    bedroom_count?: number;
-
     @Field(() => DateRangeInput, { nullable: true })
     lease_term?: DateRangeInput;
 }
@@ -89,18 +71,6 @@ export class PartialResidence implements Partial<Residence> {
     res_id?: number;
     @Field({ nullable: true })
     google_place_id?: string;
-    @Field({ nullable: true })
-    apt_num?: string;
-    @Field({ nullable: true })
-    street_num?: string;
-    @Field({ nullable: true })
-    route?: string;
-    @Field({ nullable: true })
-    city?: string;
-    @Field({ nullable: true })
-    postal_code?: string;
-    @Field({ nullable: true })
-    state?: string;
     @Field({ nullable: true })
     avg_rent?: number;
     @Field(() => Float, { nullable: true })
@@ -264,57 +234,18 @@ export class CreateResidenceInput {
 }
 
 @InputType()
-export class AllAttributes {
-    @Field(() => Float, { nullable: true })
-    rating?: number;
+export class ReviewFieldsInput implements ReviewFields {
+    @Field()
+    rating: number;
 
-    @Field({ nullable: true })
+    @Field()
     rent?: number;
-
-    @Field({ nullable: true })
-    air_conditioning?: boolean;
-
-    @Field({ nullable: true })
-    heat?: boolean;
-
-    @Field(() => StoveType, { nullable: true })
-    stove?: StoveType;
-
-    @Field({ nullable: true })
-    pool?: boolean;
-
-    @Field({ nullable: true })
-    gym?: boolean;
-
-    @Field({ nullable: true })
-    garbage_disposal?: boolean;
-
-    @Field({ nullable: true })
-    dishwasher?: boolean;
-
-    @Field({ nullable: true })
-    parking?: boolean;
-
-    @Field({ nullable: true })
-    doorman?: boolean;
 
     @Field(() => DateRangeInput)
     lease_term: DateRangeInput;
 
-    @Field({ nullable: true })
-    pet_friendly?: boolean;
-
-    @Field(() => LaundryType, { nullable: true })
-    laundry?: LaundryType;
-
-    @Field({ nullable: true })
-    backyard?: boolean;
-
-    @Field(() => Float, { nullable: true })
-    bath_count?: number;
-
-    @Field(() => Int, { nullable: true })
-    bedroom_count?: number;
+    @Field()
+    feedback?: string;
 }
 
 @InputType()
@@ -325,6 +256,20 @@ export class WriteReviewInput {
     @Field()
     unit: string;
 
-    @Field(() => AllAttributes)
-    review_details: AllAttributes;
+    @Field(() => ReviewFieldsInput)
+    review_input: ReviewFieldsInput;
+
+    @Field(() => LocationCategory)
+    category: LocationCategory;
+
+    @Field()
+    landlord_email: string;
+}
+
+@InputType()
+export class LocationInput {
+    @Field(() => LocationCategory)
+    category: LocationCategory;
+    @Field()
+    landlord_email: string;
 }

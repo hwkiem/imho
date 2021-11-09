@@ -2,19 +2,19 @@ import {
     GeocodeResponse,
     GeocodeResult,
 } from '@googlemaps/google-maps-services-js';
-import { Location } from '../Location/Location';
+import { AddressComponents } from '../types/types';
 
 export const geoToData = (g: GeocodeResponse) => {
     return g.data.results[0];
 };
 
-export const unpackLocation = (location: GeocodeResult): Partial<Location> => {
+export const unpackLocation = (location: GeocodeResult): AddressComponents => {
     if (!location.address_components) {
         throw Error('Not a valid location, cannot unpack');
     }
 
-    const r: Partial<Location> = {
-        full_address: location.formatted_address,
+    const r: AddressComponents = {
+        formatted_address: location.formatted_address,
     };
 
     location.address_components.forEach((i: any) => {
