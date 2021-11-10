@@ -31,10 +31,8 @@ export class FlagInput {
     red_topic?: RedFlags;
     @Field(() => GreenFlags, { nullable: true })
     green_topic?: GreenFlags;
-    @Field()
-    intensity: number;
-    @Field()
-    rev_id: number;
+    // @Field()
+    // rev_id: number;
 }
 
 @InputType() // subset of User used as filter values

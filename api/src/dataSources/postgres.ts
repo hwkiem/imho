@@ -41,6 +41,7 @@ import { Service } from 'typedi';
 import { Knex, knex } from 'knex';
 import {
     createFlag,
+    createFlagBatch,
     getFlagsById,
     getFlagsByReviewId,
 } from '../Flag/flag_db_handler';
@@ -116,6 +117,8 @@ export class postgresHandler {
 
     // Flags
     public createFlag = createFlag;
+
+    public createFlagBatch = createFlagBatch;
 
     public getFlagsById = getFlagsById;
 

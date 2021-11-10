@@ -78,7 +78,6 @@ export async function up(knex: Knex): Promise<void> {
                 .notNullable();
             table.enum('category', ['RED', 'GREEN']).notNullable();
             table.string('topic');
-            table.integer('intensity');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })

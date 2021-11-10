@@ -32,9 +32,6 @@ export class Flag {
     @Field() // incomplete typing
     topic: string;
 
-    @Field()
-    intensity: number;
-
     // Field Resolvers
     // Review
     @Field(() => [Review], { nullable: true })

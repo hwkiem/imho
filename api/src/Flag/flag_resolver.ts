@@ -11,7 +11,10 @@ import { Flag } from './Flag';
 export class FlagResolver {
     constructor(private readonly pg: postgresHandler) {}
     @Mutation(() => FlagResponse)
-    async createFlag(@Arg('options') input: FlagInput): Promise<FlagResponse> {
+    async createFlag(
+        @Arg('options') input: FlagInput,
+        @Arg('rev_id') rev_id: number
+    ): Promise<FlagResponse> {
         if (
             (input.category == FlagTypes.RED && !input.red_topic) ||
             (input.category == FlagTypes.GREEN && !input.green_topic) ||
@@ -22,14 +25,13 @@ export class FlagResolver {
             };
         }
         return await this.pg.createFlag(
-            input.rev_id,
+            rev_id,
             input.category,
             input.green_topic
                 ? input.green_topic
                 : input.red_topic
                 ? input.red_topic
-                : '',
-            input.intensity
+                : ''
         );
     }
 
