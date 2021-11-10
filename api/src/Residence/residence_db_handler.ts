@@ -6,8 +6,6 @@ import {
     ResidenceResponse,
     SingleResidenceResponse,
 } from '../types/object_types';
-import { residenceColumns } from '../utils/db_helper';
-// import { residenceColumns } from '../utils/db_helper';
 import { Residence } from './Residence';
 
 export async function createResidence(
