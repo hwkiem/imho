@@ -13,7 +13,7 @@ export class FlagResolver {
     @Mutation(() => FlagResponse)
     async createFlag(
         @Arg('options') input: FlagInput,
-        @Arg('rev_id') rev_id: number
+        @Arg('rev_id', () => Int) rev_id: number
     ): Promise<FlagResponse> {
         if (
             (input.category == FlagTypes.RED && !input.red_topic) ||

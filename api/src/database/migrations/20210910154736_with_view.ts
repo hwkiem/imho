@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema
         .createTable('users', (table: Knex.TableBuilder) => {
-            table.increments('user_id').primary();
+            table.increments('user_id');
             table.string('first_name');
             table.string('last_name');
             table.string('email').unique();
@@ -56,8 +56,16 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema
         .createTable('reviews', (table: Knex.TableBuilder) => {
             table.increments('rev_id');
-            table.integer('res_id').references('res_id').inTable('residences');
-            table.integer('user_id').references('user_id').inTable('users');
+            table
+                .integer('res_id')
+                .references('res_id')
+                .inTable('residences')
+                .notNullable();
+            table
+                .integer('user_id')
+                .references('user_id')
+                .inTable('users')
+                .notNullable();
             table.unique(['user_id', 'res_id']);
             table.integer('rent');
             table.integer('rating');
@@ -67,6 +75,24 @@ export async function up(knex: Knex): Promise<void> {
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
         .then(() => knex.raw(onUpdateTrigger('reviews')));
+
+    await knex.schema
+        .createTable('saved_residences', (table: Knex.TableBuilder) => {
+            table
+                .integer('res_id')
+                .references('res_id')
+                .inTable('residences')
+                .notNullable();
+            table
+                .integer('user_id')
+                .references('user_id')
+                .inTable('users')
+                .notNullable();
+            table.unique(['user_id', 'res_id']);
+            table.timestamp('created_at').defaultTo(knex.fn.now());
+            table.timestamp('updated_at').defaultTo(knex.fn.now());
+        })
+        .then(() => knex.raw(onUpdateTrigger('saved_residences')));
 
     await knex.schema
         .createTable('flags', (table: Knex.TableBuilder) => {
@@ -95,6 +121,7 @@ export async function down(knex: Knex): Promise<void> {
     await knex.raw(DROP_ENHANCED_RES_VIEW);
     await knex.schema.dropTable('flags');
     await knex.schema.dropTable('reviews');
+    await knex.schema.dropTable('saved_residences');
     await knex.schema.dropTable('users');
     await knex.schema.dropTable('residences');
     await knex.schema.dropTable('locations');

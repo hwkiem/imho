@@ -2,7 +2,11 @@ import { Resolver, Mutation, Arg, Ctx, Query, Int } from 'type-graphql';
 import { User } from './User';
 import { validateRegister } from '../utils/validators';
 import argon2 from 'argon2';
-import { SingleUserResponse, UserResponse } from '../types/object_types';
+import {
+    SingleResidenceResponse,
+    SingleUserResponse,
+    UserResponse,
+} from '../types/object_types';
 import { MyContext } from '../types/types';
 import {
     ChangePasswordInput,
@@ -216,7 +220,7 @@ export class UserResolver {
         return await this.pg.getUsersById(ids);
     }
 
-    @Query(() => UserResponse) // return number of rows returned? everywhere?
+    @Query(() => UserResponse)
     async getUsersGeneric(
         @Arg('options', { nullable: true }) options: UserQueryOptions
     ): Promise<UserResponse> {
@@ -227,5 +231,28 @@ export class UserResolver {
                   options.limit ? options.limit : undefined
               )
             : await this.pg.getUsersGeneric();
+    }
+
+    @Mutation(() => SingleResidenceResponse)
+    async saveResidence(
+        @Arg('res_id') res_id: number,
+        @Ctx() { req }: MyContext
+    ): Promise<SingleResidenceResponse> {
+        // ensure logged in
+        const userId = req.session.userId;
+        if (userId === undefined) {
+            return { errors: [{ field: 'session', message: 'not logged in' }] };
+        }
+        const response = await this.pg.getUsersById([userId]);
+        // type guards, ensure users
+        if (response.errors !== undefined || response.users === undefined) {
+            return {
+                errors: [
+                    { field: 'fetch user', message: 'user does not exist' },
+                ],
+            };
+        }
+
+        return await this.pg.saveResidence(res_id, userId);
     }
 }

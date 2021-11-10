@@ -12,8 +12,10 @@ import {
     createResidenceIfNotExists,
     getResidencesById,
     getResidencesGeneric,
+    getSavedResidences,
     getSingleResidenceById,
     residenceExists,
+    saveResidence,
 } from '../Residence/residence_db_handler';
 import {
     getReviewsByPrimaryKeyTuple,
@@ -99,6 +101,10 @@ export class postgresHandler {
     public getSingleResidenceById = getSingleResidenceById;
 
     public residenceExists = residenceExists;
+
+    public saveResidence = saveResidence;
+
+    public getSavedResidences = getSavedResidences;
 
     // Reviews
     public writeReview = writeReview;
