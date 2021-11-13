@@ -28,5 +28,5 @@ describe('Sidebar', () => {
             </Sidebar>
         );
         expect(screen.getByTestId('my-child')).toBeInTheDocument();
-    })
+    });
 });

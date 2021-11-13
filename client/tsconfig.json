@@ -21,11 +21,6 @@
         "jsx": "preserve",
         "allowJs": true
     },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "src/lib/apollo.js"
-    ],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/apollo.js"],
     "exclude": ["node_modules", ".next"]
 }
