@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "jest-setup.ts"
+    ],
+    "compilerOptions": {
+        "jsx": "react"
+    }
+}

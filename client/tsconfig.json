@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es6",
         "lib": ["dom", "dom.iterable", "esnext"],
-        "types": ["node", "googlemaps"],
+        "types": ["node", "googlemaps", "jest"],
         "skipLibCheck": true,
         "strict": true,
         "noImplicitAny": true,
@@ -21,6 +21,11 @@
         "jsx": "preserve",
         "allowJs": true
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/lib/apollo.js"],
+    "include": [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        "src/lib/apollo.js"
+    ],
     "exclude": ["node_modules", ".next"]
 }
