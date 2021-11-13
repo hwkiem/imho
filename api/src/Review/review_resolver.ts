@@ -12,7 +12,6 @@ import {
     SingleReviewResponse,
 } from '../types/object_types';
 import { MyContext } from '../types/types';
-// import { validateWriteReviewInput } from '../utils/validators';
 import { Review } from './Review';
 
 @Service()
@@ -69,7 +68,7 @@ export class ReviewResolver {
         // if we fail out at insert flags, do we undo the whole review?
         if (res instanceof FieldError) return { errors: [res] };
 
-        // 
+        //
         return review;
     }
 
