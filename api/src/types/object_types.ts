@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { User } from '../User/User';
@@ -129,6 +129,14 @@ export class SingleReviewResponse {
 
     @Field(() => Review, { nullable: true })
     review?: Review;
+}
+
+@ObjectType()
+export class ReviewsAndCount {
+    @Field(() => [Review], { nullable: true })
+    reviews?: Review[];
+    @Field(() => Int)
+    count: number;
 }
 
 @ObjectType()

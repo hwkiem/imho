@@ -1,8 +1,8 @@
 import { ObjectType, Field, Float, Root, Arg } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
-import { Review } from '../Review/Review';
 import { ReviewQueryOptions } from '../types/input_types';
+import { ReviewsAndCount } from '../types/object_types';
 @ObjectType()
 export class Residence {
     @Field()
@@ -23,11 +23,11 @@ export class Residence {
     avg_rent?: number;
 
     // Field Resolvers
-    @Field(() => [Review], { nullable: true })
+    @Field(() => ReviewsAndCount, { nullable: true })
     async reviews(
         @Root() residence: Residence,
         @Arg('options', { nullable: true }) options: ReviewQueryOptions
-    ): Promise<Review[] | undefined> {
+    ): Promise<ReviewsAndCount | undefined> {
         const pg = Container.get(postgresHandler);
         const res = options
             ? await pg.getReviewsGeneric(
@@ -45,7 +45,7 @@ export class Residence {
               });
 
         if (!res.errors && res.reviews) {
-            return res.reviews;
+            return { reviews: res.reviews, count: res.reviews.length };
         }
         return;
     }

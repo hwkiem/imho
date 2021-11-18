@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { Flag } from '../Flag/Flag';
+import { FlagTypes, GreenFlags, RedFlags } from './enum_types';
 import { DateRange } from './object_types';
 
 export type MyContext = {
@@ -24,3 +26,8 @@ export type ReviewFields = {
 
     feedback?: string;
 };
+
+export class ProcessedFlag implements Partial<Flag> {
+    category: FlagTypes;
+    topic: RedFlags | GreenFlags;
+}

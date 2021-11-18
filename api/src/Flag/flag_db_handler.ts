@@ -1,7 +1,7 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { FlagTypes } from '../types/enum_types';
-import { FlagInput } from '../types/input_types';
 import { FlagResponse } from '../types/object_types';
+import { ProcessedFlag } from '../types/types';
 import { Flag } from './Flag';
 
 export async function createFlag(
@@ -66,8 +66,9 @@ export async function getFlagsByReviewId(
 export async function createFlagBatch(
     this: postgresHandler,
     rev_id: number,
-    flags: [FlagInput]
+    flags: ProcessedFlag[]
 ): Promise<FlagResponse> {
+    // consolidate args, all flags exist on the same review
     const args = flags.map((x) => {
         return { ...x, rev_id };
     });

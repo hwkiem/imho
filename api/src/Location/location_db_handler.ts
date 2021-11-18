@@ -246,7 +246,6 @@ export async function getLocationByPlaceId(
         .where('google_place_id', '=', place_id)
         .limit(1)
         .then((locations) => {
-            console.log(locations);
             r.location = assembleLocation(locations)[0];
             console.log('after');
         })
