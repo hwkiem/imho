@@ -9,6 +9,8 @@ import { Fragment } from 'react';
 import type { Page } from '../types/page';
 
 import 'react-month-picker/scss/month-picker.scss';
+import { AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/router';
 
 // this should give a better typing
 type Props = AppProps & {
@@ -17,13 +19,14 @@ type Props = AppProps & {
 const MyApp = ({ Component, pageProps }: Props) => {
     // adjust accordingly if you disabled a layout rendering option
     const apolloClient = useApollo(pageProps);
-    const getLayout = Component.getLayout ?? ((page) => page);
-    const Layout = Component.layout ?? Fragment;
+    const router = useRouter();
 
     return (
         <ApolloProvider client={apolloClient}>
             <ChakraProvider theme={theme}>
-                <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                <AnimatePresence exitBeforeEnter>
+                    <Component {...pageProps} key={router.route} />
+                </AnimatePresence>
             </ChakraProvider>
         </ApolloProvider>
     );
