@@ -1,7 +1,8 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
-import { AllAttributes, ReviewSortByInput } from '../types/input_types';
+import { ReviewSortByInput } from '../types/input_types';
 import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
+import { ReviewFields } from '../types/types';
 import { assembleReview } from '../utils/db_helper';
 import { Review } from './Review';
 
@@ -9,7 +10,7 @@ export async function writeReview(
     this: postgresHandler,
     res_id: number,
     user_id: number,
-    review_details: AllAttributes
+    review_details: ReviewFields
 ): Promise<SingleReviewResponse> {
     const { lease_term, ...attr } = review_details;
     const r: SingleReviewResponse = {};
@@ -74,6 +75,23 @@ export async function getReviewsByPrimaryKeyTuple(
         .select(this.reviewColumns())
         .where('user_id', '=', user_id)
         .where('res_id', '=', res_id)
+        .then((reviews) => {
+            r.reviews = assembleReview(reviews);
+        })
+        .catch((e) => {
+            r.errors = [{ field: 'query review', message: e.toString() }];
+        });
+    return r;
+}
+
+export async function getReviewsByReviewId(
+    this: postgresHandler,
+    rev_id: [number]
+): Promise<ReviewResponse> {
+    const r: ReviewResponse = {};
+    await this.knex<Review>('reviews')
+        .select(this.reviewColumns())
+        .where('rev_id', 'in', rev_id)
         .then((reviews) => {
             r.reviews = assembleReview(reviews);
         })

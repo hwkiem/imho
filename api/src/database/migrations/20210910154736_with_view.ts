@@ -2,8 +2,6 @@ import { Knex } from 'knex';
 import {
     CREATE_ENHANCED_LOCATION_VIEW,
     CREATE_ENHANCED_RESIDENCE_VIEW,
-    DROP_ENHANCED_LOC_VIEW,
-    DROP_ENHANCED_RES_VIEW,
     DROP_ON_UPDATE_TIMESTAMP_FUNCTION,
     onUpdateTrigger,
     ON_UPDATE_TIMESTAMP_FUNCTION,
@@ -15,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema
         .createTable('users', (table: Knex.TableBuilder) => {
-            table.increments('user_id').primary();
+            table.increments('user_id');
             table.string('first_name');
             table.string('last_name');
             table.string('email').unique();
@@ -29,13 +27,10 @@ export async function up(knex: Knex): Promise<void> {
         .createTable('locations', (table: Knex.TableBuilder) => {
             table.increments('loc_id');
             table.string('google_place_id').unique();
-            table.string('full_address');
-            table.string('street_num');
-            table.string('route');
-            table.string('city');
-            table.string('state');
-            table.string('postal_code');
-            table.specificType('geog', 'geography(point, 4326)');
+            table.string('formatted_address');
+            table.string('landlord_email');
+            table.enum('category', ['HOUSE', 'APARTMENT']).notNullable();
+            table.specificType('geog', 'geography(point, 4326)').notNullable();
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
@@ -58,45 +53,103 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema
         .createTable('reviews', (table: Knex.TableBuilder) => {
-            table.integer('res_id').references('res_id').inTable('residences');
-            table.integer('user_id').references('user_id').inTable('users');
-            table.unique(['user_id', 'res_id'], 'userResTuple');
+            table.increments('rev_id');
+            table
+                .integer('res_id')
+                .references('res_id')
+                .inTable('residences')
+                .notNullable();
+            table
+                .integer('user_id')
+                .references('user_id')
+                .inTable('users')
+                .notNullable();
+            table.unique(['user_id', 'res_id']);
             table.integer('rent');
-            table.boolean('air_conditioning');
-            table.boolean('heat');
-            table.boolean('pool');
-            table.boolean('gym');
-            table.boolean('garbage_disposal');
-            table.boolean('dishwasher');
-            table.boolean('parking');
-            table.boolean('doorman');
-            table.boolean('pet_friendly');
-            table.boolean('backyard');
-            table.integer('bedroom_count');
-            table.float('bath_count');
             table.integer('rating');
-            table.specificType('lease_term', 'tsrange');
-            table.enum('stove', ['GAS', 'ELECTRIC']);
-            table.enum('laundry', ['IN_UNIT', 'BUILDING', 'NONE']);
-
+            table.specificType('lease_term', 'tsrange').notNullable();
+            table.text('feedback');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
         .then(() => knex.raw(onUpdateTrigger('reviews')));
 
+    await knex.schema
+        .createTable('saved_residences', (table: Knex.TableBuilder) => {
+            table
+                .integer('res_id')
+                .references('res_id')
+                .inTable('residences')
+                .notNullable();
+            table
+                .integer('user_id')
+                .references('user_id')
+                .inTable('users')
+                .notNullable();
+            table.unique(['user_id', 'res_id']);
+            table.timestamp('created_at').defaultTo(knex.fn.now());
+            table.timestamp('updated_at').defaultTo(knex.fn.now());
+        })
+        .then(() => knex.raw(onUpdateTrigger('saved_residences')));
+
+    await knex.schema
+        .createTable('flags', (table: Knex.TableBuilder) => {
+            table.increments('flag_id');
+            table
+                .integer('rev_id')
+                .references('rev_id')
+                .inTable('reviews')
+                .notNullable();
+            table.enum('category', ['RED', 'GREEN']).notNullable();
+            table.string('topic');
+            table.timestamp('created_at').defaultTo(knex.fn.now());
+            table.timestamp('updated_at').defaultTo(knex.fn.now());
+        })
+        .then(() => knex.raw(onUpdateTrigger('flags')));
+
     // View to enhance residences with average_stats
-    await knex.raw(CREATE_ENHANCED_RESIDENCE_VIEW(knex));
+    await knex.schema.createView('residences_enhanced', (view) => {
+        view.columns([
+            'res_id',
+            'loc_id',
+            'unit',
+            'created_at',
+            'updated_at',
+            'avg_rating',
+            'avg_rent',
+        ]);
+        view.as(CREATE_ENHANCED_RESIDENCE_VIEW(knex));
+    });
 
     // View to enhance locations with their coords and average stats
-    await knex.raw(CREATE_ENHANCED_LOCATION_VIEW(knex));
+    await knex.schema.createView('locations_enhanced', (view) => {
+        view.columns([
+            'loc_id',
+            'google_place_id',
+            'formatted_address',
+            'category',
+            'landlord_email',
+            'geog',
+            'lat',
+            'lng',
+            'created_at',
+            'updated_at',
+        ]);
+        view.as(CREATE_ENHANCED_LOCATION_VIEW(knex));
+    });
 }
 
 export async function down(knex: Knex): Promise<void> {
-    await knex.raw(DROP_ENHANCED_LOC_VIEW);
-    await knex.raw(DROP_ENHANCED_RES_VIEW);
+    // views
+    await knex.schema.dropViewIfExists('locations_enhanced');
+    await knex.schema.dropViewIfExists('residences_enhanced');
+    // tables
+    await knex.schema.dropTable('flags');
     await knex.schema.dropTable('reviews');
+    await knex.schema.dropTable('saved_residences');
     await knex.schema.dropTable('users');
     await knex.schema.dropTable('residences');
     await knex.schema.dropTable('locations');
+    // functions
     await knex.raw(DROP_ON_UPDATE_TIMESTAMP_FUNCTION);
 }

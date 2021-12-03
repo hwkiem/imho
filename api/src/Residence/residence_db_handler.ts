@@ -101,7 +101,7 @@ export async function getResidencesById(
 
 export async function getSingleResidenceById(
     this: postgresHandler,
-    ids: number[]
+    ids: number
 ): Promise<SingleResidenceResponse> {
     const r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')
@@ -160,4 +160,72 @@ export async function createResidenceIfNotExists(
     } else {
         return resId;
     }
+}
+
+export async function saveResidence(
+    this: postgresHandler,
+    res_id: number,
+    user_id: number
+): Promise<SingleResidenceResponse> {
+    const r: SingleResidenceResponse = {};
+    await this.knex('saved_residences')
+        .insert({ res_id, user_id })
+        .returning('res_id')
+        .then(async (ids) => {
+            await this.getResidencesById(ids)
+                .then((res) => {
+                    if (res.residences) r.residence = res.residences[0];
+                })
+                .catch(
+                    (e) =>
+                        (r.errors = [
+                            {
+                                field: 'fetch residence',
+                                message: e.toString(),
+                            },
+                        ])
+                );
+        })
+        .catch(
+            (e) =>
+                (r.errors = [
+                    { field: 'query residence', message: e.toString() },
+                ])
+        );
+    return r;
+}
+
+export async function getSavedResidences(
+    this: postgresHandler,
+    user_id: number
+): Promise<ResidenceResponse> {
+    console.log('in');
+    const r: ResidenceResponse = {};
+
+    const saved_residences = this.knex('saved_residences')
+        .select('res_id')
+        .where({ user_id: user_id });
+
+    await this.knex('residences_enhanced')
+        .select([
+            'res_id',
+            'loc_id',
+            'unit',
+            'created_at',
+            'updated_at',
+            'avg_rating',
+            'avg_rent',
+        ])
+        .where('res_id', 'in', saved_residences)
+        .then((residences) => {
+            console.log(residences);
+            r.residences = residences;
+        })
+        .catch(
+            (e) =>
+                (r.errors = [
+                    { field: 'query residence', message: e.toString() },
+                ])
+        );
+    return r;
 }

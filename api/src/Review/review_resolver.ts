@@ -2,7 +2,7 @@ import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
 import {
-    AllAttributes,
+    FlagInput,
     ReviewQueryOptions,
     WriteReviewInput,
 } from '../types/input_types';
@@ -11,8 +11,8 @@ import {
     ReviewResponse,
     SingleReviewResponse,
 } from '../types/object_types';
-import { MyContext } from '../types/types';
-import { validateWriteReviewInput } from '../utils/validators';
+import { MyContext, ProcessedFlag } from '../types/types';
+import { validateFlagInput } from '../utils/validators';
 import { Review } from './Review';
 
 @Service()
@@ -22,6 +22,7 @@ export class ReviewResolver {
     @Mutation(() => SingleReviewResponse)
     async writeReview(
         @Arg('options') options: WriteReviewInput,
+        @Arg('flags', () => [FlagInput]) flags: [FlagInput],
         @Ctx() { req }: MyContext
     ): Promise<SingleReviewResponse> {
         // ensure user logged in
@@ -30,14 +31,26 @@ export class ReviewResolver {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         // Validation
-        const err = validateWriteReviewInput(options.review_details);
-        if (err) {
-            return { errors: [err] };
-        }
+        // validate FlagInput
+        let err: FieldError | null = null;
+        const processedFlags: ProcessedFlag[] = [];
+        flags.forEach((input) => {
+            const res = validateFlagInput(input);
+            if (res instanceof FieldError) err = res;
+            else processedFlags.push(res);
+        });
+        if (err !== null) return { errors: [err] };
+        // validate WriteReviewInput
+        // const err = validateWriteReviewInput(options.review_details);
+        // if (err) {
+        //     return { errors: [err] };
+        // }
 
         // ensure location exists
         const loc_id = await this.pg.createLocationIfNotExists(
-            options.google_place_id
+            options.google_place_id,
+            options.category,
+            options.landlord_email
         );
         if (loc_id instanceof FieldError) return { errors: [loc_id] };
 
@@ -49,11 +62,29 @@ export class ReviewResolver {
         if (res_id instanceof FieldError) return { errors: [res_id] };
 
         // write review
-        return await this.pg.writeReview(
+        const review = await this.pg.writeReview(
             res_id,
             user_id,
-            options.review_details
+            options.review_input
         );
+        if (review instanceof FieldError) return { errors: [review] };
+
+        // Create flags
+        if (!review.review) {
+            return {
+                errors: [{ field: 'review', message: 'could not insert' }],
+            };
+        }
+        const res = await this.pg.createFlagBatch(
+            review.review.rev_id,
+            processedFlags
+        );
+        console.log(res);
+        // if we fail out at insert flags, do we undo the whole review?
+        if (res instanceof FieldError) return { errors: [res] };
+
+        //
+        return review;
     }
 
     @Query(() => ReviewResponse)
@@ -83,24 +114,24 @@ export class ReviewResolver {
         return await this.pg.getReviewsByResidenceId(ids);
     }
 
-    @Mutation(() => SingleReviewResponse)
-    async updateMyReviewOverwrite(
-        @Arg('changes') changes: AllAttributes,
-        @Arg('res_id') res_id: number,
-        @Ctx() { req }: MyContext
-    ): Promise<SingleReviewResponse> {
-        if (req.session.userId === undefined) {
-            return { errors: [{ field: 'session', message: 'not logged in' }] };
-        }
-        // Validation
-        const err = validateWriteReviewInput(changes);
-        if (err) {
-            return { errors: [err] };
-        }
-        return await this.pg.updateReviewGeneric(
-            res_id,
-            req.session.userId,
-            changes
-        );
-    }
+    // @Mutation(() => SingleReviewResponse)
+    // async updateMyReviewOverwrite(
+    //     @Arg('changes') changes: AllAttributes,
+    //     @Arg('res_id') res_id: number,
+    //     @Ctx() { req }: MyContext
+    // ): Promise<SingleReviewResponse> {
+    //     if (req.session.userId === undefined) {
+    //         return { errors: [{ field: 'session', message: 'not logged in' }] };
+    //     }
+    //     // Validation
+    //     const err = validateWriteReviewInput(changes);
+    //     if (err) {
+    //         return { errors: [err] };
+    //     }
+    //     return await this.pg.updateReviewGeneric(
+    //         res_id,
+    //         req.session.userId,
+    //         changes
+    //     );
+    // }
 }

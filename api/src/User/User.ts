@@ -1,6 +1,7 @@
-import { ObjectType, Field, Ctx, Arg } from 'type-graphql';
+import { ObjectType, Field, Ctx, Arg, Root } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
+import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
@@ -55,6 +56,22 @@ export class User {
 
         if (!res.errors && res.reviews) {
             return res.reviews;
+        }
+        return;
+    }
+
+    @Field(() => [Residence], { nullable: true })
+    async savedResidences(
+        @Root() user: User
+    ): Promise<Residence[] | undefined> {
+        const uid = user.user_id;
+        if (uid === undefined) {
+            return;
+        }
+        const pg = Container.get(postgresHandler);
+        const res = await pg.getSavedResidences(user.user_id);
+        if (!res.errors && res.residences) {
+            return res.residences;
         }
         return;
     }
