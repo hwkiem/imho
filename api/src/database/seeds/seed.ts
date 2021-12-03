@@ -6,8 +6,6 @@ import { Review } from '../../Review/Review';
 import { User } from '../../User/User';
 import KnexPostgis from 'knex-postgis';
 
-import { StoveType } from '../../types/enum_types';
-
 export async function seed(knex: Knex): Promise<void> {
     const knexPostgis = KnexPostgis(knex);
     // Deletes ALL existing entries
@@ -141,11 +139,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart,
             rent: 4000,
             rating: 2,
-            air_conditioning: true,
-            bath_count: 1.5,
-            bedroom_count: 2,
-            parking: false,
-            doorman: false,
             lease_term: require('pg-range').Range(
                 new Date('January 2019'),
                 new Date('January 2020')
@@ -156,12 +149,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart,
             rent: 2500,
             rating: 5,
-            air_conditioning: true,
-            bath_count: 1.5,
-            bedroom_count: 2,
-            parking: false,
-            doorman: false,
-            pet_friendly: false,
             lease_term: require('pg-range').Range(
                 new Date('January 2017'),
                 new Date('March 2018')
@@ -173,12 +160,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 1,
             rent: 3000,
             rating: 4,
-            air_conditioning: true,
-            bath_count: 1,
-            bedroom_count: 1,
-            pet_friendly: false,
-            heat: true,
-            stove: StoveType.ELECTRIC,
             lease_term: require('pg-range').Range(
                 new Date('January 2016'),
                 new Date('January 2017')
@@ -189,13 +170,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 1,
             rent: 2700,
             rating: 5,
-            air_conditioning: true,
-            bath_count: 1,
-            bedroom_count: 1,
-            pet_friendly: false,
-            heat: true,
-            stove: StoveType.ELECTRIC,
-            parking: true,
             lease_term: require('pg-range').Range(
                 new Date('January 2015'),
                 new Date('January 2016')
@@ -207,12 +181,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 2,
             rent: 4000,
             rating: 5,
-            air_conditioning: true,
-            heat: true,
-            stove: StoveType.ELECTRIC,
-            parking: true,
-            dishwasher: true,
-            gym: true,
             lease_term: require('pg-range').Range(
                 new Date('December 2017'),
                 new Date('May 2020')
@@ -224,11 +192,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 3,
             rent: 6000,
             rating: 5,
-            air_conditioning: true,
-            bath_count: 2,
-            bedroom_count: 2,
-            parking: false,
-            doorman: false,
             lease_term: require('pg-range').Range(
                 new Date('September 2020'),
                 new Date('June 2021')
@@ -240,12 +203,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 4,
             rent: 10000,
             rating: 3,
-            air_conditioning: false,
-            heat: false,
-            stove: StoveType.GAS,
-            parking: true,
-            dishwasher: true,
-            gym: true,
             lease_term: require('pg-range').Range(
                 new Date('April 2018'),
                 new Date('January 2020')
@@ -257,12 +214,6 @@ export async function seed(knex: Knex): Promise<void> {
             res_id: resStart + 5,
             rent: 4000,
             rating: 5,
-            air_conditioning: true,
-            heat: true,
-            stove: StoveType.ELECTRIC,
-            parking: true,
-            dishwasher: true,
-            gym: true,
             lease_term: require('pg-range').Range(
                 new Date('March 2017'),
                 new Date('June 2019')

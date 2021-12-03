@@ -1,14 +1,47 @@
-import { ObjectType, Field, Float } from 'type-graphql';
-import { LaundryType, StoveType } from '../types/enum_types';
+import { ObjectType, Field, Root } from 'type-graphql';
+import Container from 'typedi';
+import { postgresHandler } from '../dataSources/postgres';
+import { Flag } from '../Flag/Flag';
+import { Residence } from '../Residence/Residence';
 import { DateRange } from '../types/object_types';
+import { User } from '../User/User';
 
 @ObjectType()
 export class Review {
     @Field()
+    rev_id: number;
+
+    user_id: number;
+
     res_id: number;
 
-    @Field()
-    user_id: number;
+    // Residence
+    @Field(() => Residence, { nullable: true })
+    async residence(@Root() review: Review): Promise<Residence | undefined> {
+        const pg = Container.get(postgresHandler);
+        const residence = await pg.getSingleResidenceById(review.res_id);
+        if (residence.errors || !residence.residence) return;
+
+        return residence.residence;
+    }
+    // User
+    @Field(() => User, { nullable: true })
+    async user(@Root() review: Review): Promise<User | undefined> {
+        const pg = Container.get(postgresHandler);
+        const users = await pg.getUsersById([review.user_id]);
+        if (users.errors || !users.users) return;
+
+        return users.users[0];
+    }
+
+    // TODO Flags Resolver
+    @Field(() => [Flag], { nullable: true })
+    async flags(@Root() review: Review): Promise<Flag[] | undefined> {
+        const pg = Container.get(postgresHandler);
+        const flags = await pg.getFlagsByReviewId(review.rev_id);
+        if (flags.errors || !flags.flags) return;
+        return flags.flags;
+    }
 
     @Field()
     rating?: number;
@@ -16,51 +49,11 @@ export class Review {
     @Field({ nullable: true })
     rent?: number;
 
-    // new bools
-    @Field({ nullable: true })
-    air_conditioning?: boolean;
+    @Field(() => DateRange)
+    lease_term: DateRange;
 
     @Field({ nullable: true })
-    heat?: boolean;
-
-    @Field(() => StoveType, { nullable: true })
-    stove?: StoveType;
-
-    @Field({ nullable: true })
-    pool?: boolean;
-
-    @Field({ nullable: true })
-    gym?: boolean;
-
-    @Field({ nullable: true })
-    garbage_disposal?: boolean;
-
-    @Field({ nullable: true })
-    dishwasher?: boolean;
-
-    @Field({ nullable: true })
-    parking?: boolean;
-
-    @Field({ nullable: true })
-    doorman?: boolean;
-
-    @Field({ nullable: true })
-    pet_friendly?: boolean;
-
-    @Field(() => LaundryType, { nullable: true })
-    laundry?: LaundryType;
-
-    @Field({ nullable: true })
-    backyard?: boolean;
-
-    @Field(() => Float, { nullable: true })
-    bath_count?: number;
-
-    @Field({ nullable: true })
-    bedroom_count?: number;
-
-    @Field(() => DateRange, { nullable: true })
-    lease_term?: DateRange;
+    feedback?: string;
 
     @Field(() => String)
     created_at = new Date();

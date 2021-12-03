@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
+import KnexPostgis from 'knex-postgis';
 import { Residence } from '../Residence/Residence';
-import { locationColumns, residenceColumns } from '../utils/db_helper';
 export const ON_UPDATE_TIMESTAMP_FUNCTION = `
     CREATE OR REPLACE FUNCTION on_update_timestamp()
     RETURNS TRIGGER
@@ -10,33 +10,6 @@ export const ON_UPDATE_TIMESTAMP_FUNCTION = `
         RETURN NEW;
         END; $$;
     `;
-
-// export const USER_LOCATION_UNIQUE_REVIEW_TUPLE = `
-//         CREATE OR REPLACE FUNCTION uniqueUserLocationTuple(res_id int, user_id int)
-//         RETURNS boolean AS
-//         $$
-//         DECLARE
-//         i int;
-//         BEGIN
-//         SELECT loc_id INTO i FROM residences WHERE res_id = residences.res_id;
-//         int j;
-//         SELECT count(*) INTO j FROM
-//         IF (i = user_id) THEN
-//         RETURN true;
-//         END IF;
-
-//         RETURN false;
-//         END
-//         $$ LANGUAGE plpgsql;
-// `;
-
-// export const onInsertReview = (): string => {
-//     return `CREATE TRIGGER
-//     BEFORE INSERT ON reviews
-//     FOR EACH ROW
-//     EXECUTE PROCEDURE uniqueUserLocationTuple(ROW.res_id, ROW.user_id);
-//     `;
-// };
 
 export const DROP_ENHANCED_RES_VIEW = `DROP VIEW IF EXISTS residences_enhanced`;
 export const DROP_ENHANCED_LOC_VIEW = `DROP VIEW IF EXISTS locations_enhanced`;
@@ -51,39 +24,33 @@ export const onUpdateTrigger = (table: string): string => {
     `;
 };
 
-const mode = (s: string, knex: Knex) => {
-    return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
-};
+// const mode = (s: string, knex: Knex) => {
+//     return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
+// };
 
-export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex): string => {
+export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
     const sub = knex('residences')
         .select([
             'residences.res_id',
             knex.raw('avg(reviews.rent) as avg_rent'),
             knex.raw('avg(reviews.rating) as avg_rating'),
-            mode('air_conditioning', knex),
-            mode('heat', knex),
-            mode('stove', knex),
-            mode('pool', knex),
-            mode('gym', knex),
-            mode('garbage_disposal', knex),
-            mode('dishwasher', knex),
-            mode('parking', knex),
-            mode('doorman', knex),
-            mode('pet_friendly', knex),
-            mode('laundry', knex),
-            mode('backyard', knex),
-            mode('bath_count', knex),
-            mode('bedroom_count', knex),
         ])
         .leftOuterJoin('reviews', 'reviews.res_id', 'residences.res_id')
         .groupBy('residences.res_id')
         .as('aggs');
     const viewDefinition = knex<Residence>('residences')
-        .select(residenceColumns())
+        .select([
+            'residences.res_id',
+            'loc_id',
+            'unit',
+            'residences.created_at',
+            'residences.updated_at',
+            'avg_rating',
+            'avg_rent',
+        ])
         .join(sub, 'aggs.res_id', 'residences.res_id');
 
-    return `CREATE OR REPLACE VIEW residences_enhanced AS (\n ${viewDefinition})`;
+    return viewDefinition;
 };
 
 const loc_avg = (s: string, knex: Knex) => {
@@ -94,35 +61,27 @@ const loc_avg = (s: string, knex: Knex) => {
         .as(s);
 };
 
-const loc_mode = (s: string, knex: Knex) => {
-    return knex.raw(
-        `(SELECT mode() WITHIN GROUP (order by ${s}) from residences_enhanced where locations.loc_id = residences_enhanced.loc_id) as ${s}`
-    );
-};
-
 // NOTE
-// any mode aggregate available to a location must already be available on a residence
+// any aggregate available to a location must already be available on a residence
 // this queries residences_enhanced
-export const CREATE_ENHANCED_LOCATION_VIEW = (knex: Knex): string => {
+export const CREATE_ENHANCED_LOCATION_VIEW = (knex: Knex) => {
+    const knexPostgis: KnexPostgis.KnexPostgis = KnexPostgis(knex);
     const viewDefinition = knex('locations').select([
-        ...locationColumns(),
+        [
+            'loc_id',
+            'google_place_id',
+            'formatted_address',
+            'category',
+            'landlord_email',
+            'geog',
+            knexPostgis.x(knexPostgis.geometry('geog')),
+            knexPostgis.y(knexPostgis.geometry('geog')),
+            'created_at',
+            'updated_at',
+        ],
         loc_avg('avg_rent', knex),
         loc_avg('avg_rating', knex),
-        loc_mode('air_conditioning', knex),
-        loc_mode('heat', knex),
-        loc_mode('stove', knex),
-        loc_mode('pool', knex),
-        loc_mode('gym', knex),
-        loc_mode('garbage_disposal', knex),
-        loc_mode('dishwasher', knex),
-        loc_mode('parking', knex),
-        loc_mode('doorman', knex),
-        loc_mode('pet_friendly', knex),
-        loc_mode('laundry', knex),
-        loc_mode('backyard', knex),
-        loc_mode('bath_count', knex),
-        loc_mode('bedroom_count', knex),
     ]);
 
-    return `CREATE OR REPLACE VIEW locations_enhanced AS (\n ${viewDefinition})`;
+    return viewDefinition;
 };

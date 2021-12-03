@@ -1,10 +1,8 @@
 import { ObjectType, Field, Float, Root, Arg } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
-import { Review } from '../Review/Review';
-import { LaundryType, StoveType } from '../types/enum_types';
 import { ReviewQueryOptions } from '../types/input_types';
-
+import { ReviewsAndCount } from '../types/object_types';
 @ObjectType()
 export class Residence {
     @Field()
@@ -24,56 +22,12 @@ export class Residence {
     @Field(() => Float, { nullable: true })
     avg_rent?: number;
 
-    // modes
-    @Field({ nullable: true })
-    air_conditioning?: boolean;
-
-    @Field({ nullable: true })
-    heat?: boolean;
-
-    @Field(() => StoveType, { nullable: true })
-    stove?: StoveType;
-
-    @Field({ nullable: true })
-    pool?: boolean;
-
-    @Field({ nullable: true })
-    gym?: boolean;
-
-    @Field({ nullable: true })
-    garbage_disposal?: boolean;
-
-    @Field({ nullable: true })
-    dishwasher?: boolean;
-
-    @Field({ nullable: true })
-    parking?: boolean;
-
-    @Field({ nullable: true })
-    doorman?: boolean;
-
-    @Field({ nullable: true })
-    pet_friendly?: boolean;
-
-    @Field(() => LaundryType, { nullable: true })
-    laundry?: LaundryType;
-
-    @Field({ nullable: true })
-    backyard?: boolean;
-
-    @Field(() => Float, { nullable: true })
-    bath_count?: number;
-
-    @Field({ nullable: true })
-    bedroom_count?: number;
-
-    //
-
-    @Field(() => [Review], { nullable: true })
-    async myReviews(
+    // Field Resolvers
+    @Field(() => ReviewsAndCount, { nullable: true })
+    async reviews(
         @Root() residence: Residence,
         @Arg('options', { nullable: true }) options: ReviewQueryOptions
-    ): Promise<Review[] | undefined> {
+    ): Promise<ReviewsAndCount | undefined> {
         const pg = Container.get(postgresHandler);
         const res = options
             ? await pg.getReviewsGeneric(
@@ -91,7 +45,7 @@ export class Residence {
               });
 
         if (!res.errors && res.reviews) {
-            return res.reviews;
+            return { reviews: res.reviews, count: res.reviews.length };
         }
         return;
     }
