@@ -4,7 +4,9 @@ import { Knex } from 'knex';
 import { Residence } from '../../Residence/Residence';
 import { Review } from '../../Review/Review';
 import { User } from '../../User/User';
+import { Location } from '../../Location/Location';
 import KnexPostgis from 'knex-postgis';
+import { GreenFlags, LocationCategory, RedFlags } from '../../types/enum_types';
 
 export async function seed(knex: Knex): Promise<void> {
     const knexPostgis = KnexPostgis(knex);
@@ -55,60 +57,45 @@ export async function seed(knex: Knex): Promise<void> {
     await knex<Location>('locations').insert([
         {
             google_place_id: 'ChIJA7uBlJcphYAR79QB8w6fAVg',
-            full_address: '920 Cranbrook Court, Davis, CA 95616, USA',
-            street_num: '920',
-            route: 'Cranbrook Court',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
+            formatted_address: '920 Cranbrook Court, Davis, CA 95616, USA',
+            landlord_email: 'privacyabuser@yahoo.com',
+            category: LocationCategory.HOUSE,
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7407628 + ' ' + 38.5591035 + ')'
             ),
         },
         {
             google_place_id: 'ChIJ5z8sO3gphYARfxI717FQgtI',
-            full_address: '1737 Pomona Dr, Davis, CA 95616, USA',
-            street_num: '1737',
-            route: 'Pomona Drive',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
+            formatted_address: '1737 Pomona Dr, Davis, CA 95616, USA',
+            landlord_email: 'aloof@gmail.com',
+            category: LocationCategory.HOUSE,
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7302551 + ' ' + 38.5503238 + ')'
             ),
         },
         {
             google_place_id: 'ChIJC4XVZawphYAR9STg547WSeQ',
-            full_address: '614 Sycamore Ln, Davis, CA 95616, USA',
-            street_num: '614',
-            route: 'Sycamore Lane',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
+            formatted_address: '614 Sycamore Ln, Davis, CA 95616, USA',
+            landlord_email: 'oneofthegoodones@gmail.com',
+            category: LocationCategory.HOUSE,
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7609074 + ' ' + 38.5483489 + ')'
             ),
         },
         {
             google_place_id: 'ChIJa4E1i7AphYAROy3Ai_nYWhA',
-            full_address: '539 Villanova Dr, Davis, CA 95616, USA',
-            street_num: '539',
-            route: 'Villanova Drive',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
+            formatted_address: '539 Villanova Dr, Davis, CA 95616, USA',
+            landlord_email: 'sueme@gmail.com',
+            category: LocationCategory.HOUSE,
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7551427 + ' ' + 38.5564679 + ')'
             ),
         },
         {
             google_place_id: 'ChIJfX6HAbEphYARBl5uwq5ksYQ',
-            full_address: '606 Villanova Dr, Davis, CA 95616, USA',
-            street_num: '606',
-            route: 'Villanova Drive',
-            city: 'Davis',
-            state: 'California',
-            postal_code: '95616',
+            formatted_address: '606 Villanova Dr, Davis, CA 95616, USA',
+            landlord_email: 'lordofland@gmail.com',
+            category: LocationCategory.HOUSE,
             geog: knexPostgis.geographyFromText(
                 'Point(' + -121.7567452 + ' ' + 38.5560953 + ')'
             ),
@@ -143,6 +130,8 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2019'),
                 new Date('January 2020')
             ),
+            green_flags: [GreenFlags.PRIVACY, GreenFlags.LIGHT],
+            red_flags: [RedFlags.MOLD],
         },
         {
             user_id: userStart + 1,
@@ -153,6 +142,8 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2017'),
                 new Date('March 2018')
             ),
+            green_flags: [GreenFlags.WATER_PRESSURE, GreenFlags.NEIGHBORHOOD],
+            red_flags: [RedFlags.MOLD],
         },
         // 2
         {
@@ -164,6 +155,8 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2016'),
                 new Date('January 2017')
             ),
+            green_flags: [GreenFlags.WATER_PRESSURE, GreenFlags.NEIGHBORHOOD],
+            red_flags: [RedFlags.NOISE, RedFlags.UNRESPONSIVE],
         },
         {
             user_id: userStart,
@@ -174,6 +167,8 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2015'),
                 new Date('January 2016')
             ),
+            green_flags: [GreenFlags.NEIGHBORHOOD, GreenFlags.SAFE],
+            red_flags: [RedFlags.SAFETY_DEPOSIT],
         },
         // 3
         {
@@ -185,6 +180,8 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('December 2017'),
                 new Date('May 2020')
             ),
+            green_flags: [GreenFlags.PRIVACY],
+            red_flags: [RedFlags.SAFETY_DEPOSIT],
         },
         // 4
         {
@@ -196,6 +193,12 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('September 2020'),
                 new Date('June 2021')
             ),
+            green_flags: [
+                GreenFlags.APPLIANCES,
+                GreenFlags.TEMP_CONTROL,
+                GreenFlags.SAFE,
+            ],
+            red_flags: [],
         },
         // 5
         {
@@ -207,6 +210,11 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('April 2018'),
                 new Date('January 2020')
             ),
+            red_flags: [
+                RedFlags.SAFETY_DEPOSIT,
+                RedFlags.PRIVACY,
+                RedFlags.SMELL,
+            ],
         },
         // 6
         {
@@ -218,6 +226,14 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('March 2017'),
                 new Date('June 2019')
             ),
+            green_flags: [],
+            red_flags: [],
         },
     ]);
+
+    // await knex<GreenFlag>('flags').insert(
+    //     Object.keys(RedFlags).map((topic) => {
+    //         return { topic: topic, category: FlagTypes.RED };
+    //     })
+    // );
 }

@@ -69,6 +69,8 @@ export async function up(knex: Knex): Promise<void> {
             table.integer('rating');
             table.specificType('lease_term', 'tsrange').notNullable();
             table.text('feedback');
+            table.specificType('red_flags', 'TEXT[]');
+            table.specificType('green_flags', 'TEXT[]');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
@@ -91,21 +93,6 @@ export async function up(knex: Knex): Promise<void> {
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
         .then(() => knex.raw(onUpdateTrigger('saved_residences')));
-
-    await knex.schema
-        .createTable('flags', (table: Knex.TableBuilder) => {
-            table.increments('flag_id');
-            table
-                .integer('rev_id')
-                .references('rev_id')
-                .inTable('reviews')
-                .notNullable();
-            table.enum('category', ['RED', 'GREEN']).notNullable();
-            table.string('topic');
-            table.timestamp('created_at').defaultTo(knex.fn.now());
-            table.timestamp('updated_at').defaultTo(knex.fn.now());
-        })
-        .then(() => knex.raw(onUpdateTrigger('flags')));
 
     // View to enhance residences with average_stats
     await knex.schema.createView('residences_enhanced', (view) => {

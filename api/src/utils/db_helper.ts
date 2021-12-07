@@ -15,8 +15,8 @@ export const assembleReview = (reviews: any): Review[] => {
 // has to happen to nest coords object
 export const assembleLocation = (raw: any): Location[] => {
     return raw.map((r: any) => {
-        const { lat, lng, ...res } = r;
-        return { coords: { lat: lat, lng: lng }, ...res };
+        const { lat, lng, ...rest } = r;
+        return { coords: { lat: lat, lng: lng }, ...rest };
     });
 };
 
@@ -29,6 +29,8 @@ export function reviewColumns(this: postgresHandler) {
         'rating',
         'rent',
         'feedback',
+        'green_flags',
+        'red_flags',
         this.knex.raw('lower(lease_term) as start'),
         this.knex.raw('upper(lease_term) as end'),
         'created_at',

@@ -4,7 +4,6 @@ import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
 import {
-    FlagTypes,
     GreenFlags,
     LocationCategory,
     LocationSortBy,
@@ -16,24 +15,24 @@ import {
 } from './enum_types';
 import { ReviewFields } from './types';
 
-@InputType()
-export class AllFlagTopicsInput {
-    @Field(() => GreenFlags, { nullable: true })
-    green_flags?: GreenFlags;
-    @Field(() => RedFlags, { nullable: true })
-    red_flags?: RedFlags;
-}
-@InputType()
-export class FlagInput {
-    @Field(() => FlagTypes)
-    category: FlagTypes;
-    @Field(() => RedFlags, { nullable: true })
-    red_topic?: RedFlags;
-    @Field(() => GreenFlags, { nullable: true })
-    green_topic?: GreenFlags;
-    // @Field()
-    // rev_id: number;
-}
+// @InputType()
+// export class AllFlagTopicsInput {
+//     @Field(() => GreenFlags, { nullable: true })
+//     green_flags?: GreenFlags;
+//     @Field(() => RedFlags, { nullable: true })
+//     red_flags?: RedFlags;
+// }
+// @InputType()
+// export class FlagInput {
+//     @Field(() => FlagTypes)
+//     category: FlagTypes;
+//     @Field(() => RedFlags, { nullable: true })
+//     red_topic?: RedFlags;
+//     @Field(() => GreenFlags, { nullable: true })
+//     green_topic?: GreenFlags;
+//     // @Field()
+//     // rev_id: number;
+// }
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -244,6 +243,12 @@ export class ReviewFieldsInput implements ReviewFields {
 
     @Field()
     feedback?: string;
+
+    @Field(() => [RedFlags])
+    red_flags: RedFlags[];
+
+    @Field(() => [GreenFlags])
+    green_flags: GreenFlags[];
 }
 
 @InputType()

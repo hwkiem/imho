@@ -1,8 +1,8 @@
 import { ObjectType, Field, Root } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
-import { Flag } from '../Flag/Flag';
 import { Residence } from '../Residence/Residence';
+import { GreenFlags, RedFlags } from '../types/enum_types';
 import { DateRange } from '../types/object_types';
 import { User } from '../User/User';
 
@@ -10,6 +10,12 @@ import { User } from '../User/User';
 export class Review {
     @Field()
     rev_id: number;
+
+    @Field(() => [GreenFlags])
+    green_flags: GreenFlags[];
+
+    @Field(() => [RedFlags])
+    red_flags: RedFlags[];
 
     user_id: number;
 
@@ -34,14 +40,14 @@ export class Review {
         return users.users[0];
     }
 
-    // TODO Flags Resolver
-    @Field(() => [Flag], { nullable: true })
-    async flags(@Root() review: Review): Promise<Flag[] | undefined> {
-        const pg = Container.get(postgresHandler);
-        const flags = await pg.getFlagsByReviewId(review.rev_id);
-        if (flags.errors || !flags.flags) return;
-        return flags.flags;
-    }
+    // TODO RedFlags and GreenFlags Resolvers
+    // @Field(() => [Flag], { nullable: true })
+    // async flags(@Root() review: Review): Promise<Flag[] | undefined> {
+    //     const pg = Container.get(postgresHandler);
+    //     const flags = await pg.getFlagsByReviewId(review.rev_id);
+    //     if (flags.errors || !flags.flags) return;
+    //     return flags.flags;
+    // }
 
     @Field()
     rating?: number;

@@ -3,8 +3,7 @@ import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
-import { Flag } from '../Flag/Flag';
-import { GreenFlags, RedFlags } from './enum_types';
+import { FlagTypes, GreenFlags, RedFlags } from './enum_types';
 
 @ObjectType()
 export class Coords {
@@ -15,24 +14,42 @@ export class Coords {
 }
 
 @ObjectType()
-export class AllFlagTopics {
-    @Field(() => GreenFlags, { nullable: true })
-    green_flags?: GreenFlags;
-    @Field(() => RedFlags, { nullable: true })
-    red_flags?: RedFlags;
-}
+export class GreenFlag {
+    @Field()
+    category: FlagTypes.GREEN;
 
-@ObjectType()
-export class GreenFlagTopics {
     @Field(() => GreenFlags)
-    green_flags: GreenFlags;
+    topic: GreenFlags;
 }
 
 @ObjectType()
-export class RedFlagTopics {
+export class RedFlag {
+    @Field()
+    category: FlagTypes.RED;
+
     @Field(() => RedFlags)
-    red_flags: RedFlags;
+    topic: RedFlags;
 }
+
+// @ObjectType()
+// export class AllFlagTopics {
+//     @Field(() => GreenFlags, { nullable: true })
+//     green_flags?: GreenFlags;
+//     @Field(() => RedFlags, { nullable: true })
+//     red_flags?: RedFlags;
+// }
+
+// @ObjectType()
+// export class GreenFlagTopics {
+//     @Field(() => GreenFlags)
+//     green_flags: GreenFlags;
+// }
+
+// @ObjectType()
+// export class RedFlagTopics {
+//     @Field(() => RedFlags)
+//     red_flags: RedFlags;
+// }
 
 @ObjectType()
 export class DateRange {
@@ -59,16 +76,14 @@ export class UserResponse {
     users?: User[];
 }
 
-@ObjectType()
-export class FlagResponse {
-    @Field(() => [FieldError], { nullable: true })
-    errors?: FieldError[];
+// @ObjectType()
+// export class FlagResponse {
+//     @Field(() => [FieldError], { nullable: true })
+//     errors?: FieldError[];
 
-    @Field(() => [Flag], { nullable: true })
-    flags?: Flag[];
-}
-
-FlagResponse;
+//     @Field(() => [Flag], { nullable: true })
+//     flags?: Flag[];
+// }
 
 @ObjectType()
 export class SingleUserResponse {

@@ -1,18 +1,13 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
-import {
-    FlagInput,
-    ReviewQueryOptions,
-    WriteReviewInput,
-} from '../types/input_types';
+import { ReviewQueryOptions, WriteReviewInput } from '../types/input_types';
 import {
     FieldError,
     ReviewResponse,
     SingleReviewResponse,
 } from '../types/object_types';
-import { MyContext, ProcessedFlag } from '../types/types';
-import { validateFlagInput } from '../utils/validators';
+import { MyContext } from '../types/types';
 import { Review } from './Review';
 
 @Service()
@@ -22,7 +17,6 @@ export class ReviewResolver {
     @Mutation(() => SingleReviewResponse)
     async writeReview(
         @Arg('options') options: WriteReviewInput,
-        @Arg('flags', () => [FlagInput]) flags: [FlagInput],
         @Ctx() { req }: MyContext
     ): Promise<SingleReviewResponse> {
         // ensure user logged in
@@ -31,22 +25,14 @@ export class ReviewResolver {
             return { errors: [{ field: 'session', message: 'not logged in' }] };
         }
         // Validation
-        // validate FlagInput
-        let err: FieldError | null = null;
-        const processedFlags: ProcessedFlag[] = [];
-        flags.forEach((input) => {
-            const res = validateFlagInput(input);
-            if (res instanceof FieldError) err = res;
-            else processedFlags.push(res);
-        });
-        if (err !== null) return { errors: [err] };
         // validate WriteReviewInput
-        // const err = validateWriteReviewInput(options.review_details);
+        // const err = validateWriteReviewInput(options);
         // if (err) {
         //     return { errors: [err] };
         // }
 
         // ensure location exists
+        // make category, landlord_email required?
         const loc_id = await this.pg.createLocationIfNotExists(
             options.google_place_id,
             options.category,
@@ -70,18 +56,18 @@ export class ReviewResolver {
         if (review instanceof FieldError) return { errors: [review] };
 
         // Create flags
-        if (!review.review) {
-            return {
-                errors: [{ field: 'review', message: 'could not insert' }],
-            };
-        }
-        const res = await this.pg.createFlagBatch(
-            review.review.rev_id,
-            processedFlags
-        );
-        console.log(res);
-        // if we fail out at insert flags, do we undo the whole review?
-        if (res instanceof FieldError) return { errors: [res] };
+        // if (!review.review) {
+        //     return {
+        //         errors: [{ field: 'review', message: 'could not insert' }],
+        //     };
+        // }
+        // const res = await this.pg.createFlagBatch(
+        //     review.review.rev_id,
+        //     processedFlags
+        // );
+        // console.log(res);
+        // // if we fail out at insert flags, do we undo the whole review?
+        // if (res instanceof FieldError) return { errors: [res] };
 
         //
         return review;

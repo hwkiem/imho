@@ -11,9 +11,6 @@ export const ON_UPDATE_TIMESTAMP_FUNCTION = `
         END; $$;
     `;
 
-export const DROP_ENHANCED_RES_VIEW = `DROP VIEW IF EXISTS residences_enhanced`;
-export const DROP_ENHANCED_LOC_VIEW = `DROP VIEW IF EXISTS locations_enhanced`;
-
 export const DROP_ON_UPDATE_TIMESTAMP_FUNCTION = `DROP FUNCTION on_update_timestamp`;
 
 export const onUpdateTrigger = (table: string): string => {
@@ -28,7 +25,17 @@ export const onUpdateTrigger = (table: string): string => {
 //     return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
 // };
 
+const unnestAndCountFlags = (s: string, knex: Knex) => {
+    // const identifier = knex.ref('locations.loc_id');
+    const str = knex.raw('')
+    return knex('residences_enhanced')
+        .avg(s)
+        .where('residences_enhanced.loc_id', identifier)
+        .as(s);
+};
+
 export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
+    const top_flags = knex().select('res_id').sum('mold').from(unnestAndCountFlags('', knex))
     const sub = knex('residences')
         .select([
             'residences.res_id',

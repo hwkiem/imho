@@ -48,7 +48,7 @@ export async function writeReview(
                 r.errors = [
                     {
                         field: 'duplicate',
-                        message: 'you have already reviewed this residency',
+                        message: 'you have already reviewed this residence',
                     },
                 ];
             } else if (e.code == 23503) {
