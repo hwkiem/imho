@@ -3,7 +3,7 @@ import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
 import { Residence } from '../Residence/Residence';
 import { GreenFlags, RedFlags } from '../types/enum_types';
-import { DateRange } from '../types/object_types';
+import { DateRange, FieldError } from '../types/object_types';
 import { User } from '../User/User';
 
 @ObjectType()
@@ -11,11 +11,11 @@ export class Review {
     @Field()
     rev_id: number;
 
-    @Field(() => [GreenFlags])
-    green_flags: GreenFlags[];
+    // @Field(() => [GreenFlags])
+    // green_flags: GreenFlags[];
 
-    @Field(() => [RedFlags])
-    red_flags: RedFlags[];
+    // @Field(() => [RedFlags])
+    // red_flags: RedFlags[];
 
     user_id: number;
 
@@ -32,22 +32,31 @@ export class Review {
     }
     // User
     @Field(() => User, { nullable: true })
-    async user(@Root() review: Review): Promise<User | undefined> {
+    async author(@Root() review: Review): Promise<User | undefined> {
         const pg = Container.get(postgresHandler);
         const users = await pg.getUsersById([review.user_id]);
         if (users.errors || !users.users) return;
 
         return users.users[0];
     }
+    // Flags
+    @Field(() => [RedFlags], { nullable: true })
+    async red_flags(@Root() review: Review): Promise<RedFlags[] | undefined> {
+        const pg = Container.get(postgresHandler);
+        const flags = await pg.getReviewFlagsByType(review.rev_id, 'RED');
+        if (flags instanceof FieldError) return;
+        return flags;
+    }
 
-    // TODO RedFlags and GreenFlags Resolvers
-    // @Field(() => [Flag], { nullable: true })
-    // async flags(@Root() review: Review): Promise<Flag[] | undefined> {
-    //     const pg = Container.get(postgresHandler);
-    //     const flags = await pg.getFlagsByReviewId(review.rev_id);
-    //     if (flags.errors || !flags.flags) return;
-    //     return flags.flags;
-    // }
+    @Field(() => [GreenFlags], { nullable: true })
+    async green_flags(
+        @Root() review: Review
+    ): Promise<GreenFlags[] | undefined> {
+        const pg = Container.get(postgresHandler);
+        const flags = await pg.getReviewFlagsByType(review.rev_id, 'GREEN');
+        if (flags instanceof FieldError) return;
+        return flags;
+    }
 
     @Field()
     rating?: number;

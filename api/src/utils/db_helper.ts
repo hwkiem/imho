@@ -1,6 +1,8 @@
 import { postgresHandler } from '../dataSources/postgres';
 import { Review } from '../Review/Review';
 import { Location } from '../Location/Location';
+import { Flag, FlagType, FlagTypeNames } from '../types/types';
+import { GreenFlags, RedFlags } from '../types/enum_types';
 
 export const assembleReview = (reviews: any): Review[] => {
     return reviews.map((review: any) => {
@@ -20,6 +22,24 @@ export const assembleLocation = (raw: any): Location[] => {
     });
 };
 
+export function alignFlagTypes(
+    topics: Pick<Flag, 'topic'>[],
+    type: FlagTypeNames
+): FlagType<typeof type>[] {
+    switch (type) {
+        case 'GREEN':
+            return topics.map((pick) => {
+                return GreenFlags[pick.topic as keyof typeof GreenFlags];
+            });
+        case 'RED':
+            return topics.map((pick) => {
+                return RedFlags[pick.topic as keyof typeof RedFlags];
+            });
+        default:
+            return [];
+    }
+}
+
 // used by review_db_handler, make a view for this too? with lease term
 export function reviewColumns(this: postgresHandler) {
     return [
@@ -29,8 +49,6 @@ export function reviewColumns(this: postgresHandler) {
         'rating',
         'rent',
         'feedback',
-        'green_flags',
-        'red_flags',
         this.knex.raw('lower(lease_term) as start'),
         this.knex.raw('upper(lease_term) as end'),
         'created_at',

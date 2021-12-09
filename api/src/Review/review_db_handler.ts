@@ -1,18 +1,27 @@
 import { postgresHandler } from '../dataSources/postgres';
-import { QueryOrderChoice, ReviewSortBy } from '../types/enum_types';
-import { ReviewSortByInput } from '../types/input_types';
-import { ReviewResponse, SingleReviewResponse } from '../types/object_types';
-import { ReviewFields } from '../types/types';
-import { assembleReview } from '../utils/db_helper';
+import {
+    GreenFlags,
+    QueryOrderChoice,
+    RedFlags,
+    ReviewSortBy,
+} from '../types/enum_types';
+import { ReviewFieldsInput, ReviewSortByInput } from '../types/input_types';
+import {
+    FieldError,
+    ReviewResponse,
+    SingleReviewResponse,
+} from '../types/object_types';
+import { Flag, FlagType, FlagTypeNames } from '../types/types';
+import { alignFlagTypes, assembleReview } from '../utils/db_helper';
 import { Review } from './Review';
 
 export async function writeReview(
     this: postgresHandler,
     res_id: number,
     user_id: number,
-    review_details: ReviewFields
+    review_details: ReviewFieldsInput
 ): Promise<SingleReviewResponse> {
-    const { lease_term, ...attr } = review_details;
+    const { lease_term, green_flags, red_flags, ...attr } = review_details;
     const r: SingleReviewResponse = {};
     await this.knex<Review>('reviews')
         .insert({
@@ -25,8 +34,12 @@ export async function writeReview(
                 lease_term.end_date
             ),
         })
-        .returning(['res_id', 'user_id'])
+        .returning(['rev_id', 'res_id', 'user_id'])
         .then(async (ids) => {
+            // NOTE
+            // this just has to happen before fetching review, so flag arrays can be fetched
+            await this.writeFlags(ids[0].rev_id, green_flags, red_flags);
+
             await this.getReviewsByPrimaryKeyTuple(
                 ids[0].user_id,
                 ids[0].res_id
@@ -193,5 +206,103 @@ export async function updateReviewGeneric(
             (e) =>
                 (r.errors = [{ field: 'update review', message: e.toString() }])
         );
+    return r;
+}
+
+// Flag operations
+
+export async function writeFlags(
+    this: postgresHandler,
+    rev_id: number,
+    green_flags: GreenFlags[],
+    red_flags: RedFlags[]
+): Promise<boolean | null> {
+    console.log(green_flags, red_flags, rev_id);
+    let b: boolean | null = null;
+    console.log(
+        ...green_flags.map((e) => {
+            return { rev_id: rev_id, topic: e.toString() };
+        })
+    );
+    await this.knex('flags')
+        .insert([
+            ...green_flags.map((e) => {
+                return { rev_id: rev_id, topic: e.toString() };
+            }),
+            ...red_flags.map((e) => {
+                return { rev_id: rev_id, topic: e.toString() };
+            }),
+        ])
+        // .insert({
+        //     rev_id: rev_id,
+        //     green_flags: green_flags,
+        //     red_flags: red_flags,
+        // })
+        .then(async () => {
+            b = true;
+            //     await this.getLocationsById(ids)
+            //         .then((res) => {
+            //             if (res.locations) r.location = res.locations[0];
+            //         })
+            //         .catch(
+            //             (e) =>
+            //                 (r.errors = [
+            //                     {
+            //                         field: 'fetch location',
+            //                         message: e.toString(),
+            //                     },
+            //                 ])
+            //         );
+        })
+        .catch(() => {
+            b = false;
+            // dup place_id
+            // if (e.code == 23505) {
+            //     r.errors = [
+            //         {
+            //             field: 'create location',
+            //             message: 'this location already exists',
+            //         },
+            //     ];
+            // } else {
+            //     r.errors = [
+            //         { field: 'create location', message: e.toString() },
+            //     ];
+            // }
+        });
+
+    console.log(b);
+    return b;
+}
+
+export async function getReviewFlagsByType<T extends FlagTypeNames>(
+    this: postgresHandler,
+    rev_id: number,
+    topics: T
+): Promise<FlagType<T>[] | FieldError> {
+    let r: FlagType<T>[] | FieldError = {
+        field: 'default',
+        message: 'not reassigned',
+    };
+    await this.knex<Flag>('flags')
+        .select('topic')
+        .where({ rev_id: rev_id })
+        .where(
+            'topic',
+            'in',
+            topics == 'RED'
+                ? Object.keys(RedFlags)
+                : topics == 'GREEN'
+                ? Object.keys(GreenFlags)
+                : [...Object.keys(RedFlags), ...Object.keys(GreenFlags)]
+        )
+        .then((t) => {
+            // hm
+            r = alignFlagTypes(t, topics) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+        })
+        .catch(
+            (e) => (r = { field: 'query residence', message: e.toString() })
+        );
+
     return r;
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { DateRange } from './object_types';
+import { GreenFlags, RedFlags } from './enum_types';
 
 export type MyContext = {
     req: Request;
@@ -15,17 +15,17 @@ export type AddressComponents = {
     postal_code?: string;
 };
 
-export type ReviewFields = {
-    rating: number;
-
-    rent?: number;
-
-    lease_term: DateRange;
-
-    feedback?: string;
+export type Flag = {
+    topic: string;
+    rev_id: number;
 };
 
-// export class ProcessedFlag implements Partial<Flag> {
-//     category: FlagTypes;
-//     topic: RedFlags | GreenFlags;
-// }
+export type FlagTypeNames = 'RED' | 'GREEN';
+
+export type FlagType<T> = T extends 'RED'
+    ? RedFlags
+    : T extends 'GREEN'
+    ? GreenFlags
+    : // : T extends 'BOTH'
+      // ? RedFlags | GreenFlags
+      never;

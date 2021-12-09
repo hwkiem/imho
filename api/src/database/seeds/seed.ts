@@ -6,11 +6,12 @@ import { Review } from '../../Review/Review';
 import { User } from '../../User/User';
 import { Location } from '../../Location/Location';
 import KnexPostgis from 'knex-postgis';
-import { GreenFlags, LocationCategory, RedFlags } from '../../types/enum_types';
+import { LocationCategory } from '../../types/enum_types';
 
 export async function seed(knex: Knex): Promise<void> {
     const knexPostgis = KnexPostgis(knex);
     // Deletes ALL existing entries
+    await knex('flags').del();
     await knex('reviews').del();
     await knex('users').del();
     await knex('residences').del();
@@ -130,8 +131,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2019'),
                 new Date('January 2020')
             ),
-            green_flags: [GreenFlags.PRIVACY, GreenFlags.LIGHT],
-            red_flags: [RedFlags.MOLD],
         },
         {
             user_id: userStart + 1,
@@ -142,8 +141,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2017'),
                 new Date('March 2018')
             ),
-            green_flags: [GreenFlags.WATER_PRESSURE, GreenFlags.NEIGHBORHOOD],
-            red_flags: [RedFlags.MOLD],
         },
         // 2
         {
@@ -155,8 +152,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2016'),
                 new Date('January 2017')
             ),
-            green_flags: [GreenFlags.WATER_PRESSURE, GreenFlags.NEIGHBORHOOD],
-            red_flags: [RedFlags.NOISE, RedFlags.UNRESPONSIVE],
         },
         {
             user_id: userStart,
@@ -167,8 +162,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('January 2015'),
                 new Date('January 2016')
             ),
-            green_flags: [GreenFlags.NEIGHBORHOOD, GreenFlags.SAFE],
-            red_flags: [RedFlags.SAFETY_DEPOSIT],
         },
         // 3
         {
@@ -180,8 +173,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('December 2017'),
                 new Date('May 2020')
             ),
-            green_flags: [GreenFlags.PRIVACY],
-            red_flags: [RedFlags.SAFETY_DEPOSIT],
         },
         // 4
         {
@@ -193,12 +184,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('September 2020'),
                 new Date('June 2021')
             ),
-            green_flags: [
-                GreenFlags.APPLIANCES,
-                GreenFlags.TEMP_CONTROL,
-                GreenFlags.SAFE,
-            ],
-            red_flags: [],
         },
         // 5
         {
@@ -210,11 +195,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('April 2018'),
                 new Date('January 2020')
             ),
-            red_flags: [
-                RedFlags.SAFETY_DEPOSIT,
-                RedFlags.PRIVACY,
-                RedFlags.SMELL,
-            ],
         },
         // 6
         {
@@ -226,8 +206,6 @@ export async function seed(knex: Knex): Promise<void> {
                 new Date('March 2017'),
                 new Date('June 2019')
             ),
-            green_flags: [],
-            red_flags: [],
         },
     ]);
 

@@ -101,12 +101,12 @@ export async function getResidencesById(
 
 export async function getSingleResidenceById(
     this: postgresHandler,
-    ids: number
+    res_id: number
 ): Promise<SingleResidenceResponse> {
     const r: SingleResidenceResponse = {};
     await this.knex<Residence>('residences_enhanced')
         .select('*')
-        .where('res_id', 'in', ids)
+        .where('res_id', '=', res_id)
         .limit(1)
         .then((residences) => {
             r.residence = residences[0];
@@ -199,7 +199,6 @@ export async function getSavedResidences(
     this: postgresHandler,
     user_id: number
 ): Promise<ResidenceResponse> {
-    console.log('in');
     const r: ResidenceResponse = {};
 
     const saved_residences = this.knex('saved_residences')
@@ -207,18 +206,9 @@ export async function getSavedResidences(
         .where({ user_id: user_id });
 
     await this.knex('residences_enhanced')
-        .select([
-            'res_id',
-            'loc_id',
-            'unit',
-            'created_at',
-            'updated_at',
-            'avg_rating',
-            'avg_rent',
-        ])
+        .select('*')
         .where('res_id', 'in', saved_residences)
         .then((residences) => {
-            console.log(residences);
             r.residences = residences;
         })
         .catch(

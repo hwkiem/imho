@@ -1,4 +1,6 @@
+import 'reflect-metadata';
 import { Knex } from 'knex';
+import { GreenFlags, RedFlags } from '../../types/enum_types';
 import {
     CREATE_ENHANCED_LOCATION_VIEW,
     CREATE_ENHANCED_RESIDENCE_VIEW,
@@ -69,8 +71,6 @@ export async function up(knex: Knex): Promise<void> {
             table.integer('rating');
             table.specificType('lease_term', 'tsrange').notNullable();
             table.text('feedback');
-            table.specificType('red_flags', 'TEXT[]');
-            table.specificType('green_flags', 'TEXT[]');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
@@ -93,6 +93,21 @@ export async function up(knex: Knex): Promise<void> {
             table.timestamp('updated_at').defaultTo(knex.fn.now());
         })
         .then(() => knex.raw(onUpdateTrigger('saved_residences')));
+
+    await knex.schema.createTable('flags', (table: Knex.TableBuilder) => {
+        table
+            .integer('rev_id')
+            .references('rev_id')
+            .inTable('reviews')
+            .notNullable();
+        table
+            .enum('topic', [
+                ...Object.keys(RedFlags),
+                ...Object.keys(GreenFlags),
+            ])
+            .notNullable();
+        table.unique(['rev_id', 'topic']);
+    });
 
     // View to enhance residences with average_stats
     await knex.schema.createView('residences_enhanced', (view) => {

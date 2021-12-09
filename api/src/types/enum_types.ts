@@ -85,14 +85,14 @@ registerEnumType(FlagTypes, {
 });
 
 export enum GreenFlags {
-    LIGHT = 'light',
-    REPONSIVENESS = 'responsiveness',
-    PRIVACY = 'privacy',
-    WATER_PRESSURE = 'water_pressure',
-    TEMP_CONTROL = 'temp_control',
-    NEIGHBORHOOD = 'neightborhood',
-    SAFE = 'safe',
-    APPLIANCES = 'appliances',
+    LIGHT = 'LIGHT',
+    REPONSIVENESS = 'REPONSIVENESS',
+    PRIVACY = 'PRIVACY',
+    WATER_PRESSURE = 'WATER_PRESSURE',
+    TEMP_CONTROL = 'TEMP_CONTROL',
+    NEIGHBORHOOD = 'NEIGHBORHOOD',
+    SAFE = 'SAFE',
+    APPLIANCES = 'APPLIANCES',
 }
 
 registerEnumType(GreenFlags, {
@@ -101,15 +101,14 @@ registerEnumType(GreenFlags, {
 });
 
 export enum RedFlags {
-    SMELL = 'smell',
-    SAFETY_DEPOSIT = 'safety_deposit',
-    NOISE = 'noise',
-    PESTS = 'pests',
-    MOLD = 'mold',
-    WATER_PRESSURE = 'water_pressure',
-    PRIVACY = 'privacy',
-    UNRESPONSIVE = 'unresponsive',
-    TEMP_CONTROL = 'temp_control',
+    SMELL = 'SMELL',
+    SAFETY_DEPOSIT = 'SAFETY_DEPOSIT',
+    NOISE = 'NOISE',
+    PESTS = 'PESTS',
+    MOLD = 'MOLD',
+    PRIVACY = 'PRIVACY',
+    UNRESPONSIVE = 'UNRESPONSIVE',
+    TEMP_CONTROL = 'TEMP_CONTROL',
 }
 
 registerEnumType(RedFlags, {

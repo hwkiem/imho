@@ -13,7 +13,6 @@ import {
     ReviewSortBy,
     UserSortBy,
 } from './enum_types';
-import { ReviewFields } from './types';
 
 // @InputType()
 // export class AllFlagTopicsInput {
@@ -231,7 +230,7 @@ export class CreateResidenceInput {
 }
 
 @InputType()
-export class ReviewFieldsInput implements ReviewFields {
+export class ReviewFieldsInput {
     @Field()
     rating: number;
 

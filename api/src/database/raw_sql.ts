@@ -25,17 +25,7 @@ export const onUpdateTrigger = (table: string): string => {
 //     return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
 // };
 
-const unnestAndCountFlags = (s: string, knex: Knex) => {
-    // const identifier = knex.ref('locations.loc_id');
-    const str = knex.raw('')
-    return knex('residences_enhanced')
-        .avg(s)
-        .where('residences_enhanced.loc_id', identifier)
-        .as(s);
-};
-
 export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
-    const top_flags = knex().select('res_id').sum('mold').from(unnestAndCountFlags('', knex))
     const sub = knex('residences')
         .select([
             'residences.res_id',

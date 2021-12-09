@@ -54,22 +54,6 @@ export class ReviewResolver {
             options.review_input
         );
         if (review instanceof FieldError) return { errors: [review] };
-
-        // Create flags
-        // if (!review.review) {
-        //     return {
-        //         errors: [{ field: 'review', message: 'could not insert' }],
-        //     };
-        // }
-        // const res = await this.pg.createFlagBatch(
-        //     review.review.rev_id,
-        //     processedFlags
-        // );
-        // console.log(res);
-        // // if we fail out at insert flags, do we undo the whole review?
-        // if (res instanceof FieldError) return { errors: [res] };
-
-        //
         return review;
     }
 

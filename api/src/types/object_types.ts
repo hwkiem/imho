@@ -3,7 +3,6 @@ import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
-import { FlagTypes, GreenFlags, RedFlags } from './enum_types';
 
 @ObjectType()
 export class Coords {
@@ -13,23 +12,23 @@ export class Coords {
     lng: number;
 }
 
-@ObjectType()
-export class GreenFlag {
-    @Field()
-    category: FlagTypes.GREEN;
+// @ObjectType()
+// export class GreenFlag {
+//     @Field()
+//     category: FlagTypes.GREEN;
 
-    @Field(() => GreenFlags)
-    topic: GreenFlags;
-}
+//     @Field(() => GreenFlags)
+//     topic: GreenFlags;
+// }
 
-@ObjectType()
-export class RedFlag {
-    @Field()
-    category: FlagTypes.RED;
+// @ObjectType()
+// export class RedFlag {
+//     @Field()
+//     category: FlagTypes.RED;
 
-    @Field(() => RedFlags)
-    topic: RedFlags;
-}
+//     @Field(() => RedFlags)
+//     topic: RedFlags;
+// }
 
 // @ObjectType()
 // export class AllFlagTopics {
