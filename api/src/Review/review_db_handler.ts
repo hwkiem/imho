@@ -23,29 +23,43 @@ export async function writeReview(
 ): Promise<SingleReviewResponse> {
     const { lease_term, green_flags, red_flags, ...attr } = review_details;
     const r: SingleReviewResponse = {};
-    await this.knex<Review>('reviews')
-        .insert({
-            res_id: res_id,
-            user_id: user_id,
-            ...attr,
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            lease_term: require('pg-range').Range(
-                lease_term.start_date,
-                lease_term.end_date
-            ),
-        })
-        .returning(['rev_id', 'res_id', 'user_id'])
-        .then(async (ids) => {
-            // NOTE
-            // this just has to happen before fetching review, so flag arrays can be fetched
-            await this.writeFlags(ids[0].rev_id, green_flags, red_flags);
+    let rev_id: Pick<Review, 'rev_id'>;
 
-            await this.getReviewsByPrimaryKeyTuple(
-                ids[0].user_id,
-                ids[0].res_id
-            )
+    await this.knex
+        .transaction(async (trx) => {
+            // Insert review
+            const ids = await trx<Review>('reviews')
+                .insert({
+                    res_id: res_id,
+                    user_id: user_id,
+                    ...attr,
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    lease_term: require('pg-range').Range(
+                        lease_term.start_date,
+                        lease_term.end_date
+                    ),
+                })
+                .returning(['rev_id']);
+
+            rev_id = ids[0];
+
+            // Insert flags
+            await trx('flags').insert([
+                ...green_flags.map((e) => {
+                    return { rev_id: ids[0].rev_id, topic: e.toString() };
+                }),
+                ...red_flags.map((e) => {
+                    return { rev_id: ids[0].rev_id, topic: e.toString() };
+                }),
+            ]);
+        })
+        .then(async () => {
+            // Fetch review
+            await this.getReviewsByReviewId([rev_id.rev_id])
                 .then((res) => {
                     if (res.reviews) r.review = res.reviews[0];
+                    console.log(res.reviews);
+                    console.log('working?');
                 })
                 .catch((e) => {
                     r.errors = [
@@ -57,6 +71,7 @@ export async function writeReview(
                 });
         })
         .catch((e) => {
+            console.log(e);
             if (e.code == 23505) {
                 r.errors = [
                     {
@@ -75,7 +90,62 @@ export async function writeReview(
                 r.errors = [{ field: 'insert review', message: e.toString() }];
             }
         });
+    console.log('heres r:', r);
     return r;
+
+    // await this.knex<Review>('reviews')
+    //     .insert({
+    //         res_id: res_id,
+    //         user_id: user_id,
+    //         ...attr,
+    //         // eslint-disable-next-line @typescript-eslint/no-var-requires
+    //         lease_term: require('pg-range').Range(
+    //             lease_term.start_date,
+    //             lease_term.end_date
+    //         ),
+    //     })
+    //     .returning(['rev_id', 'res_id', 'user_id'])
+    //     .then(async (ids) => {
+    //         // NOTE
+    //         // this just has to happen before fetching review, so flag arrays can be fetched
+    //         await this.writeFlags(ids[0].rev_id, green_flags, red_flags);
+
+    //         await this.getReviewsByPrimaryKeyTuple(
+    //             ids[0].user_id,
+    //             ids[0].res_id
+    //         )
+    //             .then((res) => {
+    //                 if (res.reviews) r.review = res.reviews[0];
+    //             })
+    //             .catch((e) => {
+    //                 r.errors = [
+    //                     {
+    //                         field: 'fetch review',
+    //                         message: e.toString(),
+    //                     },
+    //                 ];
+    //             });
+    //     })
+    //     .catch((e) => {
+    //         if (e.code == 23505) {
+    //             r.errors = [
+    //                 {
+    //                     field: 'duplicate',
+    //                     message: 'you have already reviewed this residence',
+    //                 },
+    //             ];
+    //         } else if (e.code == 23503) {
+    //             r.errors = [
+    //                 {
+    //                     field: 'user',
+    //                     message: 'user does not exist, cannot review',
+    //                 },
+    //             ];
+    //         } else {
+    //             r.errors = [{ field: 'insert review', message: e.toString() }];
+    //         }
+    //     });
+    // return r;
 }
 
 export async function getReviewsByPrimaryKeyTuple(
@@ -210,20 +280,13 @@ export async function updateReviewGeneric(
 }
 
 // Flag operations
-
 export async function writeFlags(
     this: postgresHandler,
     rev_id: number,
     green_flags: GreenFlags[],
     red_flags: RedFlags[]
-): Promise<boolean | null> {
-    console.log(green_flags, red_flags, rev_id);
-    let b: boolean | null = null;
-    console.log(
-        ...green_flags.map((e) => {
-            return { rev_id: rev_id, topic: e.toString() };
-        })
-    );
+): Promise<FieldError | null> {
+    let r: FieldError | null = null;
     await this.knex('flags')
         .insert([
             ...green_flags.map((e) => {
@@ -233,46 +296,18 @@ export async function writeFlags(
                 return { rev_id: rev_id, topic: e.toString() };
             }),
         ])
-        // .insert({
-        //     rev_id: rev_id,
-        //     green_flags: green_flags,
-        //     red_flags: red_flags,
-        // })
-        .then(async () => {
-            b = true;
-            //     await this.getLocationsById(ids)
-            //         .then((res) => {
-            //             if (res.locations) r.location = res.locations[0];
-            //         })
-            //         .catch(
-            //             (e) =>
-            //                 (r.errors = [
-            //                     {
-            //                         field: 'fetch location',
-            //                         message: e.toString(),
-            //                     },
-            //                 ])
-            //         );
-        })
-        .catch(() => {
-            b = false;
-            // dup place_id
-            // if (e.code == 23505) {
-            //     r.errors = [
-            //         {
-            //             field: 'create location',
-            //             message: 'this location already exists',
-            //         },
-            //     ];
-            // } else {
-            //     r.errors = [
-            //         { field: 'create location', message: e.toString() },
-            //     ];
-            // }
+        .catch((e) => {
+            if (e.code == 23505) {
+                r = {
+                    field: 'create location',
+                    message: 'this location already exists',
+                };
+            } else {
+                r = { field: 'write flags', message: e.toString() };
+            }
         });
 
-    console.log(b);
-    return b;
+    return r;
 }
 
 export async function getReviewFlagsByType<T extends FlagTypeNames>(
@@ -282,7 +317,7 @@ export async function getReviewFlagsByType<T extends FlagTypeNames>(
 ): Promise<FlagType<T>[] | FieldError> {
     let r: FlagType<T>[] | FieldError = {
         field: 'default',
-        message: 'not reassigned',
+        message: 'default',
     };
     await this.knex<Flag>('flags')
         .select('topic')
