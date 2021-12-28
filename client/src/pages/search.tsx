@@ -1,16 +1,6 @@
 import { Layout } from '../components/layout';
 import Head from 'next/head';
-import {
-    Box,
-    Heading,
-    Container,
-    Text,
-    Stack,
-    createIcon,
-    InputGroup,
-    Input,
-    InputLeftElement,
-} from '@chakra-ui/react';
+import { Box, Heading, Container, Text, Stack } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { usePlacesWidget } from 'react-google-autocomplete';
 import { useState } from 'react';
@@ -26,7 +16,6 @@ const getCatchPhrase = () => {
 
 const Search: React.FC = () => {
     // show house / apt buttons
-    const [hasSelected, setHasSelected] = useState(false);
 
     const router = useRouter();
 
@@ -49,13 +38,6 @@ const Search: React.FC = () => {
 
     return (
         <>
-            <Head>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
-
             <Container maxW={'3xl'} key={'search'}>
                 <Stack
                     as={Box}

@@ -1,0 +1,5 @@
+query GetLocationsByPlaceId($google_place_id: String!) {
+    getLocationByPlaceId(google_place_id: $google_place_id) {
+        ...RegularLocationResponse
+    }
+}

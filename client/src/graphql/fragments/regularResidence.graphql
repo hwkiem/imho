@@ -1,9 +1,13 @@
 fragment RegularResidence on Residence {
     res_id
+    loc_id
     unit
     avg_rating
     avg_rent
-    myReviews {
-        ...RegularReview
+    reviews {
+        reviews {
+            ...RegularReview
+        }
+        count
     }
 }

@@ -6,7 +6,9 @@ interface GoogleBarProps {
     onSelect: (placeid: string | undefined) => void;
 }
 
-export const GoogleBar: React.FC<GoogleBarProps> = ({ onSelect }) => {
+export const GoogleBar: React.FC<GoogleBarProps> = ({
+    onSelect,
+}: GoogleBarProps) => {
     // autocomplete widget
     const { ref } = usePlacesWidget<HTMLInputElement>({
         apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY,

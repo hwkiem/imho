@@ -1,38 +1,22 @@
 import { Layout } from '../../components/layout';
-import Head from 'next/head';
+import { Box, Heading, Container, Text, Stack } from '@chakra-ui/react';
 import {
-    Box,
-    Heading,
-    Container,
-    Text,
-    Stack,
-    createIcon,
-    InputGroup,
-    Input,
-    InputLeftElement,
-} from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
-import { usePlacesWidget } from 'react-google-autocomplete';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { initializeApollo, useApollo } from '../../lib/apollo';
-import { Location } from '../../generated/graphql';
-import { GetStaticPropsResult, NextPage } from 'next';
+    GetLocationsByPlaceIdDocument,
+    GetLocationsByPlaceIdQuery,
+    RegularLocationFragment,
+} from '../../generated/graphql';
+import { GetStaticPropsContext, GetStaticPropsResult, NextPage } from 'next';
+import { initializeApollo } from '../../lib/apollo';
 
-interface LocationProps {
-    location: Location;
+interface LocationPageProps {
+    location: RegularLocationFragment;
 }
 
-const LocationComponent: React.FC<LocationProps> = ({ location }) => {
-    const router = useRouter();
+const LocationComponent: React.FC<LocationPageProps> = ({
+    location,
+}: LocationPageProps) => {
     return (
         <>
-            <Head>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
             <Container maxW={'3xl'} key={'search'}>
                 <Stack
                     as={Box}
@@ -47,7 +31,7 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
                     >
                         A little bit about <br />
                         <Text as={'span'} color={'pink.400'}>
-                            {location.full_address}
+                            {location.formatted_address}
                         </Text>
                     </Heading>
                     <Stack
@@ -65,33 +49,46 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
     );
 };
 
-interface LocationPageProps {
-    location: Location;
-}
-
-const LocationPage: NextPage<LocationPageProps> = ({ location }) => {
+const LocationPage: NextPage<LocationPageProps> = ({
+    location,
+}: LocationPageProps) => {
     return (
-        <Layout title={'Location'} description={location.full_address}>
+        <Layout title={'Location'} description={location.formatted_address}>
             <LocationComponent location={location} />
         </Layout>
     );
 };
 
-export async function getStaticProps(): Promise<
-    GetStaticPropsResult<LocationPageProps>
-> {
-    const temp: Location = {
-        city: 'New York',
-        coords: { lat: 71.04, lng: 44.23 },
-        full_address: '12 West 104th Street',
-        google_place_id: 'some bs',
-        loc_id: 2,
-        postal_code: '10025',
-        route: 'W 104th St',
-        state: 'New York',
-        street_num: '12',
-    };
-    return { props: { location: temp } };
+export async function getStaticProps({
+    params,
+}: GetStaticPropsContext): Promise<GetStaticPropsResult<LocationPageProps>> {
+    const apollo = initializeApollo();
+    console.log(params);
+    if (params) {
+        console.log(params.placeid);
+        const locQuery = await apollo.query<GetLocationsByPlaceIdQuery>({
+            query: GetLocationsByPlaceIdDocument,
+            variables: { google_place_id: params.placeid },
+        });
+
+        console.log(locQuery.data.getLocationByPlaceId.location);
+
+        if (locQuery.data.getLocationByPlaceId.location) {
+            console.log('SUCCESS');
+            return {
+                props: {
+                    location: locQuery.data.getLocationByPlaceId.location,
+                },
+            };
+        }
+
+        if (locQuery.error) {
+            console.log('FAIL');
+            console.log(locQuery.error);
+        }
+    }
+
+    return { redirect: { permanent: false, destination: '/error' } };
 }
 
 export async function getStaticPaths() {

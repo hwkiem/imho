@@ -1,8 +1,0 @@
-query GetLocationsByGeoScope(
-    $options: LocationQueryOptions
-    $place_id: String!
-) {
-    getLocationsByGeoScope(options: $options, place_id: $place_id) {
-        ...RegularLocationResponse
-    }
-}

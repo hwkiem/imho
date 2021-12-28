@@ -1,6 +1,19 @@
 fragment RegularReview on Review {
-    res_id
-    user_id
-    rent
+    rev_id
+    user {
+        email
+    }
+    flags {
+        category
+        topic
+    }
     rating
+    rent
+    lease_term {
+        start_date
+        end_date
+    }
+    feedback
+    created_at
+    updated_at
 }

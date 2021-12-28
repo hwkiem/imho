@@ -1,32 +1,19 @@
 import {
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    DeleteIcon,
-    SunIcon,
-} from '@chakra-ui/icons';
-import {
     Box,
     Container,
     Heading,
     Stack,
-    useColorModeValue,
     Text,
     Button,
     SimpleGrid,
-    IconButton,
     ContainerProps,
-    Spacer,
-    Flex,
     BoxProps,
-    StyleProps,
-    ButtonGroup,
     Center,
     Icon,
 } from '@chakra-ui/react';
 
 import {
     FaBacteria,
-    FaHiking,
     FaLockOpen,
     FaMoneyCheck,
     FaParking,
@@ -47,9 +34,8 @@ import {
 } from 'react-icons/gi';
 
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import next, { NextPage } from 'next';
+import { NextPage } from 'next';
 import Head from 'next/head';
-import router from 'next/router';
 import React, { useState } from 'react';
 import { GoogleBar } from '../components/googlebar';
 import { Layout } from '../components/layout';
@@ -489,12 +475,6 @@ const ReviewPage: NextPage = () => {
 
     return (
         <>
-            <Head>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap"
-                    rel="stylesheet"
-                />
-            </Head>
             <Layout title={'Review'} description={'Write a Review'}>
                 <AnimatePresence exitBeforeEnter>{steps[step]}</AnimatePresence>
             </Layout>
