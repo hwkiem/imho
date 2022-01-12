@@ -23,11 +23,11 @@ import {
     getReviewsByResidenceId,
     getReviewsByReviewId,
     getReviewsByUserId,
+    getReviewsCountGeneric,
     getReviewsGeneric,
     updateReviewGeneric,
     writeFlags,
     writeReview,
-    // writeReview,
 } from '../Review/review_db_handler';
 import { reviewColumns } from '../utils/db_helper';
 import {
@@ -66,7 +66,6 @@ export class postgresHandler {
     public changePassword = changePassword;
 
     // Locations
-
     public getLocationsById = getLocationsById;
 
     public getSingleLocationById = getSingleLocationById;
@@ -120,6 +119,8 @@ export class postgresHandler {
     public writeFlags = writeFlags;
 
     public getReviewFlagsByType = getReviewFlagsByType;
+
+    public getReviewsCountGeneric = getReviewsCountGeneric;
 
     // Helpers
     public reviewColumns = reviewColumns;

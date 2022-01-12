@@ -1,8 +1,8 @@
 import { ObjectType, Field, Float, Root, Arg } from 'type-graphql';
 import Container from 'typedi';
 import { postgresHandler } from '../dataSources/postgres';
+import { Review } from '../Review/Review';
 import { ReviewQueryOptions } from '../types/input_types';
-import { ReviewsAndCount } from '../types/object_types';
 @ObjectType()
 export class Residence {
     @Field()
@@ -23,11 +23,11 @@ export class Residence {
     avg_rent?: number;
 
     // Field Resolvers
-    @Field(() => ReviewsAndCount, { nullable: true })
+    @Field(() => [Review], { nullable: true })
     async reviews(
         @Root() residence: Residence,
         @Arg('options', { nullable: true }) options: ReviewQueryOptions
-    ): Promise<ReviewsAndCount | undefined> {
+    ): Promise<Review[] | undefined> {
         const pg = Container.get(postgresHandler);
         const res = options
             ? await pg.getReviewsGeneric(
@@ -45,10 +45,25 @@ export class Residence {
               });
 
         if (!res.errors && res.reviews) {
-            return { reviews: res.reviews, count: res.reviews.length };
+            return res.reviews;
         }
         return;
     }
+
+    // // Field Resolvers
+    // @Field(() => Int, { nullable: true })
+    // async count(@Root() residence: Residence): Promise<number | undefined> {
+    //     const pg = Container.get(postgresHandler);
+    //     // const count = pg.getReviewsCountGeneric({})
+    //     const count = await pg.getReviewsCountGeneric({
+    //         res_id: residence.res_id,
+    //     });
+
+    //     if (!res.errors && res.reviews) {
+    //         return res.reviews;
+    //     }
+    //     return;
+    // }
 
     @Field(() => String)
     created_at = new Date();

@@ -83,25 +83,4 @@ export class ReviewResolver {
     ): Promise<ReviewResponse> {
         return await this.pg.getReviewsByResidenceId(ids);
     }
-
-    // @Mutation(() => SingleReviewResponse)
-    // async updateMyReviewOverwrite(
-    //     @Arg('changes') changes: AllAttributes,
-    //     @Arg('res_id') res_id: number,
-    //     @Ctx() { req }: MyContext
-    // ): Promise<SingleReviewResponse> {
-    //     if (req.session.userId === undefined) {
-    //         return { errors: [{ field: 'session', message: 'not logged in' }] };
-    //     }
-    //     // Validation
-    //     const err = validateWriteReviewInput(changes);
-    //     if (err) {
-    //         return { errors: [err] };
-    //     }
-    //     return await this.pg.updateReviewGeneric(
-    //         res_id,
-    //         req.session.userId,
-    //         changes
-    //     );
-    // }
 }

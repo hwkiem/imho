@@ -145,13 +145,13 @@ export class SingleReviewResponse {
     review?: Review;
 }
 
-@ObjectType()
-export class ReviewsAndCount {
-    @Field(() => [Review], { nullable: true })
-    reviews?: Review[];
-    @Field(() => Int)
-    count: number;
-}
+// @ObjectType()
+// export class ReviewsAndCount {
+//     @Field(() => [Review], { nullable: true })
+//     reviews?: Review[];
+//     @Field(() => Int)
+//     count: number;
+// }
 
 @ObjectType()
 export class PlaceIDResponse {

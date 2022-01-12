@@ -21,10 +21,6 @@ export const onUpdateTrigger = (table: string): string => {
     `;
 };
 
-// const mode = (s: string, knex: Knex) => {
-//     return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
-// };
-
 export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
     const sub = knex('residences')
         .select([

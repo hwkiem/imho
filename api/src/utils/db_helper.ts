@@ -22,6 +22,7 @@ export const assembleLocation = (raw: any): Location[] => {
     });
 };
 
+//
 export function alignFlagTypes(
     topics: Pick<Flag, 'topic'>[],
     type: FlagTypeNames
@@ -40,7 +41,7 @@ export function alignFlagTypes(
     }
 }
 
-// used by review_db_handler, make a view for this too? with lease term
+// used by review_db_handler
 export function reviewColumns(this: postgresHandler) {
     return [
         'rev_id',

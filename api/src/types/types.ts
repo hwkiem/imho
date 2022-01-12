@@ -26,6 +26,4 @@ export type FlagType<T> = T extends 'RED'
     ? RedFlags
     : T extends 'GREEN'
     ? GreenFlags
-    : // : T extends 'BOTH'
-      // ? RedFlags | GreenFlags
-      never;
+    : never;

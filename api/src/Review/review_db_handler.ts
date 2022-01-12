@@ -58,8 +58,6 @@ export async function writeReview(
             await this.getReviewsByReviewId([rev_id.rev_id])
                 .then((res) => {
                     if (res.reviews) r.review = res.reviews[0];
-                    console.log(res.reviews);
-                    console.log('working?');
                 })
                 .catch((e) => {
                     r.errors = [
@@ -71,7 +69,6 @@ export async function writeReview(
                 });
         })
         .catch((e) => {
-            console.log(e);
             if (e.code == 23505) {
                 r.errors = [
                     {
@@ -90,62 +87,7 @@ export async function writeReview(
                 r.errors = [{ field: 'insert review', message: e.toString() }];
             }
         });
-    console.log('heres r:', r);
     return r;
-
-    // await this.knex<Review>('reviews')
-    //     .insert({
-    //         res_id: res_id,
-    //         user_id: user_id,
-    //         ...attr,
-    //         // eslint-disable-next-line @typescript-eslint/no-var-requires
-    //         lease_term: require('pg-range').Range(
-    //             lease_term.start_date,
-    //             lease_term.end_date
-    //         ),
-    //     })
-    //     .returning(['rev_id', 'res_id', 'user_id'])
-    //     .then(async (ids) => {
-    //         // NOTE
-    //         // this just has to happen before fetching review, so flag arrays can be fetched
-    //         await this.writeFlags(ids[0].rev_id, green_flags, red_flags);
-
-    //         await this.getReviewsByPrimaryKeyTuple(
-    //             ids[0].user_id,
-    //             ids[0].res_id
-    //         )
-    //             .then((res) => {
-    //                 if (res.reviews) r.review = res.reviews[0];
-    //             })
-    //             .catch((e) => {
-    //                 r.errors = [
-    //                     {
-    //                         field: 'fetch review',
-    //                         message: e.toString(),
-    //                     },
-    //                 ];
-    //             });
-    //     })
-    //     .catch((e) => {
-    //         if (e.code == 23505) {
-    //             r.errors = [
-    //                 {
-    //                     field: 'duplicate',
-    //                     message: 'you have already reviewed this residence',
-    //                 },
-    //             ];
-    //         } else if (e.code == 23503) {
-    //             r.errors = [
-    //                 {
-    //                     field: 'user',
-    //                     message: 'user does not exist, cannot review',
-    //                 },
-    //             ];
-    //         } else {
-    //             r.errors = [{ field: 'insert review', message: e.toString() }];
-    //         }
-    //     });
-    // return r;
 }
 
 export async function getReviewsByPrimaryKeyTuple(
@@ -246,6 +188,31 @@ export async function getReviewsGeneric(
     return r;
 }
 
+export async function getReviewsCountGeneric(
+    this: postgresHandler,
+    obj: Partial<Review> = {},
+    sort_params: ReviewSortByInput = {
+        attribute: ReviewSortBy.USER_ID,
+        sort: QueryOrderChoice.ASC,
+    }
+): Promise<number> {
+    let r: number - 1;
+    await this.knex<Review>('reviews')
+        .count()
+        // .as('count')
+        .where(obj)
+        .whereNotNull(sort_params.attribute)
+        .then((count) => {
+            console.log(count);
+            // r.reviews = assembleReview(reviews);
+        })
+        .catch(
+            (e) =>
+                (r.errors = [{ field: 'query review', message: e.toString() }])
+        );
+    return r;
+}
+
 export async function updateReviewGeneric(
     this: postgresHandler,
     res_id: number,
@@ -297,14 +264,7 @@ export async function writeFlags(
             }),
         ])
         .catch((e) => {
-            if (e.code == 23505) {
-                r = {
-                    field: 'create location',
-                    message: 'this location already exists',
-                };
-            } else {
-                r = { field: 'write flags', message: e.toString() };
-            }
+            r = { field: 'write flags', message: e.toString() };
         });
 
     return r;
