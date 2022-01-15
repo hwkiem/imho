@@ -18,15 +18,13 @@ import {
     saveResidence,
 } from '../Residence/residence_db_handler';
 import {
-    getReviewFlagsByType,
-    getReviewsByPrimaryKeyTuple,
+    // getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
     getReviewsByReviewId,
     getReviewsByUserId,
-    getReviewsCountGeneric,
+    // getReviewsCountGeneric,
     getReviewsGeneric,
     updateReviewGeneric,
-    writeFlags,
     writeReview,
 } from '../Review/review_db_handler';
 import { reviewColumns } from '../utils/db_helper';
@@ -110,17 +108,9 @@ export class postgresHandler {
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
 
-    public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
-
     public getReviewsByReviewId = getReviewsByReviewId;
 
     public updateReviewGeneric = updateReviewGeneric;
-
-    public writeFlags = writeFlags;
-
-    public getReviewFlagsByType = getReviewFlagsByType;
-
-    public getReviewsCountGeneric = getReviewsCountGeneric;
 
     // Helpers
     public reviewColumns = reviewColumns;

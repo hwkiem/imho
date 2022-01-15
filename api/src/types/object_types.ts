@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import { Residence } from '../Residence/Residence';
 import { Review } from '../Review/Review';
 import { User } from '../User/User';
@@ -10,52 +10,6 @@ export class Coords {
     lat: number;
     @Field()
     lng: number;
-}
-
-// @ObjectType()
-// export class GreenFlag {
-//     @Field()
-//     category: FlagTypes.GREEN;
-
-//     @Field(() => GreenFlags)
-//     topic: GreenFlags;
-// }
-
-// @ObjectType()
-// export class RedFlag {
-//     @Field()
-//     category: FlagTypes.RED;
-
-//     @Field(() => RedFlags)
-//     topic: RedFlags;
-// }
-
-// @ObjectType()
-// export class AllFlagTopics {
-//     @Field(() => GreenFlags, { nullable: true })
-//     green_flags?: GreenFlags;
-//     @Field(() => RedFlags, { nullable: true })
-//     red_flags?: RedFlags;
-// }
-
-// @ObjectType()
-// export class GreenFlagTopics {
-//     @Field(() => GreenFlags)
-//     green_flags: GreenFlags;
-// }
-
-// @ObjectType()
-// export class RedFlagTopics {
-//     @Field(() => RedFlags)
-//     red_flags: RedFlags;
-// }
-
-@ObjectType()
-export class DateRange {
-    @Field(() => Date)
-    start_date: Date;
-    @Field(() => Date)
-    end_date: Date;
 }
 
 @ObjectType()
@@ -75,15 +29,6 @@ export class UserResponse {
     users?: User[];
 }
 
-// @ObjectType()
-// export class FlagResponse {
-//     @Field(() => [FieldError], { nullable: true })
-//     errors?: FieldError[];
-
-//     @Field(() => [Flag], { nullable: true })
-//     flags?: Flag[];
-// }
-
 @ObjectType()
 export class SingleUserResponse {
     @Field(() => [FieldError], { nullable: true })
@@ -102,6 +47,14 @@ export class ResidenceResponse {
     residences?: Residence[];
 }
 @ObjectType()
+export class SingleResidenceResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors?: FieldError[];
+
+    @Field(() => Residence, { nullable: true })
+    residence?: Residence;
+}
+@ObjectType()
 export class LocationResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
@@ -110,14 +63,6 @@ export class LocationResponse {
     locations?: Location[];
 }
 
-@ObjectType()
-export class SingleResidenceResponse {
-    @Field(() => [FieldError], { nullable: true })
-    errors?: FieldError[];
-
-    @Field(() => Residence, { nullable: true })
-    residence?: Residence;
-}
 @ObjectType()
 export class SingleLocationResponse {
     @Field(() => [FieldError], { nullable: true })

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { GreenFlags, RedFlags } from './enum_types';
+import { Review } from '../Review/Review';
+import { Flags } from './flags';
 
 export type MyContext = {
     req: Request;
@@ -15,15 +16,11 @@ export type AddressComponents = {
     postal_code?: string;
 };
 
-export type Flag = {
-    topic: string;
-    rev_id: number;
-};
-
-export type FlagTypeNames = 'RED' | 'GREEN';
-
-export type FlagType<T> = T extends 'RED'
-    ? RedFlags
-    : T extends 'GREEN'
-    ? GreenFlags
-    : never;
+// you don't insert rev_id into database, for example
+// useful subset of fields inserted into DB
+export class FlattenedReview implements Partial<Review> {
+    user_id?: number | undefined;
+    flags: Flags;
+    res_id: number;
+    feedback?: string | undefined;
+}

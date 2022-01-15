@@ -34,12 +34,10 @@ export class Location {
     // aggregates
     // averages
     @Field(() => Float, { nullable: true })
-    avg_rent?: number;
-
-    @Field(() => Float, { nullable: true })
     avg_rating?: number;
 
     // Field Resolvers
+    // Residences found at this location
     @Field(() => [Residence], { nullable: true })
     async residences(
         @Root() location: Location,

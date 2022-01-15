@@ -19,11 +19,11 @@ export class ReviewResolver {
         @Arg('options') options: WriteReviewInput,
         @Ctx() { req }: MyContext
     ): Promise<SingleReviewResponse> {
-        // ensure user logged in
+        // user_id is allowed to be undefined, anon review
         const user_id = req.session.userId;
-        if (user_id === undefined) {
-            return { errors: [{ field: 'session', message: 'not logged in' }] };
-        }
+        // if (user_id === undefined) {
+        //     return { errors: [{ field: 'session', message: 'not logged in' }] };
+        // }
         // Validation
         // validate WriteReviewInput
         // const err = validateWriteReviewInput(options);
@@ -50,8 +50,8 @@ export class ReviewResolver {
         // write review
         const review = await this.pg.writeReview(
             res_id,
-            user_id,
-            options.review_input
+            options.review_input,
+            user_id
         );
         if (review instanceof FieldError) return { errors: [review] };
         return review;

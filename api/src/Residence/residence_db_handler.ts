@@ -124,7 +124,7 @@ export async function getSingleResidenceById(
 export async function residenceExists(
     this: postgresHandler,
     loc_id: number,
-    unit: string
+    unit = 'PH'
 ): Promise<number | null> {
     let r: number | null = null;
     await this.knex('residences')
@@ -147,7 +147,7 @@ export async function residenceExists(
 export async function createResidenceIfNotExists(
     this: postgresHandler,
     loc_id: number,
-    unit: string
+    unit = 'PH'
 ): Promise<number | FieldError> {
     const resId = await this.residenceExists(loc_id, unit); // unique tuple
     // does residence exist

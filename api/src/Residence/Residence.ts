@@ -19,10 +19,8 @@ export class Residence {
     @Field(() => Float, { nullable: true })
     avg_rating?: number;
 
-    @Field(() => Float, { nullable: true })
-    avg_rent?: number;
-
     // Field Resolvers
+    // All the reviews about this residence
     @Field(() => [Review], { nullable: true })
     async reviews(
         @Root() residence: Residence,
@@ -50,7 +48,7 @@ export class Residence {
         return;
     }
 
-    // // Field Resolvers
+    // count of total reviews ..
     // @Field(() => Int, { nullable: true })
     // async count(@Root() residence: Residence): Promise<number | undefined> {
     //     const pg = Container.get(postgresHandler);
