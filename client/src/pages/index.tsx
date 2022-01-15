@@ -1,13 +1,5 @@
 import Link from 'next/link';
-import {
-    Title,
-    Text,
-    Container,
-    Grid,
-    Box,
-    Button,
-    Center,
-} from '@mantine/core';
+import { Title, Text, Grid, Box, Button, Center } from '@mantine/core';
 import { FaRegCommentDots, FaSearchengin } from 'react-icons/fa';
 import { RiLoginBoxLine } from 'react-icons/ri';
 import { Variants } from 'framer-motion';

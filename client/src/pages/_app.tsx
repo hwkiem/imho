@@ -2,8 +2,6 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import {
     MantineProvider,
-    NormalizeCSS,
-    GlobalStyles,
     ColorSchemeProvider,
     ColorScheme,
 } from '@mantine/core';

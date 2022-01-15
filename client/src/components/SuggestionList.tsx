@@ -2,8 +2,6 @@ import { Group, Text } from '@mantine/core';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import usePlacesService from 'react-google-autocomplete/lib/usePlacesAutocompleteService';
-import { FaHome, FaLocationArrow, FaSearchLocation } from 'react-icons/fa';
-import { MdLocationCity } from 'react-icons/md';
 import { MotionButton } from '../utils/motion';
 
 interface SuggestionListProps {
@@ -34,9 +32,6 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
         });
     }, [address]);
 
-    // if hidden we don't show anything
-    if (hidden) return <></>;
-
     const variants = {
         initial: { opacity: 0, y: 200 },
         animate: (idx: number) => ({
@@ -58,6 +53,9 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
     };
 
     const [selected, setSelected] = useState(false);
+
+    // if hidden we don't show anything
+    if (hidden) return <></>;
 
     return (
         <Group position="center" direction="column" mt={30}>

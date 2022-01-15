@@ -1,4 +1,4 @@
-import { Container, Title } from '@mantine/core';
+import { Title } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import { MotionContainer } from '../utils/motion';
 
