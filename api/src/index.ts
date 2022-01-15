@@ -12,7 +12,6 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { ReviewResolver } from './Review/review_resolver';
 import { LocationResolver } from './Location/location_resolver';
 import { Container } from 'typedi';
-import { FlagResolver } from './Flag/flag_resolver';
 
 // var morgan = require('morgan')
 
@@ -61,7 +60,6 @@ const main = async () => {
                 ResidencyResolver,
                 ReviewResolver,
                 LocationResolver,
-                FlagResolver,
             ],
             container: Container,
             validate: false,

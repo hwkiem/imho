@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import { Flag } from '../Flag/Flag';
-import { FlagTypes, GreenFlags, RedFlags } from './enum_types';
-import { DateRange } from './object_types';
+import { Review } from '../Review/Review';
+import { Flags } from './flags';
 
 export type MyContext = {
     req: Request;
@@ -17,17 +16,11 @@ export type AddressComponents = {
     postal_code?: string;
 };
 
-export type ReviewFields = {
-    rating: number;
-
-    rent?: number;
-
-    lease_term: DateRange;
-
-    feedback?: string;
-};
-
-export class ProcessedFlag implements Partial<Flag> {
-    category: FlagTypes;
-    topic: RedFlags | GreenFlags;
+// you don't insert rev_id into database, for example
+// useful subset of fields inserted into DB
+export class FlattenedReview implements Partial<Review> {
+    user_id?: number | undefined;
+    flags: Flags;
+    res_id: number;
+    feedback?: string | undefined;
 }

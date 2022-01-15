@@ -11,9 +11,6 @@ export const ON_UPDATE_TIMESTAMP_FUNCTION = `
         END; $$;
     `;
 
-export const DROP_ENHANCED_RES_VIEW = `DROP VIEW IF EXISTS residences_enhanced`;
-export const DROP_ENHANCED_LOC_VIEW = `DROP VIEW IF EXISTS locations_enhanced`;
-
 export const DROP_ON_UPDATE_TIMESTAMP_FUNCTION = `DROP FUNCTION on_update_timestamp`;
 
 export const onUpdateTrigger = (table: string): string => {
@@ -24,16 +21,14 @@ export const onUpdateTrigger = (table: string): string => {
     `;
 };
 
-// const mode = (s: string, knex: Knex) => {
-//     return knex.raw(`mode() WITHIN GROUP (order by ${s}) as ${s}`);
-// };
-
 export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
     const sub = knex('residences')
         .select([
             'residences.res_id',
-            knex.raw('avg(reviews.rent) as avg_rent'),
-            knex.raw('avg(reviews.rating) as avg_rating'),
+            // knex.avg('reviews.rent').as('avg_rent'), // does this work? should
+            knex.avg('reviews.rating').as('avg_rating'),
+            // knex.raw('avg(reviews.rent) as avg_rent'),
+            // knex.raw('avg(reviews.rating) as avg_rating'),
         ])
         .leftOuterJoin('reviews', 'reviews.res_id', 'residences.res_id')
         .groupBy('residences.res_id')
@@ -46,7 +41,7 @@ export const CREATE_ENHANCED_RESIDENCE_VIEW = (knex: Knex) => {
             'residences.created_at',
             'residences.updated_at',
             'avg_rating',
-            'avg_rent',
+            // 'avg_rent',
         ])
         .join(sub, 'aggs.res_id', 'residences.res_id');
 
@@ -79,7 +74,7 @@ export const CREATE_ENHANCED_LOCATION_VIEW = (knex: Knex) => {
             'created_at',
             'updated_at',
         ],
-        loc_avg('avg_rent', knex),
+        // loc_avg('avg_rent', knex),
         loc_avg('avg_rating', knex),
     ]);
 

@@ -1,4 +1,4 @@
-import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Int, Query, Resolver } from 'type-graphql';
 import {
     LocationResponse,
     PlaceIDResponse,
@@ -15,7 +15,7 @@ import { LocationCategory } from '../types/enum_types';
 @Resolver(Location)
 export class LocationResolver {
     constructor(private readonly pg: postgresHandler) {}
-    @Mutation(() => SingleLocationResponse)
+    // @Mutation(() => SingleLocationResponse)
     async createLocation(
         @Arg('place_id') place_id: string,
         @Arg('category', () => LocationCategory)
@@ -34,7 +34,7 @@ export class LocationResolver {
         return await this.pg.getLocationsById(ids);
     }
 
-    @Query(() => LocationResponse)
+    // @Query(() => LocationResponse)
     async getLocationsByGeoScope(
         @Arg('place_id') place_id: string,
         @Arg('options', { nullable: true }) options: LocationQueryOptions
@@ -99,7 +99,7 @@ export class LocationResolver {
     }
 
     // just for dev
-    @Query(() => PlaceIDResponse)
+    // @Query(() => PlaceIDResponse)
     async placeIdFromAddress(
         @Arg('address', () => String) address: string
     ): Promise<PlaceIDResponse> {

@@ -247,7 +247,6 @@ export async function getLocationByPlaceId(
         .limit(1)
         .then((locations) => {
             r.location = assembleLocation(locations)[0];
-            console.log('after');
         })
         .catch(
             (e) =>
@@ -255,8 +254,6 @@ export async function getLocationByPlaceId(
                     { field: 'query location', message: e.toString() },
                 ])
         );
-    console.log('before?');
-    console.log(r);
     return r;
 }
 

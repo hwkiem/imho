@@ -31,7 +31,6 @@ registerEnumType(QueryOrderChoice, {
 });
 
 export enum ResidenceSortBy {
-    RENT = 'avg_rent',
     RATING = 'avg_rating',
     ID = 'res_id',
 }
@@ -42,7 +41,6 @@ registerEnumType(ResidenceSortBy, {
 });
 
 export enum LocationSortBy {
-    RENT = 'avg_rent',
     RATING = 'avg_rating',
     ID = 'loc_id',
 }
@@ -56,7 +54,6 @@ export enum ReviewSortBy {
     RENT = 'rating',
     RATING = 'rating',
     USER_ID = 'res_id',
-    LEASE_TERM = 'lease_term',
 }
 
 registerEnumType(ReviewSortBy, {
@@ -72,49 +69,6 @@ export enum UserSortBy {
 registerEnumType(UserSortBy, {
     name: 'UserSortBy',
     description: 'Field by which to sort user query results',
-});
-
-export enum FlagTypes {
-    RED = 'RED',
-    GREEN = 'GREEN',
-}
-
-registerEnumType(FlagTypes, {
-    name: 'FlagTypes',
-    description: 'Types of flags assigned to an apartment',
-});
-
-export enum GreenFlags {
-    LIGHT = 'light',
-    REPONSIVENESS = 'responsiveness',
-    PRIVACY = 'privacy',
-    WATER_PRESSURE = 'water_pressure',
-    TEMP_CONTROL = 'temp_control',
-    NEIGHBORHOOD = 'neightborhood',
-    SAFE = 'safe',
-    APPLIANCES = 'appliances',
-}
-
-registerEnumType(GreenFlags, {
-    name: 'GreenFlags',
-    description: 'Things someone liked about their place',
-});
-
-export enum RedFlags {
-    SMELL = 'smell',
-    SAFETY_DEPOSIT = 'safety_deposit',
-    NOISE = 'noise',
-    PESTS = 'pests',
-    MOLD = 'mold',
-    WATER_PRESSURE = 'water_pressure',
-    PRIVACY = 'privacy',
-    UNRESPONSIVE = 'unresponsive',
-    TEMP_CONTROL = 'temp_control',
-}
-
-registerEnumType(RedFlags, {
-    name: 'RedFlags',
-    description: 'Things someone disliked about their place',
 });
 
 export enum LocationCategory {
