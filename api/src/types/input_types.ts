@@ -230,7 +230,7 @@ export class ReviewFieldsInput {
     @Field()
     rating: number;
 
-    @Field({ nullable: true })
+    @Field()
     feedback: string;
 
     @Field(() => FlagsInput)
@@ -243,13 +243,13 @@ export class WriteReviewInput {
     @Field()
     google_place_id: string;
 
-    @Field({ nullable: true })
+    @Field()
     unit: string;
 
     @Field(() => LocationCategory)
     category: LocationCategory;
 
-    @Field({ nullable: true })
+    @Field()
     landlord_email: string;
 
     // purely review

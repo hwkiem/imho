@@ -1,8 +1,0 @@
-fragment RegularUserResponse on SingleUserResponse {
-    errors {
-        ...RegularError
-    }
-    user {
-        ...RegularUser
-    }
-}

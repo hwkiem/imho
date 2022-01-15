@@ -10,6 +10,8 @@ import { useColorScheme, useHotkeys } from '@mantine/hooks';
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { ApolloProvider } from '@apollo/client';
+import { useApollo } from '../lib/apollo';
 
 export default function App(props: AppProps) {
     const { Component, pageProps } = props;
@@ -28,6 +30,8 @@ export default function App(props: AppProps) {
 
     const router = useRouter();
 
+    const apolloClient = useApollo(pageProps);
+
     return (
         <>
             <Head>
@@ -36,22 +40,24 @@ export default function App(props: AppProps) {
                     content="minimum-scale=1, initial-scale=1, width=device-width"
                 />
             </Head>
-            <ColorSchemeProvider
-                colorScheme={colorScheme}
-                toggleColorScheme={toggleColorScheme}
-            >
-                <MantineProvider
-                    theme={{ colorScheme }}
-                    withNormalizeCSS
-                    withGlobalStyles
+            <ApolloProvider client={apolloClient}>
+                <ColorSchemeProvider
+                    colorScheme={colorScheme}
+                    toggleColorScheme={toggleColorScheme}
                 >
-                    <NotificationsProvider>
-                        <AnimatePresence exitBeforeEnter>
-                            <Component {...pageProps} key={router.route} />
-                        </AnimatePresence>
-                    </NotificationsProvider>
-                </MantineProvider>
-            </ColorSchemeProvider>
+                    <MantineProvider
+                        theme={{ colorScheme }}
+                        withNormalizeCSS
+                        withGlobalStyles
+                    >
+                        <NotificationsProvider>
+                            <AnimatePresence exitBeforeEnter>
+                                <Component {...pageProps} key={router.route} />
+                            </AnimatePresence>
+                        </NotificationsProvider>
+                    </MantineProvider>
+                </ColorSchemeProvider>
+            </ApolloProvider>
         </>
     );
 }
