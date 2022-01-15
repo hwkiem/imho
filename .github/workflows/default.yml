@@ -97,26 +97,26 @@ jobs:
       - run: yarn build
         working-directory: client/
 
-  test-client:
-    name: yarn test / client
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - run: echo ::set-output name=NVMRC::$(cat .nvmrc)
-        id: nvm
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "yarn"
-          check-latest: true
-          cache-dependency-path: client/yarn.lock
-      - uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/client/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/**/yarn.lock') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('client/**/yarn.lock') }}-
-      - run: yarn install
-        working-directory: client/
-      - run: yarn test:ci
-        working-directory: client/
+  # test-client:
+  #   name: yarn test / client
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+  #       id: nvm
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "${{ steps.nvm.outputs.NVMRC }}"
+  #         cache: "yarn"
+  #         check-latest: true
+  #         cache-dependency-path: client/yarn.lock
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: ${{ github.workspace }}/client/.next/cache
+  #         key: ${{ runner.os }}-nextjs-${{ hashFiles('client/**/yarn.lock') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-nextjs-${{ hashFiles('client/**/yarn.lock') }}-
+  #     - run: yarn install
+  #       working-directory: client/
+  #     - run: yarn test:ci
+  #       working-directory: client/
