@@ -26,7 +26,6 @@ import {
     useWriteReviewMutation,
     WriteReviewInput,
 } from '../generated/graphql';
-import { consumers } from 'stream';
 
 /**
  *

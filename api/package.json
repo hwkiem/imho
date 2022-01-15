@@ -17,6 +17,8 @@
     },
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
+        "@mikro-orm/core": "^4.5.10",
+        "@mikro-orm/postgresql": "^4.5.10",
         "apollo-server": "^3.1.2",
         "argon2": "^0.28.2",
         "class-validator": "^0.13.1",
@@ -26,6 +28,7 @@
         "express": "^4.17.1",
         "express-session": "^1.17.2",
         "graphql": "^15.5.1",
+        "graphql-fields-to-relations": "^1.0.5",
         "ioredis": "^4.27.7",
         "knex": "^0.95.11",
         "knex-postgis": "^0.14.1",
@@ -33,7 +36,8 @@
         "pg-range": "^1.1.0",
         "reflect-metadata": "^0.1.13",
         "type-graphql": "^1.1.1",
-        "typedi": "^0.10.0"
+        "typedi": "^0.10.0",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "@types/connect-pg-simple": "^4.2.4",
@@ -45,6 +49,7 @@
         "@types/node": "^16.4.14",
         "@types/pg": "^8.6.1",
         "@types/pg-pool": "^2.0.3",
+        "@types/uuid": "^8.3.4",
         "@typescript-eslint/eslint-plugin": "^5.2.0",
         "@typescript-eslint/parser": "^5.2.0",
         "eslint": "^8.1.0",

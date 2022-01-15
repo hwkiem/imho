@@ -6,24 +6,27 @@ import { buildSchema } from 'type-graphql';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import { UserResolver } from './User/user_resolver';
-import { ResidencyResolver } from './Residence/residence_resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { ReviewResolver } from './Review/review_resolver';
-import { LocationResolver } from './Location/location_resolver';
 import { Container } from 'typedi';
+import { MikroORM } from '@mikro-orm/core';
 
 // var morgan = require('morgan')
 
 const main = async () => {
     const app = express();
 
+    const orm = await MikroORM.init({
+        entities: ['./dist/app/**/entities'],
+        dbName: 'imho',
+        type: 'postgresql',
+        clientUrl: process.env.DATABASE_URL,
+    });
+
     // Redis Cookies / Sessions
     const RedisStore = connectRedis(session);
     const redis = new Redis(process.env.REDIS_URL);
 
     app.set('trust proxy', 1);
-    // app.use(morgan("combined"))
     app.use(
         cors({
             origin: process.env.CORS_ORIGIN,
