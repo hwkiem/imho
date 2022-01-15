@@ -1,0 +1,12 @@
+mutation writeReview($options: WriteReviewInput!) {
+    writeReview(options: $options) {
+        errors {
+            field
+            message
+        }
+        review {
+            rev_id
+            created_at
+        }
+    }
+}
