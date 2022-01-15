@@ -1,150 +1,123 @@
-import { Layout } from '../components/layout';
-import Head from 'next/head';
+import Link from 'next/link';
 import {
-    Box,
-    Heading,
-    Container,
+    Title,
     Text,
+    Container,
+    Grid,
+    Box,
     Button,
-    Stack,
-    Icon,
-    useColorModeValue,
-    createIcon,
-    TextProps,
-    ButtonGroup,
-} from '@chakra-ui/react';
-import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
-import { NextPage } from 'next';
+    Center,
+} from '@mantine/core';
+import { FaRegCommentDots, FaSearchengin } from 'react-icons/fa';
+import { RiLoginBoxLine } from 'react-icons/ri';
+import { Variants } from 'framer-motion';
+import { MotionContainer } from '../utils/motion';
 
-const CATCH_PHRASES = ['100% Free!', 'Welcome Home!', 'Reinventing Renting.'];
+export default function HomePage() {
+    const variants: Variants = {
+        hidden: { opacity: 0, x: -200, y: 0 },
+        enter: {
+            opacity: 1,
+            x: 0,
+            y: 0,
+        },
+        exit: { opacity: 0, x: 200, y: 0 },
+    };
 
-const getCatchPhrase = () => {
-    return CATCH_PHRASES[Math.floor(Math.random() * CATCH_PHRASES.length)];
-};
-
-const MotionText = motion<TextProps>(Text);
-
-const Index: React.FC = () => {
-    const router = useRouter();
     return (
-        <>
-            <Container maxW={'3xl'} key={'index'}>
-                <Stack
-                    as={Box}
-                    textAlign={'center'}
-                    spacing={{ base: 8, md: 14 }}
-                    py={{ base: 20, md: 36 }}
+        <MotionContainer
+            initial="hidden"
+            animate="enter"
+            exit="exit"
+            variants={variants}
+            transition={{ type: 'spring' }}
+            key={'review'}
+        >
+            <Title
+                sx={{ fontSize: 100, fontWeight: 900, letterSpacing: -2 }}
+                align="center"
+                mt={100}
+            >
+                Welcome to{' '}
+                <Text
+                    inherit
+                    variant="gradient"
+                    gradient={{ from: 'pink', to: 'cyan', deg: 45 }}
+                    component="span"
                 >
-                    <Heading
-                        fontWeight={600}
-                        fontSize={{ base: '2xl', sm: '4xl', md: '6xl' }}
-                        lineHeight={'110%'}
-                    >
-                        Get the inside scoop on
-                        <br />
-                        <Text as={'span'} color={'pink.400'}>
-                            that new apartment.
-                        </Text>
-                    </Heading>
-                    <Text color={'gray.500'}>
-                        Finding your next home is difficult. We provide answers
-                        to all the questions you wish you could ask. Is that
-                        restaurant across the street really noisy? How many hot
-                        showers will you really get? Is the morning light in the
-                        kitchen perfect for your food blog? Let IMHO help you
-                        find your oasis!
-                    </Text>
-                    <Stack
-                        direction={'column'}
-                        spacing={3}
-                        align={'center'}
-                        alignSelf={'center'}
-                        position={'relative'}
-                    >
-                        <ButtonGroup spacing={10}>
-                            <Button
-                                colorScheme={'pink'}
-                                bg={'pink.400'}
-                                rounded={'full'}
-                                px={6}
-                                _hover={{
-                                    bg: 'pink.500',
-                                }}
-                                onClick={() => router.push('/review')}
-                            >
-                                Write Review
-                            </Button>
-                            <Button
-                                colorScheme={'pink'}
-                                bg={'pink.400'}
-                                rounded={'full'}
-                                px={6}
-                                _hover={{
-                                    bg: 'pink.500',
-                                }}
-                                onClick={() => router.push('/search')}
-                            >
-                                Get Searching
-                            </Button>
-                        </ButtonGroup>
-
-                        <Box>
-                            <Icon
-                                as={Arrow}
-                                color={useColorModeValue(
-                                    'gray.800',
-                                    'gray.300'
-                                )}
-                                w={71}
-                                position={'absolute'}
-                                right={-71}
-                                top={'10px'}
-                            />
-                            <MotionText
-                                fontSize={'lg'}
-                                fontFamily={'Caveat'}
-                                position={'absolute'}
-                                right={'-125px'}
-                                top={'-15px'}
-                                animate={{
-                                    y: [0, 2, 0],
-                                    transition: {
-                                        type: 'spring',
-                                        duration: 2,
-                                        repeat: Infinity,
-                                    },
-                                }}
-                            >
-                                {getCatchPhrase()}
-                            </MotionText>
-                        </Box>
-                    </Stack>
-                </Stack>
-            </Container>
-        </>
+                    IMHO
+                </Text>
+            </Title>
+            <Text
+                color="dimmed"
+                align="center"
+                size="lg"
+                sx={{ maxWidth: 580 }}
+                mx="auto"
+                mt="xl"
+            >
+                Finding your next home is difficult. We provide answers to all
+                the questions you wish you could ask. Is that restaurant across
+                the street really noisy? How many hot showers will you really
+                get? Is the morning light in the kitchen perfect for your food
+                blog? Let IMHO help you find your oasis!
+            </Text>
+            <Box>
+                <Grid mt={40} justify="space-between">
+                    <Grid.Col span={3}>
+                        <Center>
+                            <Link href="/review" passHref>
+                                <Button
+                                    variant="gradient"
+                                    gradient={{
+                                        from: 'grape',
+                                        to: 'pink',
+                                        deg: 35,
+                                    }}
+                                    leftIcon={<FaRegCommentDots size={18} />}
+                                >
+                                    Write a Review
+                                </Button>
+                            </Link>
+                        </Center>
+                    </Grid.Col>
+                    <Grid.Col span={3}>
+                        <Center>
+                            <Link href="/search" passHref>
+                                <Button
+                                    component="a"
+                                    variant="gradient"
+                                    gradient={{
+                                        from: 'grape',
+                                        to: 'pink',
+                                        deg: 35,
+                                    }}
+                                    leftIcon={<FaSearchengin size={18} />}
+                                >
+                                    Search our Records
+                                </Button>
+                            </Link>
+                        </Center>
+                    </Grid.Col>
+                    <Grid.Col span={3}>
+                        <Center>
+                            <Link href="/login" passHref>
+                                <Button
+                                    variant="gradient"
+                                    gradient={{
+                                        from: 'grape',
+                                        to: 'pink',
+                                        deg: 35,
+                                    }}
+                                    leftIcon={<RiLoginBoxLine size={18} />}
+                                >
+                                    Login to Dashboard
+                                </Button>
+                            </Link>
+                        </Center>
+                    </Grid.Col>
+                </Grid>
+            </Box>
+        </MotionContainer>
     );
-};
-
-const Arrow = createIcon({
-    displayName: 'Arrow',
-    viewBox: '0 0 72 24',
-    path: (
-        <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M0.600904 7.08166C0.764293 6.8879 1.01492 6.79004 1.26654 6.82177C2.83216 7.01918 5.20326 7.24581 7.54543 7.23964C9.92491 7.23338 12.1351 6.98464 13.4704 6.32142C13.84 6.13785 14.2885 6.28805 14.4722 6.65692C14.6559 7.02578 14.5052 7.47362 14.1356 7.6572C12.4625 8.48822 9.94063 8.72541 7.54852 8.7317C5.67514 8.73663 3.79547 8.5985 2.29921 8.44247C2.80955 9.59638 3.50943 10.6396 4.24665 11.7384C4.39435 11.9585 4.54354 12.1809 4.69301 12.4068C5.79543 14.0733 6.88128 15.8995 7.1179 18.2636C7.15893 18.6735 6.85928 19.0393 6.4486 19.0805C6.03792 19.1217 5.67174 18.8227 5.6307 18.4128C5.43271 16.4346 4.52957 14.868 3.4457 13.2296C3.3058 13.0181 3.16221 12.8046 3.01684 12.5885C2.05899 11.1646 1.02372 9.62564 0.457909 7.78069C0.383671 7.53862 0.437515 7.27541 0.600904 7.08166ZM5.52039 10.2248C5.77662 9.90161 6.24663 9.84687 6.57018 10.1025C16.4834 17.9344 29.9158 22.4064 42.0781 21.4773C54.1988 20.5514 65.0339 14.2748 69.9746 0.584299C70.1145 0.196597 70.5427 -0.0046455 70.931 0.134813C71.3193 0.274276 71.5206 0.70162 71.3807 1.08932C66.2105 15.4159 54.8056 22.0014 42.1913 22.965C29.6185 23.9254 15.8207 19.3142 5.64226 11.2727C5.31871 11.0171 5.26415 10.5479 5.52039 10.2248Z"
-            fill="currentColor"
-        />
-    ),
-});
-
-const IndexPage: NextPage = () => {
-    return (
-        <Layout title="Home" description={'splash'}>
-            <Index />
-        </Layout>
-    );
-};
-
-export default IndexPage;
+}

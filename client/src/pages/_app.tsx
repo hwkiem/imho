@@ -1,38 +1,59 @@
-import { ChakraProvider } from '@chakra-ui/react';
-import '@fontsource/raleway/400.css';
-import '@fontsource/open-sans/700.css';
-import { theme } from '../theme';
-import { ApolloProvider } from '@apollo/client';
-import { useApollo } from '../lib/apollo';
-import type { AppProps } from 'next/app';
-import { Fragment } from 'react';
-import type { Page } from '../types/page';
-
-import 'react-month-picker/scss/month-picker.scss';
+import { AppProps } from 'next/app';
+import Head from 'next/head';
+import {
+    MantineProvider,
+    NormalizeCSS,
+    GlobalStyles,
+    ColorSchemeProvider,
+    ColorScheme,
+} from '@mantine/core';
+import { NotificationsProvider } from '@mantine/notifications';
+import { useColorScheme, useHotkeys } from '@mantine/hooks';
+import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 
-// this should give a better typing
-type Props = AppProps & {
-    Component: Page;
-};
-const MyApp = ({ Component, pageProps }: Props) => {
-    // adjust accordingly if you disabled a layout rendering option
-    const apolloClient = useApollo(pageProps);
+export default function App(props: AppProps) {
+    const { Component, pageProps } = props;
+
+    // fetch user preferred ColorScheme and set default
+    const preferredColorScheme = useColorScheme();
+    const [colorScheme, setColorScheme] =
+        useState<ColorScheme>(preferredColorScheme);
+
+    // color scheme toggle function
+    const toggleColorScheme = (value?: ColorScheme) =>
+        setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+
+    // ctr/cmd J to quick switch color scheme
+    useHotkeys([['mod+J', () => toggleColorScheme()]]);
+
     const router = useRouter();
 
     return (
-        <ApolloProvider client={apolloClient}>
-            <ChakraProvider theme={theme}>
-                <AnimatePresence exitBeforeEnter>
-                    <Component {...pageProps} key={router.route} />
-                </AnimatePresence>
-            </ChakraProvider>
-        </ApolloProvider>
+        <>
+            <Head>
+                <meta
+                    name="viewport"
+                    content="minimum-scale=1, initial-scale=1, width=device-width"
+                />
+            </Head>
+            <ColorSchemeProvider
+                colorScheme={colorScheme}
+                toggleColorScheme={toggleColorScheme}
+            >
+                <MantineProvider
+                    theme={{ colorScheme }}
+                    withNormalizeCSS
+                    withGlobalStyles
+                >
+                    <NotificationsProvider>
+                        <AnimatePresence exitBeforeEnter>
+                            <Component {...pageProps} key={router.route} />
+                        </AnimatePresence>
+                    </NotificationsProvider>
+                </MantineProvider>
+            </ColorSchemeProvider>
+        </>
     );
-
-    // or swap the layout rendering priority
-    // return getLayout(<Layout><Component {...pageProps} /></Layout>)
-};
-
-export default MyApp;
+}
