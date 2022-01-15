@@ -1,4 +1,4 @@
-mutation writeReview($options: WriteReviewInput!) {
+mutation WriteReview($options: WriteReviewInput!) {
     writeReview(options: $options) {
         errors {
             field

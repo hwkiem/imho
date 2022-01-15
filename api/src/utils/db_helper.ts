@@ -23,7 +23,7 @@ export const assembleReview = (reviews: any): Review[] => {
             noise: review.neighborhood,
             mold_or_mildew: review.pet_friendly,
             pests: review.storage,
-            maintanence_issues: review.storage,
+            maintenance_issues: review.storage,
             connectivity: review.storage,
         };
         const dbks: DbksType = {
@@ -85,7 +85,7 @@ export function reviewColumns(this: postgresHandler) {
         'noise',
         'mold_or_mildew',
         'pests',
-        'maintanence_issues',
+        'maintenance_issues',
         'connectivity',
         'safety',
         'security_deposit',
