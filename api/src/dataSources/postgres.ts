@@ -18,14 +18,14 @@ import {
     saveResidence,
 } from '../Residence/residence_db_handler';
 import {
-    getReviewsByPrimaryKeyTuple,
+    // getReviewsByPrimaryKeyTuple,
     getReviewsByResidenceId,
     getReviewsByReviewId,
     getReviewsByUserId,
+    // getReviewsCountGeneric,
     getReviewsGeneric,
     updateReviewGeneric,
     writeReview,
-    // writeReview,
 } from '../Review/review_db_handler';
 import { reviewColumns } from '../utils/db_helper';
 import {
@@ -41,12 +41,6 @@ import {
 } from '../Location/location_db_handler';
 import { Service } from 'typedi';
 import { Knex, knex } from 'knex';
-import {
-    createFlag,
-    createFlagBatch,
-    getFlagsById,
-    getFlagsByReviewId,
-} from '../Flag/flag_db_handler';
 
 @Service()
 export class postgresHandler {
@@ -70,7 +64,6 @@ export class postgresHandler {
     public changePassword = changePassword;
 
     // Locations
-
     public getLocationsById = getLocationsById;
 
     public getSingleLocationById = getSingleLocationById;
@@ -115,20 +108,9 @@ export class postgresHandler {
 
     public getReviewsByResidenceId = getReviewsByResidenceId;
 
-    public getReviewsByPrimaryKeyTuple = getReviewsByPrimaryKeyTuple;
-
     public getReviewsByReviewId = getReviewsByReviewId;
 
     public updateReviewGeneric = updateReviewGeneric;
-
-    // Flags
-    public createFlag = createFlag;
-
-    public createFlagBatch = createFlagBatch;
-
-    public getFlagsById = getFlagsById;
-
-    public getFlagsByReviewId = getFlagsByReviewId;
 
     // Helpers
     public reviewColumns = reviewColumns;

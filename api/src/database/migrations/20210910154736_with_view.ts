@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Knex } from 'knex';
 import {
     CREATE_ENHANCED_LOCATION_VIEW,
@@ -44,7 +45,7 @@ export async function up(knex: Knex): Promise<void> {
                 .references('loc_id')
                 .inTable('locations')
                 .notNullable();
-            table.string('unit').notNullable();
+            table.string('unit').defaultTo('PH');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
             table.unique(['loc_id', 'unit']);
@@ -63,11 +64,37 @@ export async function up(knex: Knex): Promise<void> {
                 .integer('user_id')
                 .references('user_id')
                 .inTable('users')
-                .notNullable();
+                .nullable();
             table.unique(['user_id', 'res_id']);
-            table.integer('rent');
+            // start Flags
+            // Pros
+            table.boolean('appliances');
+            table.boolean('natural_light');
+            table.boolean('neighborhood');
+            table.boolean('amenities');
+            table.boolean('good_landlord');
+            table.boolean('pet_friendly');
+            table.boolean('storage');
+            // Cons
+            table.boolean('bad_landlord');
+            table.boolean('pet_unfriendly');
+            table.boolean('shower');
+            table.boolean('false_advertisement');
+            table.boolean('noise');
+            table.boolean('mold_or_mildew');
+            table.boolean('pests');
+            table.boolean('maintanence_issues');
+            table.boolean('connectivity');
+            table.boolean('safety');
+            // Dealbreakers
+            table.boolean('security_deposit');
+            table.boolean('lease_issues');
+            table.boolean('burglary');
+            table.boolean('construction_harrassment');
+            table.boolean('unresponsiveness');
+            table.boolean('privacy');
+
             table.integer('rating');
-            table.specificType('lease_term', 'tsrange').notNullable();
             table.text('feedback');
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('updated_at').defaultTo(knex.fn.now());
@@ -92,21 +119,6 @@ export async function up(knex: Knex): Promise<void> {
         })
         .then(() => knex.raw(onUpdateTrigger('saved_residences')));
 
-    await knex.schema
-        .createTable('flags', (table: Knex.TableBuilder) => {
-            table.increments('flag_id');
-            table
-                .integer('rev_id')
-                .references('rev_id')
-                .inTable('reviews')
-                .notNullable();
-            table.enum('category', ['RED', 'GREEN']).notNullable();
-            table.string('topic');
-            table.timestamp('created_at').defaultTo(knex.fn.now());
-            table.timestamp('updated_at').defaultTo(knex.fn.now());
-        })
-        .then(() => knex.raw(onUpdateTrigger('flags')));
-
     // View to enhance residences with average_stats
     await knex.schema.createView('residences_enhanced', (view) => {
         view.columns([
@@ -116,7 +128,6 @@ export async function up(knex: Knex): Promise<void> {
             'created_at',
             'updated_at',
             'avg_rating',
-            'avg_rent',
         ]);
         view.as(CREATE_ENHANCED_RESIDENCE_VIEW(knex));
     });
@@ -144,7 +155,6 @@ export async function down(knex: Knex): Promise<void> {
     await knex.schema.dropViewIfExists('locations_enhanced');
     await knex.schema.dropViewIfExists('residences_enhanced');
     // tables
-    await knex.schema.dropTable('flags');
     await knex.schema.dropTable('reviews');
     await knex.schema.dropTable('saved_residences');
     await knex.schema.dropTable('users');

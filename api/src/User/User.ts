@@ -22,7 +22,7 @@ export class User {
     email: string;
 
     @Field({ nullable: true })
-    profession: string;
+    profession?: string;
 
     password: string;
 
@@ -45,9 +45,9 @@ export class User {
                         }
                       : { user_id: uid },
                   {
-                      attribute: ReviewSortBy.LEASE_TERM,
+                      attribute: ReviewSortBy.USER_ID,
                       sort: QueryOrderChoice.DESC,
-                  }, // overwrite sort to most recent first
+                  }, // shouldnt do anything
                   options.limit ? options.limit : undefined
               )
             : await pg.getReviewsGeneric({

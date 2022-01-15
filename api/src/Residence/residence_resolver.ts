@@ -1,4 +1,4 @@
-import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Int, Query, Resolver } from 'type-graphql';
 import { Residence } from './Residence';
 import {
     FieldError,
@@ -16,7 +16,7 @@ import { LocationCategory } from '../types/enum_types';
 @Resolver(Residence)
 export class ResidencyResolver {
     constructor(private readonly pg: postgresHandler) {}
-    @Mutation(() => SingleResidenceResponse)
+    // @Mutation(() => SingleResidenceResponse)
     async createResidence(
         @Arg('options') options: CreateResidenceInput
     ): Promise<SingleResidenceResponse> {
@@ -25,7 +25,7 @@ export class ResidencyResolver {
         const loc_id = await this.pg.createLocationIfNotExists(
             options.google_place_id,
             LocationCategory.HOUSE,
-            '' // bad code here
+            '' // no landlord
         );
         if (loc_id instanceof FieldError) return { errors: [loc_id] };
 

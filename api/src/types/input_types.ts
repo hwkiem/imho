@@ -4,36 +4,33 @@ import { Review } from '../Review/Review';
 import { User } from '../User/User';
 import { Location } from '../Location/Location';
 import {
-    FlagTypes,
-    GreenFlags,
     LocationCategory,
     LocationSortBy,
     QueryOrderChoice,
-    RedFlags,
     ResidenceSortBy,
     ReviewSortBy,
     UserSortBy,
 } from './enum_types';
-import { ReviewFields } from './types';
+import { FlagsInput } from './flags';
 
-@InputType()
-export class AllFlagTopicsInput {
-    @Field(() => GreenFlags, { nullable: true })
-    green_flags?: GreenFlags;
-    @Field(() => RedFlags, { nullable: true })
-    red_flags?: RedFlags;
-}
-@InputType()
-export class FlagInput {
-    @Field(() => FlagTypes)
-    category: FlagTypes;
-    @Field(() => RedFlags, { nullable: true })
-    red_topic?: RedFlags;
-    @Field(() => GreenFlags, { nullable: true })
-    green_topic?: GreenFlags;
-    // @Field()
-    // rev_id: number;
-}
+// @InputType()
+// export class AllFlagTopicsInput {
+//     @Field(() => GreenFlags, { nullable: true })
+//     green_flags?: GreenFlags;
+//     @Field(() => RedFlags, { nullable: true })
+//     red_flags?: RedFlags;
+// }
+// @InputType()
+// export class FlagInput {
+//     @Field(() => FlagTypes)
+//     category: FlagTypes;
+//     @Field(() => RedFlags, { nullable: true })
+//     red_topic?: RedFlags;
+//     @Field(() => GreenFlags, { nullable: true })
+//     green_topic?: GreenFlags;
+//     // @Field()
+//     // rev_id: number;
+// }
 
 @InputType() // subset of User used as filter values
 export class PartialUser implements Partial<User> {
@@ -58,9 +55,6 @@ export class PartialReview implements Partial<Review> {
 
     @Field({ nullable: true })
     rent: number;
-
-    @Field(() => DateRangeInput, { nullable: true })
-    lease_term?: DateRangeInput;
 }
 
 @InputType()
@@ -232,36 +226,35 @@ export class CreateResidenceInput {
 }
 
 @InputType()
-export class ReviewFieldsInput implements ReviewFields {
+export class ReviewFieldsInput {
     @Field()
     rating: number;
 
-    @Field()
-    rent?: number;
+    @Field({ nullable: true })
+    feedback: string;
 
-    @Field(() => DateRangeInput)
-    lease_term: DateRangeInput;
-
-    @Field()
-    feedback?: string;
+    @Field(() => FlagsInput)
+    flags: FlagsInput;
 }
 
 @InputType()
 export class WriteReviewInput {
+    // relevant to location
     @Field()
     google_place_id: string;
 
-    @Field()
+    @Field({ nullable: true })
     unit: string;
-
-    @Field(() => ReviewFieldsInput)
-    review_input: ReviewFieldsInput;
 
     @Field(() => LocationCategory)
     category: LocationCategory;
 
-    @Field()
+    @Field({ nullable: true })
     landlord_email: string;
+
+    // purely review
+    @Field(() => ReviewFieldsInput)
+    review_input: ReviewFieldsInput;
 }
 
 @InputType()
