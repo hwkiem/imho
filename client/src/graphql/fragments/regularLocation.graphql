@@ -1,13 +1,27 @@
 fragment RegularLocation on Location {
     loc_id
-    full_address
+    imho_score
+    landlord_email
+    category
+    google_place_id
+    formatted_address
     coords {
         lat
         lng
     }
     avg_rent
     avg_rating
-    myResidences {
-        ...RegularResidence
+    residences {
+        res_id
+        loc_id
+        unit
+        avg_rating
+        avg_rent
+        reviews {
+            reviews {
+                ...RegularReview
+            }
+            count
+        }
     }
 }

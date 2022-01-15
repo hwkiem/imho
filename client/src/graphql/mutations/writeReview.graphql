@@ -1,10 +1,5 @@
-mutation WriteReview($options: WriteReviewInput!) {
-    writeReview(options: $options) {
-        errors {
-            ...RegularError
-        }
-        review {
-            ...RegularReview
-        }
+mutation WriteReview($flags: [FlagInput!]!, $options: WriteReviewInput!) {
+    writeReview(flags: $flags, options: $options) {
+        ...RegularSingleReviewResponse
     }
 }

@@ -1,8 +1,8 @@
-fragment RegularReviewResponse on ReviewResponse {
+fragment RegularSingleReviewResponse on SingleReviewResponse {
     errors {
         ...RegularError
     }
-    reviews {
+    review {
         ...RegularReview
     }
 }
