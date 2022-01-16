@@ -12,6 +12,7 @@ import { Base } from './Base';
 import { Residence } from './Residence';
 import { LocationType } from 'src/enums/LocationType.enum';
 import LocationValidator from 'src/validators/location.validator';
+import { Flag } from './Review';
 
 @ObjectType()
 @Entity()
@@ -20,19 +21,21 @@ export class Location extends Base<Location> {
     @Property()
     public google_place_id: string;
 
-    @Field(() => Location, { nullable: true })
-    @ManyToOne(() => Location, {
-        cascade: [Cascade.PERSIST, Cascade.REMOVE],
-    })
-    public residences: Residence;
+    @Field()
+    @Property()
+    public formatted_address: string;
 
     @Field(() => [Residence])
     @OneToMany(() => Residence, (r: Residence) => r.location)
-    public residence = new Collection<Residence>(this);
+    public residences = new Collection<Residence>(this);
 
     @Field(() => LocationType)
     @Enum(() => LocationType)
     public type: LocationType;
+
+    // Field resolver and some sort of validation on topFlags length
+    @Field(() => [Flag])
+    topFlags: Flag[];
 
     constructor(body: LocationValidator) {
         super(body);
