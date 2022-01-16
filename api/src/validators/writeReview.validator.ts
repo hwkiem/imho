@@ -1,16 +1,18 @@
-import { LocationType } from '../enums/LocationType.enum';
-import { IsEnum, IsString } from 'class-validator';
+// import { LocationType } from '../enums/LocationType.enum';
+import { IsString } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
+import LocationValidator from './location.validator';
 
 @InputType()
 class WriteReviewValidator {
-    @Field()
-    @IsString()
-    public google_place_id: string;
+    public locationValidator: LocationValidator;
+    // @Field()
+    // @IsString()
+    // public google_place_id: string;
 
-    @Field(() => LocationType)
-    @IsEnum(LocationType)
-    public type: LocationType;
+    // @Field(() => LocationType)
+    // @IsEnum(LocationType)
+    // public type: LocationType;
 
     @Field({ nullable: true })
     @IsString()

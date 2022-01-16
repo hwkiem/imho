@@ -28,13 +28,16 @@ export class ReviewResolver {
     ): Promise<Review> {
         // does the location/residence exist?
 
-        const location: Location | null = await em
+        let location: Location | null = await em
             .getRepository(Location)
-            .findOne({ google_place_id: input.google_place_id });
-        // create
-        // if (typeof location == null) {
+            .findOne({
+                google_place_id: input.locationValidator.google_place_id,
+            });
 
-        // }
+        if (typeof location == null) {
+            // create
+            location = new Location(input.locationValidator);
+        }
 
         const book = new Review(input);
         try {
