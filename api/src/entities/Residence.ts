@@ -2,11 +2,9 @@ import {
     Cascade,
     Collection,
     Entity,
-    ManyToMany,
     ManyToOne,
     OneToMany,
     Property,
-    Enum,
 } from '@mikro-orm/core';
 import { Review } from './Review';
 import { Field, ObjectType } from 'type-graphql';

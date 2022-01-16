@@ -8,7 +8,8 @@ import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { Container } from 'typedi';
-import { MikroORM } from '@mikro-orm/core';
+import { MikroORM, RequestContext } from '@mikro-orm/core';
+import { ReviewResolver } from './resolvers/review.resolver';
 
 // var morgan = require('morgan')
 
@@ -54,22 +55,22 @@ const main = async () => {
         })
     );
 
+    app.use((_, __, next) => {
+        RequestContext.create(orm.em, next);
+    });
+
     // Configure AppolloServer
     const apolloServer = new ApolloServer({
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
         schema: await buildSchema({
-            resolvers: [
-                UserResolver,
-                ResidencyResolver,
-                ReviewResolver,
-                LocationResolver,
-            ],
+            resolvers: [ReviewResolver],
             container: Container,
             validate: false,
         }),
         context: ({ req, res }) => ({
             req,
             res,
+            orm,
         }),
     });
 

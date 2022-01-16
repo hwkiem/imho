@@ -9,60 +9,68 @@ import WriteReviewValidator from 'src/validators/writeReview.validator';
 
 @Resolver(() => Review)
 export class ReviewResolver {
-    @Query(() => [Review])
-    public async getReviewsByPlaceId(
-        @Ctx() ctx: MyContext,
-        @Arg('placeId') placeId: string
-    ): Promise<Review[]> {
-        const review = await ctx.em.findOne(Review, {
-            residence: { location: { google_place_id: placeId } },
-        });
-        return [review];
-    }
+    // @Query(() => [Review])
+    // public async getReviewsByPlaceId(
+    //     @Ctx() ctx: MyContext,
+    //     @Arg('placeId') placeId: string
+    // ): Promise<Review[]> {
+    //     const review = await ctx.em.findOne(Review, {
+    //         residence: { location: { google_place_id: placeId } },
+    //     });
+    //     return [review];
+    // }
 
     @Mutation(() => Review)
     public async addReview(
         @Arg('input') input: WriteReviewValidator,
-        @Ctx() ctx: MyContext,
+        @Ctx() { em }: MyContext,
         @Info() info: GraphQLResolveInfo
     ): Promise<Review> {
+        // does the location/residence exist?
+        const google_place_id = input.google_place_id;
+        const location: Location | null = await em
+            .getRepository(Location)
+            .findOne();
+
         const book = new Review(input);
         try {
-            book.residence = await ctx.em
+            book.residence = await em
                 .getRepository(Residence)
                 .findOneOrFail(
                     { google_place_id: resId },
                     fieldsToRelations(info, { root: 'residence' })
                 );
-        } catch (e) {}
+        } catch (e) {
+            console.log(e);
+        }
 
-        await ctx.em.persist(book).flush();
+        await em.persist(book).flush();
         return book;
     }
 
-    @Mutation(() => Review)
-    public async updateReview(
-        @Arg('input') input: ReviewValidator,
-        @Arg('id') id: string,
-        @Ctx() ctx: MyContext,
-        @Info() info: GraphQLResolveInfo
-    ): Promise<Review> {
-        const relationPaths = fieldsToRelations(info);
-        const book = await ctx.em
-            .getRepository(Review)
-            .findOneOrFail({ id }, relationPaths);
-        book.assign(input);
-        await ctx.em.persist(book).flush();
-        return book;
-    }
+    // @Mutation(() => Review)
+    // public async updateReview(
+    //     @Arg('input') input: ReviewValidator,
+    //     @Arg('id') id: string,
+    //     @Ctx() ctx: MyContext,
+    //     @Info() info: GraphQLResolveInfo
+    // ): Promise<Review> {
+    //     const relationPaths = fieldsToRelations(info);
+    //     const book = await ctx.em
+    //         .getRepository(Review)
+    //         .findOneOrFail({ id }, relationPaths);
+    //     book.assign(input);
+    //     await ctx.em.persist(book).flush();
+    //     return book;
+    // }
 
-    @Mutation(() => Boolean)
-    public async deleteReview(
-        @Arg('id') id: string,
-        @Ctx() ctx: MyContext
-    ): Promise<boolean> {
-        const book = await ctx.em.getRepository(Review).findOneOrFail({ id });
-        await ctx.em.getRepository(Review).remove(book).flush();
-        return true;
-    }
+    // @Mutation(() => Boolean)
+    // public async deleteReview(
+    //     @Arg('id') id: string,
+    //     @Ctx() ctx: MyContext
+    // ): Promise<boolean> {
+    //     const book = await ctx.em.getRepository(Review).findOneOrFail({ id });
+    //     await ctx.em.getRepository(Review).remove(book).flush();
+    //     return true;
+    // }
 }
