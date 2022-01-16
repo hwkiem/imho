@@ -1,11 +1,14 @@
-import { Field, ObjectType } from 'type-graphql';
+import { ClassType, Field, ObjectType } from 'type-graphql';
 import { FieldError } from './FieldError';
 
-@ObjectType({ isAbstract: true })
-export class Response<T> {
-    @Field({ nullable: true })
-    public result?: T;
+export function ApiResponse<T>(TClass: ClassType<T>) {
+    @ObjectType({ isAbstract: true })
+    abstract class ApiResponseClass {
+        @Field(() => TClass, { nullable: true })
+        public result?: T;
 
-    @Field(() => FieldError, { nullable: true })
-    public errors?: FieldError[];
+        @Field(() => FieldError, { nullable: true })
+        public errors?: FieldError[];
+    }
+    return ApiResponseClass;
 }

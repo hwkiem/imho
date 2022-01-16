@@ -5,6 +5,7 @@ import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
 import { Location } from './Location';
 import { Residence } from './Residence';
+import { ApiResponse } from './Response';
 
 @Entity()
 export class Flag {
