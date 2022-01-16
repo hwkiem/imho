@@ -11,6 +11,7 @@ import ReviewValidator from 'src/validators/review.validator';
 import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
+import { ApiResponse } from './Response';
 
 @Entity()
 export class Flag {
