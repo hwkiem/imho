@@ -1,12 +1,4 @@
-import {
-    Cascade,
-    Entity,
-    ManyToOne,
-    Property,
-    Enum,
-    Collection,
-    OneToMany,
-} from '@mikro-orm/core';
+import { Entity, Property, Enum, Collection, OneToMany } from '@mikro-orm/core';
 import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';

@@ -4,7 +4,7 @@ import { GraphQLResolveInfo } from 'graphql';
 import fieldsToRelations from 'graphql-fields-to-relations';
 import { Arg, Ctx, Info, Mutation, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
-import ReviewValidator from '../validators/review.validator';
+import { Location } from '../entities/Location';
 import WriteReviewValidator from 'src/validators/writeReview.validator';
 
 @Resolver(() => Review)
@@ -27,10 +27,14 @@ export class ReviewResolver {
         @Info() info: GraphQLResolveInfo
     ): Promise<Review> {
         // does the location/residence exist?
-        const google_place_id = input.google_place_id;
+
         const location: Location | null = await em
             .getRepository(Location)
-            .findOne();
+            .findOne({ google_place_id: input.google_place_id });
+        // create
+        // if (typeof location == null) {
+
+        // }
 
         const book = new Review(input);
         try {
