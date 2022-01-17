@@ -5,18 +5,15 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "clean": "rimraf dist/",
+        "clean": "rimraf dist/ node_modules/",
         "build": "yarn clean && tsc",
         "watch": "tsc -w",
         "start": "nodemon dist/index.js",
-        "migrate:make": "knex --knexfile src/database/knexfile.ts migrate:make -x ts",
-        "migrate:latest": "knex --knexfile src/database/knexfile.ts migrate:latest",
-        "migrate:rollback": "knex --knexfile src/database/knexfile.ts migrate:rollback",
-        "seed:make": "knex --knexfile src/database/knexfile.ts seed:make -x ts",
-        "seed:run": "knex --knexfile src/database/knexfile.ts seed:run"
+        "migrate:initial": "yarn mikro-orm migration:create --initial"
     },
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
+        "@mikro-orm/cli": "^4.5.10",
         "@mikro-orm/core": "^4.5.10",
         "@mikro-orm/postgresql": "^4.5.10",
         "apollo-server": "^3.1.2",
@@ -59,5 +56,12 @@
         "rimraf": "^3.0.2",
         "ts-node": "^10.4.0",
         "typescript": "^4.3.5"
+    },
+    "mikro-orm": {
+        "useTsNode": true,
+        "configPaths": [
+            "./src/mikro-orm.config.ts",
+            "./dist/mikro-orm.config.js"
+        ]
     }
 }

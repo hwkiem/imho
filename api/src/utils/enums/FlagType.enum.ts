@@ -40,4 +40,4 @@ export enum DbkFlagType {
 }
 
 export const FlagTypes = { ...ProFlagType, ...ConFlagType, ...DbkFlagType };
-export type FlagType = typeof FlagTypes;
+export type FlagTypes = ProFlagType | ConFlagType | DbkFlagType;

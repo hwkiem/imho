@@ -1,16 +1,11 @@
 import { Cascade, Entity, ManyToOne, Property } from '@mikro-orm/core';
-import { FlagType } from 'src/enums/FlagType.enum';
-import ReviewValidator from 'src/validators/review.validator';
+
+import { ReviewValidator } from '../validators/ReviewValidator';
 import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
-import { Location } from './Location';
 import { Residence } from './Residence';
-import { ApiResponse } from './Response';
-
-@Entity()
-export class Flag {
-    topic: FlagType;
-}
+import Flag from '../utils/types/Flag';
+// import { ApiResponse } from './Response';
 
 @ObjectType()
 @Entity()
@@ -24,12 +19,6 @@ export class Review extends Base<Review> {
         cascade: [Cascade.PERSIST, Cascade.REMOVE],
     })
     public residence: Residence;
-
-    @Field(() => Location, { nullable: true })
-    @ManyToOne(() => Location, {
-        cascade: [Cascade.PERSIST, Cascade.REMOVE],
-    })
-    public location: Location;
 
     @Field(() => [Flag])
     flags: Flag[];

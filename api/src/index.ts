@@ -2,26 +2,91 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import cors from 'cors';
-import { buildSchema } from 'type-graphql';
+import { buildSchema, registerEnumType } from 'type-graphql';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { Container } from 'typedi';
-import { MikroORM, RequestContext } from '@mikro-orm/core';
+// import { Container } from 'typedi';
+import {
+    Connection,
+    IDatabaseDriver,
+    MikroORM,
+    RequestContext,
+} from '@mikro-orm/core';
 import { ReviewResolver } from './resolvers/review.resolver';
-
-// var morgan = require('morgan')
+import { PlaceType } from './utils/enums/PlaceType.enum';
+import {
+    ConFlagType,
+    DbkFlagType,
+    FlagTypes,
+    ProFlagType,
+} from './utils/enums/FlagType.enum';
+import { PlaceResolver } from './resolvers/place.resolver';
+import { MyContext } from './utils/context';
 
 const main = async () => {
     const app = express();
 
-    const orm = await MikroORM.init({
-        entities: ['./dist/app/**/entities'],
-        dbName: 'imho',
-        type: 'postgresql',
-        clientUrl: process.env.DATABASE_URL,
+    // TODO: create service for this
+    registerEnumType(PlaceType, {
+        name: 'PlaceType',
+        description: 'Type of the this address',
     });
+
+    registerEnumType(FlagTypes, {
+        name: 'FlagTypes',
+        description: 'All the flag topics',
+    });
+
+    registerEnumType(ProFlagType, {
+        name: 'ProFlagTypes',
+        description: 'All the negative flag topics',
+    });
+
+    registerEnumType(DbkFlagType, {
+        name: 'DbkFlagTypes',
+        description: 'All the dealbreakers',
+    });
+
+    registerEnumType(ConFlagType, {
+        name: 'ConFlagTypes',
+        description: 'All the positive flag topics',
+    });
+
+    let orm: MikroORM<IDatabaseDriver<Connection>>;
+    try {
+        orm = await MikroORM.init({
+            migrations: {
+                path: './migrations',
+                tableName: 'migrations',
+                transactional: true,
+            },
+            tsNode: process.env.NODE_DEV === 'true' ? true : false,
+            user: process.env.DATABASE_USER,
+            password: process.env.DATABASE_PASSWORD,
+            dbName: process.env.DATABASE_NAME,
+            host: process.env.DATABASE_HOST,
+            port: 5432,
+            entities: ['./dist/entities/*.js'],
+            entitiesTs: ['./src/entities/*.ts'],
+            type: 'postgresql',
+        });
+        console.log('Connection secured.');
+        const migrator = orm.getMigrator();
+        const migrations = await migrator.getPendingMigrations();
+        if (migrations && migrations.length > 0) {
+            console.log('Applying migrations...');
+            console.log(migrations);
+            await migrator.up();
+            console.log('Migrations applied.');
+        } else { 
+            console.log('Migrations up to date.');
+        }
+    } catch (error) {
+        console.error('📌 Could not connect to the database', error);
+        throw Error(error);
+    }
 
     // Redis Cookies / Sessions
     const RedisStore = connectRedis(session);
@@ -63,15 +128,11 @@ const main = async () => {
     const apolloServer = new ApolloServer({
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
         schema: await buildSchema({
-            resolvers: [ReviewResolver],
-            container: Container,
-            validate: false,
+            resolvers: [ReviewResolver, PlaceResolver],
+            validate: true,
         }),
-        context: ({ req, res }) => ({
-            req,
-            res,
-            orm,
-        }),
+        context: ({ req, res }) =>
+            ({ req, res, em: orm.em.fork() } as MyContext),
     });
 
     await apolloServer.start();
