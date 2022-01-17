@@ -12,6 +12,7 @@ export default {
     dbName: process.env.DATABASE_NAME,
     host: process.env.DATABASE_HOST,
     port: 5432,
+    debug: true,
     entities: ['./dist/entities/*.js'],
     entitiesTs: ['./src/entities/*.ts'],
     type: 'postgresql',

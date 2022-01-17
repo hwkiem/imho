@@ -5,6 +5,7 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
+        "clean": "rimraf dist/ node_modules/ .next/",
         "dev": "next dev -p 4000",
         "build": "next build",
         "start": "next start",

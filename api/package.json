@@ -9,7 +9,12 @@
         "build": "yarn clean && tsc",
         "watch": "tsc -w",
         "start": "nodemon dist/index.js",
-        "migrate:initial": "yarn mikro-orm migration:create --initial"
+        "migrate:initial": "yarn mikro-orm migration:create --initial",
+        "migrate:up": "yarn mikro-orm migration:up",
+        "migrate:create": "yarn mikro-orm migration:create",
+        "migrate:down": "yarn mikro-orm migration:down",
+        "migrate:list": "yarn mikro-orm migration:list",
+        "migrate:pending": "yarn mikro-orm migration:pending"
     },
     "dependencies": {
         "@googlemaps/google-maps-services-js": "^3.1.16",
