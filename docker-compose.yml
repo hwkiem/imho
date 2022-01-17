@@ -38,7 +38,7 @@ services:
     restart: on-failure
 
   postgres:
-    image: postgis/postgis:14-3.1
+    image: postgres
     ports:
       - "5432:5432"
     environment:

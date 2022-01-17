@@ -5,13 +5,13 @@ import { ResidenceValidator } from './ResidenceValidator';
 import { ReviewValidator } from './ReviewValidator';
 
 @InputType()
-export class WriteReviewValidator {
+export class WriteReviewInput {
     @Field(() => PlaceValidator)
-    public placeValidator: PlaceValidator;
+    public placeInput: PlaceValidator;
 
     @Field(() => ResidenceValidator)
-    public residenceValidator: ResidenceValidator;
+    public residenceInput: ResidenceValidator;
 
     @Field(() => ReviewValidator)
-    public reviewValidator: ReviewValidator;
+    public reviewInput: ReviewValidator;
 }

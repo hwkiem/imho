@@ -1,24 +1,30 @@
 import { Place } from '../entities/Place';
-import { Arg, Ctx, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from 'src/utils/context';
 import { ApiResponse } from '../utils/types/Response';
 
+@ObjectType()
 class PlaceResponse extends ApiResponse(Place) {}
 
 @Resolver(() => Place)
 export class PlaceResolver {
-    @Query(() => [Place])
+    @Query(() => PlaceResponse)
     public async getPlace(
         @Ctx() ctx: MyContext,
         @Arg('placeId') placeId: string
     ): Promise<PlaceResponse> {
         try {
-            const place = await ctx.em.findOneOrFail(Place, {
-                google_place_id: placeId,
-            });
+            const place = await ctx.em.findOneOrFail(
+                Place,
+                {
+                    google_place_id: placeId,
+                },
+                ['residences', 'residence.reviews']
+            );
+            console.log(place.residences);
             return { result: place };
         } catch (e) {
-            console.error(e);
+            console.log(e);
             return {
                 errors: [
                     {

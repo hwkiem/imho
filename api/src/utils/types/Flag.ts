@@ -1,8 +1,9 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, InputType, ObjectType } from 'type-graphql';
 import { FlagTypes } from '../enums/FlagType.enum';
 
 @ObjectType()
-export default class Flag {
+@InputType('FlagInput')
+export class Flag {
     @Field(() => FlagTypes)
     topic: FlagTypes;
 }
