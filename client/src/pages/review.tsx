@@ -22,15 +22,14 @@ import { SuggestionList } from '../components/SuggestionList';
 import { MotionContainer } from '../utils/motion';
 import { Formik } from 'formik';
 import {
-    LocationCategory,
-    useWriteReviewMutation,
+    useAddReviewMutation,
     WriteReviewInput,
+    ProFlagTypes,
+    ConFlagTypes,
+    DbkFlagTypes,
+    PlaceType,
+    Flags,
 } from '../generated/graphql';
-import { consumers } from 'stream';
-
-import { useWriteReviewMutation } from '../generated/graphql';
-import { Formik } from 'formik';
-
 /**
  *
  * STEP KEY
@@ -85,50 +84,25 @@ export default function ReviewPage() {
 
     const [address, setAddress] = useState('');
 
-    const [writeReview, { error }] = useWriteReviewMutation();
+    const [writeReview, { error }] = useAddReviewMutation();
+
+    const [rating, setRating] = useState(50);
 
     const initialState: WriteReviewInput = {
-        google_place_id: '',
-        unit: '',
-        category: LocationCategory.House,
-        landlord_email: '',
-        review_input: {
-            rating: 50,
+        placeInput: {
+            google_place_id: '',
+            formatted_address: '',
+            type: PlaceType.Single,
+        },
+        residenceInput: {
+            unit: '',
+        },
+        reviewInput: {
             feedback: '',
-            flags: {
-                pros: {
-                    natural_light: false,
-                    neighborhood: false,
-                    amenities: false,
-                    appliances: false,
-                    good_landlord: false,
-                    pet_friendly: false,
-                    storage: false,
-                },
-                cons: {
-                    bad_landlord: false,
-                    pet_unfriendly: false,
-                    shower: false,
-                    false_advertisement: false,
-                    noise: false,
-                    mold_or_mildew: false,
-                    pests: false,
-                    maintenance_issues: false,
-                    connectivity: false,
-                    safety: false,
-                },
-                dbks: {
-                    lease_issues: false,
-                    security_deposit: false,
-                    burglary: false,
-                    construction_harrassment: false,
-                    privacy: false,
-                    unresponsiveness: false,
-                },
-            },
+            flags: { pros: [], cons: [], dbks: [] },
+            rating: 75,
         },
     };
-    a;
     return (
         <MotionContainer
             initial="hidden"
@@ -184,11 +158,11 @@ export default function ReviewPage() {
                 }}
                 onSubmit={async (values, { setSubmitting }) => {
                     const response = await writeReview({
-                        variables: { options: values },
+                        variables: { input: values },
                     });
-                    if (response.data?.writeReview.review) {
+                    if (response.data?.addReview.result) {
                         console.log(
-                            `Review created at: ${response.data.writeReview.review.created_at}`
+                            `Review created at: ${response.data.addReview.result.createdAt}`
                         );
                     }
                 }}
@@ -331,7 +305,7 @@ export default function ReviewPage() {
                                     onSelect={(place) => {
                                         setAddress(place.description);
                                         setFieldValue(
-                                            'google_place_id',
+                                            'placeInput.google_place_id',
                                             place.place_id
                                         );
                                         _nxt();
@@ -378,36 +352,35 @@ export default function ReviewPage() {
                                             color="pink"
                                             size="lg"
                                             spacing="xl"
-                                            value={values.category}
+                                            value={values.placeInput.type}
                                             onChange={(v) => {
-                                                setFieldValue('category', v);
+                                                setFieldValue(
+                                                    'placeInput.type',
+                                                    v
+                                                );
                                             }}
                                         >
-                                            <Radio
-                                                value={
-                                                    LocationCategory.ApartmentBuilding
-                                                }
-                                            >
+                                            <Radio value={PlaceType.Multi}>
                                                 Multi Unit
                                             </Radio>
-                                            <Radio
-                                                value={LocationCategory.House}
-                                            >
+                                            <Radio value={PlaceType.Single}>
                                                 Single Family
                                             </Radio>
                                         </RadioGroup>
                                     </Center>
                                     <Center mt={20}>
-                                        {values.category ===
-                                            LocationCategory.ApartmentBuilding && (
+                                        {values.placeInput.type ===
+                                            PlaceType.Multi && (
                                             <TextInput
                                                 size="sm"
                                                 placeholder="What unit do you live in?"
                                                 variant="filled"
-                                                value={values.unit}
+                                                value={
+                                                    values.residenceInput.unit
+                                                }
                                                 onChange={(evt) => {
                                                     setFieldValue(
-                                                        'unit',
+                                                        'residenceInput.unit',
                                                         evt.currentTarget.value
                                                     );
                                                 }}
@@ -445,13 +418,8 @@ export default function ReviewPage() {
                                         size="xl"
                                         radius="xs"
                                         step={25}
-                                        value={values.review_input.rating}
-                                        onChange={(v) => {
-                                            setFieldValue(
-                                                'review_input.rating',
-                                                v
-                                            );
-                                        }}
+                                        value={rating}
+                                        onChange={(v) => setRating(v)}
                                         marks={[
                                             { value: 0, label: 'Heck No!' },
                                             { value: 25, label: 'Nope.' },
@@ -471,11 +439,11 @@ export default function ReviewPage() {
                                                 deg: 65,
                                             }}
                                             onClick={() => {
-                                                if (
-                                                    values.review_input
-                                                        .rating >= 50
-                                                )
-                                                    setStepIdx(2);
+                                                setFieldValue(
+                                                    'reviewInput.rating',
+                                                    rating
+                                                );
+                                                if (rating >= 50) setStepIdx(2);
                                                 else setStepIdx(3);
                                             }}
                                         >
@@ -538,48 +506,34 @@ export default function ReviewPage() {
                                         ]}
                                     >
                                         {(
-                                            Object.keys(
-                                                values.review_input.flags.pros
-                                            ) as Array<
-                                                keyof typeof values.review_input.flags.pros
+                                            Object.keys(ProFlagTypes) as Array<
+                                                keyof typeof ProFlagTypes
                                             >
                                         ).map((key) => {
-                                            const getBackgroundColor = (
-                                                theme: MantineTheme
-                                            ) => {
-                                                if (
-                                                    values.review_input.flags
-                                                        .pros[key]
-                                                )
-                                                    return '#1ca600';
-                                                if (
-                                                    theme.colorScheme === 'dark'
-                                                )
-                                                    return theme.colors.dark[4];
-                                                return theme.colors.gray[2];
-                                            };
                                             return (
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
-                                                        console.log('!');
-
+                                                        const copy =
+                                                            values.reviewInput.flags.pros.map(
+                                                                (m) => m
+                                                            );
+                                                        copy.push(
+                                                            ProFlagTypes[key]
+                                                        );
                                                         setFieldValue(
-                                                            `review_input.flags.pros.${key}`,
-                                                            !values.review_input
-                                                                .flags.pros[key]
+                                                            `reviewInput.flags.pros`,
+                                                            copy
                                                         );
                                                     }}
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                getBackgroundColor(
-                                                                    theme
-                                                                ),
+                                                                '#32a852',
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
-                                                                        '#1ca600',
+                                                                        '#32a852',
                                                                         0.2
                                                                     ),
                                                             },
@@ -614,8 +568,8 @@ export default function ReviewPage() {
                                             }}
                                             onClick={() => {
                                                 if (
-                                                    values.review_input
-                                                        .rating >= 50
+                                                    values.reviewInput.rating >=
+                                                    50
                                                 )
                                                     _nxt();
                                                 else setStepIdx(5);
@@ -681,46 +635,34 @@ export default function ReviewPage() {
                                         ]}
                                     >
                                         {(
-                                            Object.keys(
-                                                values.review_input.flags.cons
-                                            ) as Array<
-                                                keyof typeof values.review_input.flags.cons
+                                            Object.keys(ConFlagTypes) as Array<
+                                                keyof typeof ConFlagTypes
                                             >
                                         ).map((key) => {
-                                            const getBackgroundColor = (
-                                                theme: MantineTheme
-                                            ) => {
-                                                if (
-                                                    values.review_input.flags
-                                                        .cons[key]
-                                                )
-                                                    return '#c46f00';
-                                                if (
-                                                    theme.colorScheme === 'dark'
-                                                )
-                                                    return theme.colors.dark[4];
-                                                return theme.colors.gray[2];
-                                            };
                                             return (
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
+                                                        const copy =
+                                                            values.reviewInput.flags.cons.map(
+                                                                (m) => m
+                                                            );
+                                                        copy.push(
+                                                            ConFlagTypes[key]
+                                                        );
                                                         setFieldValue(
-                                                            `review_input.flags.cons.${key}`,
-                                                            !values.review_input
-                                                                .flags.cons[key]
+                                                            `reviewInput.flags.cons`,
+                                                            copy
                                                         );
                                                     }}
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                getBackgroundColor(
-                                                                    theme
-                                                                ),
+                                                                '#85581b',
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
-                                                                        '#c46f00',
+                                                                        '#85581b',
                                                                         0.2
                                                                     ),
                                                             },
@@ -755,15 +697,17 @@ export default function ReviewPage() {
                                             }}
                                             onClick={() => {
                                                 if (
-                                                    values.review_input
-                                                        .rating >= 50
+                                                    values.reviewInput.rating >=
+                                                    50
                                                 )
                                                     setStepIdx(5);
                                                 else if (
-                                                    values.review_input.flags
-                                                        .cons.bad_landlord ||
-                                                    values.review_input.flags
-                                                        .cons.safety
+                                                    values.reviewInput.flags.cons.includes(
+                                                        ConFlagTypes.BadLandlord
+                                                    ) ||
+                                                    values.reviewInput.flags.cons.includes(
+                                                        ConFlagTypes.Unsafe
+                                                    )
                                                 )
                                                     _nxt();
                                                 else _prv();
@@ -828,46 +772,34 @@ export default function ReviewPage() {
                                         ]}
                                     >
                                         {(
-                                            Object.keys(
-                                                values.review_input.flags.dbks
-                                            ) as Array<
-                                                keyof typeof values.review_input.flags.dbks
+                                            Object.keys(DbkFlagTypes) as Array<
+                                                keyof typeof DbkFlagTypes
                                             >
                                         ).map((key) => {
-                                            const getBackgroundColor = (
-                                                theme: MantineTheme
-                                            ) => {
-                                                if (
-                                                    values.review_input.flags
-                                                        .dbks[key]
-                                                )
-                                                    return '#cf4100';
-                                                if (
-                                                    theme.colorScheme === 'dark'
-                                                )
-                                                    return theme.colors.dark[4];
-                                                return theme.colors.gray[2];
-                                            };
                                             return (
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
+                                                        const copy =
+                                                            values.reviewInput.flags.dbks.map(
+                                                                (m) => m
+                                                            );
+                                                        copy.push(
+                                                            DbkFlagTypes[key]
+                                                        );
                                                         setFieldValue(
-                                                            `review_input.flags.dbks.${key}`,
-                                                            !values.review_input
-                                                                .flags.dbks[key]
+                                                            `reviewInput.flags.dbks`,
+                                                            copy
                                                         );
                                                     }}
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                getBackgroundColor(
-                                                                    theme
-                                                                ),
+                                                                '#940c1e',
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
-                                                                        '#cf4100',
+                                                                        '#940c1e',
                                                                         0.2
                                                                     ),
                                                             },
@@ -925,7 +857,7 @@ export default function ReviewPage() {
                                         align="left"
                                         mt={50}
                                     >
-                                        Flags
+                                        Pros
                                     </Title>
                                     <SimpleGrid
                                         mt={30}
@@ -949,47 +881,117 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {Object.entries(
-                                            values.review_input.flags.pros
-                                        )
-                                            .map((entry) => entry.concat('pro'))
-                                            .concat(
-                                                Object.entries(
-                                                    values.review_input.flags
-                                                        .cons
-                                                ).map((entry) =>
-                                                    entry.concat('con')
-                                                )
-                                            )
-                                            .concat(
-                                                Object.entries(
-                                                    values.review_input.flags
-                                                        .dbks
-                                                ).map((entry) =>
-                                                    entry.concat('dlb')
-                                                )
-                                            )
-                                            .map(([key, val, type]) => {
-                                                const bgColor = () => {
-                                                    if (type == 'pro')
-                                                        return 'green';
-                                                    else if (type == 'con')
-                                                        return 'orange';
-                                                    else return 'red';
-                                                };
-                                                return val ? (
+                                        {values.reviewInput.flags.pros.map(
+                                            (f) => {
+                                                return (
                                                     <Badge
-                                                        color={bgColor()}
+                                                        key={f}
+                                                        color={'#32a852'}
                                                         variant={'filled'}
                                                         size={'xl'}
                                                         radius={'sm'}
                                                     >
-                                                        {key}
+                                                        {f}
                                                     </Badge>
-                                                ) : (
-                                                    <></>
                                                 );
-                                            })}
+                                            }
+                                        )}
+                                    </SimpleGrid>
+                                    <Title
+                                        sx={{
+                                            fontSize: 26,
+                                            fontWeight: 300,
+                                        }}
+                                        align="left"
+                                        mt={50}
+                                    >
+                                        Cons
+                                    </Title>
+                                    <SimpleGrid
+                                        mt={30}
+                                        cols={5}
+                                        spacing="lg"
+                                        breakpoints={[
+                                            {
+                                                maxWidth: 980,
+                                                cols: 3,
+                                                spacing: 'md',
+                                            },
+                                            {
+                                                maxWidth: 755,
+                                                cols: 2,
+                                                spacing: 'sm',
+                                            },
+                                            {
+                                                maxWidth: 600,
+                                                cols: 1,
+                                                spacing: 'sm',
+                                            },
+                                        ]}
+                                    >
+                                        {values.reviewInput.flags.cons.map(
+                                            (f) => {
+                                                return (
+                                                    <Badge
+                                                        key={f}
+                                                        color={'#85581b'}
+                                                        variant={'filled'}
+                                                        size={'xl'}
+                                                        radius={'sm'}
+                                                    >
+                                                        {f}
+                                                    </Badge>
+                                                );
+                                            }
+                                        )}
+                                    </SimpleGrid>
+                                    <Title
+                                        sx={{
+                                            fontSize: 26,
+                                            fontWeight: 300,
+                                        }}
+                                        align="left"
+                                        mt={50}
+                                    >
+                                        Dealbreakers
+                                    </Title>
+                                    <SimpleGrid
+                                        mt={30}
+                                        cols={5}
+                                        spacing="lg"
+                                        breakpoints={[
+                                            {
+                                                maxWidth: 980,
+                                                cols: 3,
+                                                spacing: 'md',
+                                            },
+                                            {
+                                                maxWidth: 755,
+                                                cols: 2,
+                                                spacing: 'sm',
+                                            },
+                                            {
+                                                maxWidth: 600,
+                                                cols: 1,
+                                                spacing: 'sm',
+                                            },
+                                        ]}
+                                    >
+                                        {values.reviewInput.flags.dbks.map(
+                                            (f) => {
+                                                return (
+                                                    <Badge
+                                                        key={f}
+                                                        color={'#940c1e'}
+                                                        variant={'filled'}
+                                                        size={'xl'}
+                                                        radius={'sm'}
+                                                    >
+                                                        {f}
+                                                    </Badge>
+                                                );
+                                            }
+                                        )}
                                     </SimpleGrid>
                                     <Title
                                         sx={{
@@ -1010,10 +1012,10 @@ export default function ReviewPage() {
                                         autosize
                                         minRows={6}
                                         maxRows={10}
-                                        value={values.review_input.feedback}
+                                        value={values.reviewInput.feedback}
                                         onChange={(evt) => {
                                             setFieldValue(
-                                                'review_input.feedback',
+                                                'reviewInput.feedback',
                                                 evt.currentTarget.value
                                             );
                                         }}
@@ -1077,7 +1079,7 @@ export default function ReviewPage() {
                                         align="left"
                                         mt={50}
                                     >
-                                        Pros
+                                        Flags
                                     </Title>
                                     <SimpleGrid
                                         mt={30}
@@ -1101,120 +1103,51 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {Object.entries(
-                                            values.review_input.flags.pros
-                                        ).map(([key, val]) => {
-                                            return val ? (
-                                                <Badge
-                                                    color={'green'}
-                                                    variant={'filled'}
-                                                    size={'xl'}
-                                                    radius={'sm'}
-                                                >
-                                                    {key}
-                                                </Badge>
-                                            ) : (
-                                                <></>
-                                            );
-                                        })}
-                                    </SimpleGrid>
-                                    <Title
-                                        sx={{
-                                            fontSize: 26,
-                                            fontWeight: 300,
-                                        }}
-                                        align="left"
-                                        mt={50}
-                                    >
-                                        Cons
-                                    </Title>
-                                    <SimpleGrid
-                                        mt={30}
-                                        cols={5}
-                                        spacing="lg"
-                                        breakpoints={[
-                                            {
-                                                maxWidth: 980,
-                                                cols: 3,
-                                                spacing: 'md',
-                                            },
-                                            {
-                                                maxWidth: 755,
-                                                cols: 2,
-                                                spacing: 'sm',
-                                            },
-                                            {
-                                                maxWidth: 600,
-                                                cols: 1,
-                                                spacing: 'sm',
-                                            },
-                                        ]}
-                                    >
-                                        {Object.entries(
-                                            values.review_input.flags.cons
-                                        ).map(([key, val]) => {
-                                            return val ? (
-                                                <Badge
-                                                    color={'orange'}
-                                                    variant={'filled'}
-                                                    size={'xl'}
-                                                    radius={'sm'}
-                                                >
-                                                    {key}
-                                                </Badge>
-                                            ) : (
-                                                <></>
-                                            );
-                                        })}
-                                    </SimpleGrid>
-                                    <Title
-                                        sx={{
-                                            fontSize: 26,
-                                            fontWeight: 300,
-                                        }}
-                                        align="left"
-                                        mt={50}
-                                    >
-                                        Dealbreakers
-                                    </Title>
-                                    <SimpleGrid
-                                        mt={30}
-                                        cols={5}
-                                        spacing="lg"
-                                        breakpoints={[
-                                            {
-                                                maxWidth: 980,
-                                                cols: 3,
-                                                spacing: 'md',
-                                            },
-                                            {
-                                                maxWidth: 755,
-                                                cols: 2,
-                                                spacing: 'sm',
-                                            },
-                                            {
-                                                maxWidth: 600,
-                                                cols: 1,
-                                                spacing: 'sm',
-                                            },
-                                        ]}
-                                    >
-                                        {Object.entries(
-                                            values.review_input.flags.dbks
-                                        ).map(([key, val]) => {
-                                            return val ? (
-                                                <Badge
-                                                    color={'red'}
-                                                    variant={'filled'}
-                                                    size={'xl'}
-                                                    radius={'sm'}
-                                                >
-                                                    {key}
-                                                </Badge>
-                                            ) : (
-                                                <></>
-                                            );
-                                        })}
+                                        {values.reviewInput.flags.pros.map(
+                                            (f) => {
+                                                return (
+                                                    <Badge
+                                                        key={f}
+                                                        color={'#32a852'}
+                                                        variant={'filled'}
+                                                        size={'xl'}
+                                                        radius={'sm'}
+                                                    >
+                                                        {f}
+                                                    </Badge>
+                                                );
+                                            }
+                                        )}
+                                        {values.reviewInput.flags.cons.map(
+                                            (f) => {
+                                                return (
+                                                    <Badge
+                                                        key={f}
+                                                        color={'#85581b'}
+                                                        variant={'filled'}
+                                                        size={'xl'}
+                                                        radius={'sm'}
+                                                    >
+                                                        {f}
+                                                    </Badge>
+                                                );
+                                            }
+                                        )}
+                                        {values.reviewInput.flags.dbks.map(
+                                            (f) => {
+                                                return (
+                                                    <Badge
+                                                        key={f}
+                                                        color={'#940c1e'}
+                                                        variant={'filled'}
+                                                        size={'xl'}
+                                                        radius={'sm'}
+                                                    >
+                                                        {f}
+                                                    </Badge>
+                                                );
+                                            }
+                                        )}
                                     </SimpleGrid>
                                     <Title
                                         sx={{
@@ -1227,7 +1160,7 @@ export default function ReviewPage() {
                                         Comments
                                     </Title>
                                     <Text size="md" lineClamp={5}>
-                                        {values.review_input.feedback}
+                                        {values.reviewInput.feedback}
                                     </Text>
                                     <Center>
                                         <Button
