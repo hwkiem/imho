@@ -1,8 +1,7 @@
 import { Place } from '../entities/Place';
-import { Arg, Ctx, Info, ObjectType, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from 'src/utils/context';
 import { ApiResponse } from '../utils/types/Response';
-import { GraphQLResolveInfo } from 'graphql';
 
 @ObjectType()
 class PlaceResponse extends ApiResponse(Place) {}
