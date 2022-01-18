@@ -28,7 +28,6 @@ import {
     ConFlagTypes,
     DbkFlagTypes,
     PlaceType,
-    Flags,
 } from '../generated/graphql';
 /**
  *
@@ -62,7 +61,7 @@ export default function ReviewPage() {
         exit: { opacity: 0, x: 200, y: 0 },
     };
 
-    const [writeReview] = useWriteReviewMutation();
+    const [writeReview, { error }] = useAddReviewMutation();
 
     const router = useRouter();
 
@@ -83,8 +82,6 @@ export default function ReviewPage() {
     };
 
     const [address, setAddress] = useState('');
-
-    const [writeReview, { error }] = useAddReviewMutation();
 
     const [rating, setRating] = useState(50);
 
@@ -164,6 +161,12 @@ export default function ReviewPage() {
                         console.log(
                             `Review created at: ${response.data.addReview.result.createdAt}`
                         );
+                    } else if (response.data?.addReview.errors) {
+                        console.log('failed to create review.');
+                        console.log(response.data.addReview.errors);
+                    } else if (response.errors) {
+                        console.log('client error.');
+                        console.log(response.errors);
                     }
                 }}
             >
