@@ -5,6 +5,7 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
+        "clean": "rimraf dist/ node_modules/ .next/",
         "dev": "next dev -p 4000",
         "build": "next build",
         "start": "next start",
@@ -73,6 +74,7 @@
         "eslint-plugin-react-hooks": "^4.2.0",
         "jest": "^27.3.1",
         "ts-jest": "^27.0.7",
-        "typescript": "^4.3.5"
+        "typescript": "^4.3.5",
+        "underscore": "^1.13.2"
     }
 }
