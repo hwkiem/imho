@@ -1,7 +1,8 @@
 import { Place } from '../entities/Place';
-import { Arg, Ctx, ObjectType, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Info, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from 'src/utils/context';
 import { ApiResponse } from '../utils/types/Response';
+import { GraphQLResolveInfo } from 'graphql';
 
 @ObjectType()
 class PlaceResponse extends ApiResponse(Place) {}
@@ -19,9 +20,8 @@ export class PlaceResolver {
                 {
                     google_place_id: placeId,
                 },
-                ['residences', 'residence.reviews']
+                ['residences', 'residences.reviews']
             );
-            console.log(place.residences);
             return { result: place };
         } catch (e) {
             console.log(e);

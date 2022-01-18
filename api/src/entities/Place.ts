@@ -38,21 +38,22 @@ export class Place extends Base<Place> {
 
         for (const residence of place.residences) {
             for (const review of residence.reviews) {
-                flagSums = flagSums.map(
-                    (num, idx) => num + review.flag_string[idx]
-                );
+                flagSums = flagSums.map((num, idx) => {
+                    if (review.flag_string[idx] > 0) {
+                        return ++num;
+                    } else {
+                        return num;
+                    }
+                });
             }
         }
 
         const res = new Array<Flag>();
 
-        console.log('FLAGSUMS');
-        console.log(flagSums);
-
         for (let i = 0; i < n; i++) {
             const maxIdx = flagSums.indexOf(Math.max(...flagSums));
             const fg = Object.values(FlagTypes).at(maxIdx);
-            if (fg) {
+            if (fg && flagSums[maxIdx]) {
                 res.push({ topic: fg });
             }
             flagSums[maxIdx] = 0;
