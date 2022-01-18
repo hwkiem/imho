@@ -517,13 +517,35 @@ export default function ReviewPage() {
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
-                                                        const copy =
+                                                        let copy =
                                                             values.reviewInput.flags.pros.map(
                                                                 (m) => m
                                                             );
-                                                        copy.push(
-                                                            ProFlagTypes[key]
-                                                        );
+                                                        if (
+                                                            copy.includes(
+                                                                ProFlagTypes[
+                                                                    key
+                                                                ]
+                                                            )
+                                                        ) {
+                                                            copy = copy.filter(
+                                                                (f) => {
+                                                                    return (
+                                                                        f !==
+                                                                        ProFlagTypes[
+                                                                            key
+                                                                        ]
+                                                                    );
+                                                                }
+                                                            );
+                                                        } else {
+                                                            copy.push(
+                                                                ProFlagTypes[
+                                                                    key
+                                                                ]
+                                                            );
+                                                        }
+
                                                         setFieldValue(
                                                             `reviewInput.flags.pros`,
                                                             copy
@@ -532,7 +554,20 @@ export default function ReviewPage() {
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                '#32a852',
+                                                                values.reviewInput.flags.pros.includes(
+                                                                    ProFlagTypes[
+                                                                        key
+                                                                    ]
+                                                                )
+                                                                    ? '#32a852'
+                                                                    : theme.colorScheme ==
+                                                                      'dark'
+                                                                    ? theme
+                                                                          .colors
+                                                                          .dark[4]
+                                                                    : theme
+                                                                          .colors
+                                                                          .gray[2],
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
@@ -646,13 +681,35 @@ export default function ReviewPage() {
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
-                                                        const copy =
+                                                        let copy =
                                                             values.reviewInput.flags.cons.map(
                                                                 (m) => m
                                                             );
-                                                        copy.push(
-                                                            ConFlagTypes[key]
-                                                        );
+                                                        if (
+                                                            copy.includes(
+                                                                ConFlagTypes[
+                                                                    key
+                                                                ]
+                                                            )
+                                                        ) {
+                                                            copy = copy.filter(
+                                                                (f) => {
+                                                                    return (
+                                                                        f !==
+                                                                        ConFlagTypes[
+                                                                            key
+                                                                        ]
+                                                                    );
+                                                                }
+                                                            );
+                                                        } else {
+                                                            copy.push(
+                                                                ConFlagTypes[
+                                                                    key
+                                                                ]
+                                                            );
+                                                        }
+
                                                         setFieldValue(
                                                             `reviewInput.flags.cons`,
                                                             copy
@@ -661,7 +718,20 @@ export default function ReviewPage() {
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                '#85581b',
+                                                                values.reviewInput.flags.cons.includes(
+                                                                    ConFlagTypes[
+                                                                        key
+                                                                    ]
+                                                                )
+                                                                    ? '#85581b'
+                                                                    : theme.colorScheme ==
+                                                                      'dark'
+                                                                    ? theme
+                                                                          .colors
+                                                                          .dark[4]
+                                                                    : theme
+                                                                          .colors
+                                                                          .gray[2],
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
@@ -783,13 +853,35 @@ export default function ReviewPage() {
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
-                                                        const copy =
+                                                        let copy =
                                                             values.reviewInput.flags.dbks.map(
                                                                 (m) => m
                                                             );
-                                                        copy.push(
-                                                            DbkFlagTypes[key]
-                                                        );
+                                                        if (
+                                                            copy.includes(
+                                                                DbkFlagTypes[
+                                                                    key
+                                                                ]
+                                                            )
+                                                        ) {
+                                                            copy = copy.filter(
+                                                                (f) => {
+                                                                    return (
+                                                                        f !==
+                                                                        DbkFlagTypes[
+                                                                            key
+                                                                        ]
+                                                                    );
+                                                                }
+                                                            );
+                                                        } else {
+                                                            copy.push(
+                                                                DbkFlagTypes[
+                                                                    key
+                                                                ]
+                                                            );
+                                                        }
+
                                                         setFieldValue(
                                                             `reviewInput.flags.dbks`,
                                                             copy
@@ -798,7 +890,20 @@ export default function ReviewPage() {
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                '#940c1e',
+                                                                values.reviewInput.flags.dbks.includes(
+                                                                    DbkFlagTypes[
+                                                                        key
+                                                                    ]
+                                                                )
+                                                                    ? '#940c1e'
+                                                                    : theme.colorScheme ==
+                                                                      'dark'
+                                                                    ? theme
+                                                                          .colors
+                                                                          .dark[4]
+                                                                    : theme
+                                                                          .colors
+                                                                          .gray[2],
                                                             '&:hover': {
                                                                 backgroundColor:
                                                                     theme.fn.darken(
