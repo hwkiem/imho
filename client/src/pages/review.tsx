@@ -26,6 +26,15 @@ import {
     useWriteReviewMutation,
     WriteReviewInput,
 } from '../generated/graphql';
+import { consumers } from 'stream';
+
+import { useWriteReviewMutation } from '../generated/graphql';
+import { Formik } from 'formik';
+import {
+    LocationCategory,
+    useWriteReviewMutation,
+    WriteReviewInput,
+} from '../generated/graphql';
 
 /**
  *
@@ -122,7 +131,6 @@ export default function ReviewPage() {
             },
         },
     };
-
     return (
         <MotionContainer
             initial="hidden"

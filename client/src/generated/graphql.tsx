@@ -48,6 +48,12 @@ export type ConsType = {
   shower: Scalars['Boolean'];
 };
 
+export type Coords = {
+  __typename?: 'Coords';
+  lat: Scalars['Float'];
+  lng: Scalars['Float'];
+};
+
 export type DbksInput = {
   burglary: Scalars['Boolean'];
   construction_harrassment: Scalars['Boolean'];
