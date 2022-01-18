@@ -1,0 +1,24 @@
+query GetPlace($placeId: String!) {
+    getPlace(placeId: $placeId) {
+        result {
+            id
+            createdAt
+            google_place_id
+            formatted_address
+            residences {
+                id
+                createdAt
+                unit
+                reviews {
+                    id
+                    createdAt
+                    feedback
+                }
+            }
+        }
+        errors {
+            field
+            error
+        }
+    }
+}

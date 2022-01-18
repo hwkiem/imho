@@ -12,7 +12,7 @@ export function ApiResponse<T>(TClass: ClassType<T>) {
         )
         public result?: T;
 
-        @Field(() => FieldError, { nullable: true })
+        @Field(() => [FieldError], { nullable: true })
         public errors?: FieldError[];
     }
     return ApiResponseClass;

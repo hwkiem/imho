@@ -81,8 +81,6 @@ export default function ReviewPage() {
         exit: { opacity: 0, x: 400 },
     };
 
-    const [address, setAddress] = useState('');
-
     const [rating, setRating] = useState(50);
 
     const initialState: WriteReviewInput = {
@@ -167,6 +165,8 @@ export default function ReviewPage() {
                     } else if (response.errors) {
                         console.log('client error.');
                         console.log(response.errors);
+                    } else {
+                        console.log('uh oh...');
                     }
                 }}
             >
@@ -239,7 +239,10 @@ export default function ReviewPage() {
                                                     </ActionIcon>
                                                 }
                                             >
-                                                {address}
+                                                {
+                                                    values.placeInput
+                                                        .formatted_address
+                                                }
                                             </Badge>
                                         </Center>
                                     </MotionContainer>
@@ -290,9 +293,14 @@ export default function ReviewPage() {
                                         icon={<FaSearchLocation size={16} />}
                                         placeholder="Your address"
                                         variant="default"
-                                        value={address}
+                                        value={
+                                            values.placeInput.formatted_address
+                                        }
                                         onChange={(evt) => {
-                                            setAddress(evt.currentTarget.value);
+                                            setFieldValue(
+                                                'placeInput.formatted_address',
+                                                evt.currentTarget.value
+                                            );
                                         }}
                                         autoFocus
                                         onFocus={() => {
@@ -304,12 +312,17 @@ export default function ReviewPage() {
                             {stepIdx == 0 && (
                                 <SuggestionList
                                     hidden={false}
-                                    address={address}
+                                    address={
+                                        values.placeInput.formatted_address
+                                    }
                                     onSelect={(place) => {
-                                        setAddress(place.description);
                                         setFieldValue(
                                             'placeInput.google_place_id',
                                             place.place_id
+                                        );
+                                        setFieldValue(
+                                            'placeInput.formatted_address',
+                                            place.description
                                         );
                                         _nxt();
                                     }}

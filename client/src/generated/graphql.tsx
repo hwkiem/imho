@@ -85,7 +85,7 @@ export type Place = {
 
 export type PlaceResponse = {
   __typename?: 'PlaceResponse';
-  errors?: Maybe<FieldError>;
+  errors?: Maybe<Array<FieldError>>;
   result?: Maybe<Place>;
 };
 
@@ -156,7 +156,7 @@ export type Review = {
 
 export type ReviewResponse = {
   __typename?: 'ReviewResponse';
-  errors?: Maybe<FieldError>;
+  errors?: Maybe<Array<FieldError>>;
   result?: Maybe<Review>;
 };
 
@@ -172,14 +172,75 @@ export type WriteReviewInput = {
   reviewInput: ReviewValidator;
 };
 
+export type GetPlaceQueryVariables = Exact<{
+  placeId: Scalars['String'];
+}>;
+
+
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+
 export type AddReviewMutationVariables = Exact<{
   input: WriteReviewInput;
 }>;
 
 
-export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback: string, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null | undefined, flags: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } } | null | undefined, errors?: { __typename?: 'FieldError', field: string, error: string } | null | undefined } };
+export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback: string, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null | undefined, flags: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 
+export const GetPlaceDocument = gql`
+    query GetPlace($placeId: String!) {
+  getPlace(placeId: $placeId) {
+    result {
+      id
+      createdAt
+      google_place_id
+      formatted_address
+      residences {
+        id
+        createdAt
+        unit
+        reviews {
+          id
+          createdAt
+          feedback
+        }
+      }
+    }
+    errors {
+      field
+      error
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPlaceQuery__
+ *
+ * To run a query within a React component, call `useGetPlaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPlaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPlaceQuery({
+ *   variables: {
+ *      placeId: // value for 'placeId'
+ *   },
+ * });
+ */
+export function useGetPlaceQuery(baseOptions: Apollo.QueryHookOptions<GetPlaceQuery, GetPlaceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPlaceQuery, GetPlaceQueryVariables>(GetPlaceDocument, options);
+      }
+export function useGetPlaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPlaceQuery, GetPlaceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPlaceQuery, GetPlaceQueryVariables>(GetPlaceDocument, options);
+        }
+export type GetPlaceQueryHookResult = ReturnType<typeof useGetPlaceQuery>;
+export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery>;
+export type GetPlaceQueryResult = Apollo.QueryResult<GetPlaceQuery, GetPlaceQueryVariables>;
 export const AddReviewDocument = gql`
     mutation AddReview($input: WriteReviewInput!) {
   addReview(input: $input) {
