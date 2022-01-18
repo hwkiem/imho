@@ -1,12 +1,28 @@
-mutation WriteReview($options: WriteReviewInput!) {
-    writeReview(options: $options) {
+mutation AddReview($input: WriteReviewInput!) {
+    addReview(input: $input) {
+        result {
+            id
+            createdAt
+            residence {
+                id
+                createdAt
+                unit
+                place {
+                    id
+                    createdAt
+                    google_place_id
+                }
+            }
+            feedback
+            flags {
+                pros
+                cons
+                dbks
+            }
+        }
         errors {
             field
-            message
-        }
-        review {
-            rev_id
-            created_at
+            error
         }
     }
 }

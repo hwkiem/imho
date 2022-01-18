@@ -33,6 +33,7 @@ export class ReviewResolver {
             };
         }
     }
+
     @Mutation(() => ReviewResponse)
     public async addReview(
         @Arg('input') input: WriteReviewInput,

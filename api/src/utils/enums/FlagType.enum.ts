@@ -38,6 +38,3 @@ export enum DbkFlagType {
     PRIVACY = 'privacy',
     UNRESPONSIVE = 'unresponsive',
 }
-
-export const FlagTypes = { ...ProFlagType, ...ConFlagType, ...DbkFlagType };
-export type FlagTypes = ProFlagType | ConFlagType | DbkFlagType;

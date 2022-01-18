@@ -19,7 +19,6 @@ import { PlaceType } from './utils/enums/PlaceType.enum';
 import {
     ConFlagType,
     DbkFlagType,
-    FlagTypes,
     ProFlagType,
 } from './utils/enums/FlagType.enum';
 import { PlaceResolver } from './resolvers/place.resolver';
@@ -33,11 +32,6 @@ const main = async () => {
     registerEnumType(PlaceType, {
         name: 'PlaceType',
         description: 'Type of the this address',
-    });
-
-    registerEnumType(FlagTypes, {
-        name: 'FlagTypes',
-        description: 'All the flag topics',
     });
 
     registerEnumType(ProFlagType, {

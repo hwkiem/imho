@@ -1,11 +1,10 @@
 import { Entity, Property, Enum, Collection, OneToMany } from '@mikro-orm/core';
-import { Arg, Field, ObjectType, Root } from 'type-graphql';
+import { Field, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
-import { Flag } from '../utils/types/Flag';
-import { FlagTypes } from '../utils/enums/FlagType.enum';
+import { Flags } from '../utils/types/Flag';
 
 @ObjectType()
 @Entity()
@@ -27,39 +26,31 @@ export class Place extends Base<Place> {
     public type: PlaceType;
 
     // Field resolver and some sort of validation on topFlags length
-    @Field(() => [Flag], { nullable: true })
-    async topNFlags(
-        @Root() place: Place,
-        @Arg('n') n: number
-    ): Promise<Flag[]> {
-        let flagSums = new Array<number>(Object.values(FlagTypes).length).fill(
-            0
-        );
-
+    @Field(() => Flags, { nullable: true })
+    async topNFlags(@Root() place: Place): Promise<Flags> {
+        const counter: { [key: string]: number } = {};
         for (const residence of place.residences) {
             for (const review of residence.reviews) {
-                flagSums = flagSums.map((num, idx) => {
-                    if (review.flag_string[idx] > 0) {
-                        return ++num;
-                    } else {
-                        return num;
+                const flags = review.flags;
+                if (flags.pros) {
+                    for (const f of flags.pros) {
+                        counter[f] = counter[f] + 1;
                     }
-                });
+                }
+                if (flags.cons) {
+                    for (const f of flags.cons) {
+                        counter[f] = counter[f] + 1;
+                    }
+                }
+                if (flags.dbks) {
+                    for (const f of flags.dbks) {
+                        counter[f] = counter[f] + 1;
+                    }
+                }
             }
         }
-
-        const res = new Array<Flag>();
-
-        for (let i = 0; i < n; i++) {
-            const maxIdx = flagSums.indexOf(Math.max(...flagSums));
-            const fg = Object.values(FlagTypes).at(maxIdx);
-            if (fg && flagSums[maxIdx]) {
-                res.push({ topic: fg });
-            }
-            flagSums[maxIdx] = 0;
-        }
-
-        return res;
+        console.log(counter);
+        return { pros: [], cons: [], dbks: [] };
     }
 
     constructor(body: PlaceValidator) {

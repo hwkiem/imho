@@ -4,9 +4,7 @@ import { ReviewValidator } from '../validators/ReviewValidator';
 import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
-import { Flag } from '../utils/types/Flag';
-import { FlagTypes } from '../utils/enums/FlagType.enum';
-// import { ApiResponse } from './Response';
+import { Flags } from '../utils/types/Flag';
 
 @ObjectType()
 @Entity()
@@ -15,28 +13,24 @@ export class Review extends Base<Review> {
     @Property()
     public feedback: string;
 
+    @Field()
+    @Property()
+    public rating: number;
+
     @Field(() => Residence, { nullable: true })
     @ManyToOne(() => Residence, {
         cascade: [Cascade.PERSIST, Cascade.REMOVE],
     })
     public residence: Residence;
 
-    @Field(() => [Flag])
-    flags: Flag[];
+    @Field(() => Flags)
+    flags: Flags;
 
     @Property()
-    flag_string: Array<number> = new Array(Object.values(FlagTypes).length);
+    flag_string: string;
 
     constructor(body: ReviewValidator) {
         super(body);
-        const topicsMap = body.flags.map((f) => f.topic);
-
-        Object.values(FlagTypes).map((v, idx) => {
-            if (topicsMap.includes(v)) {
-                this.flag_string[idx] = 1;
-            } else {
-                this.flag_string[idx] = 0;
-            }
-        });
+        this.flag_string = JSON.stringify(this.flags);
     }
 }
