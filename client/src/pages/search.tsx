@@ -90,7 +90,7 @@ export default function SearchPage() {
                 address={address}
                 onSelect={(place) => {
                     setAddress(place.description);
-                    router.push(`/location/${place.place_id}`);
+                    router.push(`/place/${place.place_id}`);
                 }}
                 key={'suggestions'}
             />
