@@ -36,7 +36,7 @@ class ConsInput {
     @Field()
     pests: boolean;
     @Field()
-    maintanence_issues: boolean;
+    maintenance_issues: boolean;
     @Field()
     connectivity: boolean;
     @Field()
@@ -99,7 +99,7 @@ export class ConsType {
     @Field()
     pests: boolean;
     @Field()
-    maintanence_issues: boolean;
+    maintenance_issues: boolean;
     @Field()
     connectivity: boolean;
 }

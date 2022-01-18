@@ -83,7 +83,7 @@ export async function up(knex: Knex): Promise<void> {
             table.boolean('noise');
             table.boolean('mold_or_mildew');
             table.boolean('pests');
-            table.boolean('maintanence_issues');
+            table.boolean('maintenance_issues');
             table.boolean('connectivity');
             table.boolean('safety');
             // Dealbreakers

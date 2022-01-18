@@ -20,6 +20,13 @@ import { useState } from 'react';
 import { FaEdit, FaSearchLocation } from 'react-icons/fa';
 import { SuggestionList } from '../components/SuggestionList';
 import { MotionContainer } from '../utils/motion';
+import { Formik } from 'formik';
+import {
+    LocationCategory,
+    useWriteReviewMutation,
+    WriteReviewInput,
+} from '../generated/graphql';
+import { consumers } from 'stream';
 
 import { useWriteReviewMutation } from '../generated/graphql';
 import { Formik } from 'formik';
@@ -78,6 +85,50 @@ export default function ReviewPage() {
 
     const [address, setAddress] = useState('');
 
+    const [writeReview, { error }] = useWriteReviewMutation();
+
+    const initialState: WriteReviewInput = {
+        google_place_id: '',
+        unit: '',
+        category: LocationCategory.House,
+        landlord_email: '',
+        review_input: {
+            rating: 50,
+            feedback: '',
+            flags: {
+                pros: {
+                    natural_light: false,
+                    neighborhood: false,
+                    amenities: false,
+                    appliances: false,
+                    good_landlord: false,
+                    pet_friendly: false,
+                    storage: false,
+                },
+                cons: {
+                    bad_landlord: false,
+                    pet_unfriendly: false,
+                    shower: false,
+                    false_advertisement: false,
+                    noise: false,
+                    mold_or_mildew: false,
+                    pests: false,
+                    maintenance_issues: false,
+                    connectivity: false,
+                    safety: false,
+                },
+                dbks: {
+                    lease_issues: false,
+                    security_deposit: false,
+                    burglary: false,
+                    construction_harrassment: false,
+                    privacy: false,
+                    unresponsiveness: false,
+                },
+            },
+        },
+    };
+    a;
     return (
         <MotionContainer
             initial="hidden"
@@ -115,47 +166,7 @@ export default function ReviewPage() {
                 about your home.
             </Text>
             <Formik
-                initialValues={{
-                    google_place_id: '',
-                    unit: undefined,
-                    location_category: 'single',
-                    landlord_email: undefined,
-                    review_input: {
-                        rating: 50,
-                        feedback_string: undefined,
-                        flags: {
-                            pros: {
-                                natural_light: false,
-                                neighborhood: false,
-                                ammenities: false,
-                                appliances: false,
-                                good_landlord: false,
-                                pet_friendly: false,
-                                storage: false,
-                            },
-                            cons: {
-                                bad_landlord: false,
-                                pet_unfriendly: false,
-                                shower: false,
-                                false_advertisement: false,
-                                noise: false,
-                                mold_or_mildew: false,
-                                pests: false,
-                                maintenance_issues: false,
-                                connectivity: false,
-                                safety: false,
-                            },
-                            dbks: {
-                                lease_issues: false,
-                                security_deposit: false,
-                                burglary: false,
-                                construction_harrassment: false,
-                                privacy: false,
-                                unresponsiveness: false,
-                            },
-                        },
-                    },
-                }}
+                initialValues={initialState}
                 validate={(values) => {
                     const errors = {};
 
@@ -171,11 +182,15 @@ export default function ReviewPage() {
 
                     return errors;
                 }}
-                onSubmit={(values, { setSubmitting }) => {
-                    setTimeout(() => {
-                        const response = writeReview({ variables: values });
-                        setSubmitting(false);
-                    }, 400);
+                onSubmit={async (values, { setSubmitting }) => {
+                    const response = await writeReview({
+                        variables: { options: values },
+                    });
+                    if (response.data?.writeReview.review) {
+                        console.log(
+                            `Review created at: ${response.data.writeReview.review.created_at}`
+                        );
+                    }
                 }}
             >
                 {({
@@ -247,7 +262,7 @@ export default function ReviewPage() {
                                                     </ActionIcon>
                                                 }
                                             >
-                                                {values}
+                                                {address}
                                             </Badge>
                                         </Center>
                                     </MotionContainer>
@@ -363,26 +378,39 @@ export default function ReviewPage() {
                                             color="pink"
                                             size="lg"
                                             spacing="xl"
-                                            value={values.location_category}
-                                            onChange={handleChange}
+                                            value={values.category}
+                                            onChange={(v) => {
+                                                setFieldValue('category', v);
+                                            }}
                                         >
-                                            <Radio value="multi">
+                                            <Radio
+                                                value={
+                                                    LocationCategory.ApartmentBuilding
+                                                }
+                                            >
                                                 Multi Unit
                                             </Radio>
-                                            <Radio value="single">
+                                            <Radio
+                                                value={LocationCategory.House}
+                                            >
                                                 Single Family
                                             </Radio>
                                         </RadioGroup>
                                     </Center>
                                     <Center mt={20}>
-                                        {values.location_category ==
-                                            'multi' && (
+                                        {values.category ===
+                                            LocationCategory.ApartmentBuilding && (
                                             <TextInput
                                                 size="sm"
                                                 placeholder="What unit do you live in?"
                                                 variant="filled"
                                                 value={values.unit}
-                                                onChange={handleChange}
+                                                onChange={(evt) => {
+                                                    setFieldValue(
+                                                        'unit',
+                                                        evt.currentTarget.value
+                                                    );
+                                                }}
                                             />
                                         )}
                                     </Center>
@@ -418,7 +446,12 @@ export default function ReviewPage() {
                                         radius="xs"
                                         step={25}
                                         value={values.review_input.rating}
-                                        onChange={handleChange}
+                                        onChange={(v) => {
+                                            setFieldValue(
+                                                'review_input.rating',
+                                                v
+                                            );
+                                        }}
                                         marks={[
                                             { value: 0, label: 'Heck No!' },
                                             { value: 25, label: 'Nope.' },
@@ -529,6 +562,8 @@ export default function ReviewPage() {
                                                 <Button
                                                     key={key}
                                                     onClick={() => {
+                                                        console.log('!');
+
                                                         setFieldValue(
                                                             `review_input.flags.pros.${key}`,
                                                             !values.review_input
@@ -673,7 +708,7 @@ export default function ReviewPage() {
                                                         setFieldValue(
                                                             `review_input.flags.cons.${key}`,
                                                             !values.review_input
-                                                                .flags.cons
+                                                                .flags.cons[key]
                                                         );
                                                     }}
                                                     styles={(theme) => ({
@@ -818,9 +853,9 @@ export default function ReviewPage() {
                                                     key={key}
                                                     onClick={() => {
                                                         setFieldValue(
-                                                            `review_input.flags.cons.${key}`,
+                                                            `review_input.flags.dbks.${key}`,
                                                             !values.review_input
-                                                                .flags.cons
+                                                                .flags.dbks[key]
                                                         );
                                                     }}
                                                     styles={(theme) => ({
@@ -975,10 +1010,13 @@ export default function ReviewPage() {
                                         autosize
                                         minRows={6}
                                         maxRows={10}
-                                        value={
-                                            values.review_input.feedback_string
-                                        }
-                                        onChange={handleChange}
+                                        value={values.review_input.feedback}
+                                        onChange={(evt) => {
+                                            setFieldValue(
+                                                'review_input.feedback',
+                                                evt.currentTarget.value
+                                            );
+                                        }}
                                     />
                                     <Center>
                                         <Button
@@ -1189,7 +1227,7 @@ export default function ReviewPage() {
                                         Comments
                                     </Title>
                                     <Text size="md" lineClamp={5}>
-                                        {values.review_input.feedback_string}
+                                        {values.review_input.feedback}
                                     </Text>
                                     <Center>
                                         <Button
@@ -1202,6 +1240,7 @@ export default function ReviewPage() {
                                                 deg: 35,
                                             }}
                                             onClick={() => {
+                                                handleSubmit();
                                                 _nxt();
                                             }}
                                         >
