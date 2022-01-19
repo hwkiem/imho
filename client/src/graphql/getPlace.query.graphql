@@ -24,9 +24,11 @@ query GetPlace($placeId: String!) {
                 id
                 createdAt
                 unit
+                averageRating
                 reviews {
                     id
                     createdAt
+                    rating
                     feedback
                 }
             }

@@ -143,6 +143,7 @@ export type QueryGetReviewArgs = {
 
 export type Residence = {
   __typename?: 'Residence';
+  averageRating?: Maybe<Scalars['Float']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['ID'];
   place: Place;
@@ -196,7 +197,7 @@ export type GetPlaceQueryVariables = Exact<{
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null | undefined, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null | undefined, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, averageRating?: number | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 export type AddReviewMutationVariables = Exact<{
   input: WriteReviewInput;
@@ -233,9 +234,11 @@ export const GetPlaceDocument = gql`
         id
         createdAt
         unit
+        averageRating
         reviews {
           id
           createdAt
+          rating
           feedback
         }
       }
