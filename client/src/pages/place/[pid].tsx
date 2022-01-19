@@ -71,7 +71,26 @@ export default function PlacePage() {
                 align="left"
                 mt={50}
             >
-                Most Common Flags
+                Average Rating:<br></br>
+                <Text
+                    inherit
+                    variant="gradient"
+                    gradient={{ from: 'orange', to: 'violet', deg: 45 }}
+                    component="span"
+                >
+                    {data.getPlace.result.averageRating?.toFixed(2)}
+                </Text>
+            </Title>
+            <Title
+                sx={{
+                    fontSize: 30,
+                    fontWeight: 500,
+                    letterSpacing: -2,
+                }}
+                align="left"
+                mt={50}
+            >
+                Flags
             </Title>
             <SimpleGrid
                 mt={30}
@@ -119,52 +138,6 @@ export default function PlacePage() {
                         {con.topic}
                     </Badge>
                 ))}
-                {data.getPlace.result.topNFlags?.dbks.map((dbk) => (
-                    <Badge
-                        key={dbk.topic}
-                        color={'red'}
-                        variant={'filled'}
-                        size={'xl'}
-                        radius={'sm'}
-                        leftSection={<Box mr={10}>{dbk.cnt}</Box>}
-                    >
-                        {dbk.topic}
-                    </Badge>
-                ))}
-            </SimpleGrid>
-            <Title
-                sx={{
-                    fontSize: 30,
-                    fontWeight: 500,
-                    letterSpacing: -2,
-                }}
-                align="left"
-                mt={50}
-            >
-                Dealbreakers
-            </Title>
-            <SimpleGrid
-                mt={30}
-                cols={5}
-                spacing="lg"
-                breakpoints={[
-                    {
-                        maxWidth: 980,
-                        cols: 3,
-                        spacing: 'md',
-                    },
-                    {
-                        maxWidth: 755,
-                        cols: 2,
-                        spacing: 'sm',
-                    },
-                    {
-                        maxWidth: 600,
-                        cols: 1,
-                        spacing: 'sm',
-                    },
-                ]}
-            >
                 {data.getPlace.result.topNFlags?.dbks.map((dbk) => (
                     <Badge
                         key={dbk.topic}
