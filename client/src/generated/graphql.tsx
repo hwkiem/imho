@@ -213,6 +213,7 @@ export const GetPlaceDocument = gql`
       createdAt
       google_place_id
       formatted_address
+<<<<<<< HEAD
       topNFlags(n: 5) {
         pros {
           topic
@@ -227,6 +228,8 @@ export const GetPlaceDocument = gql`
           cnt
         }
       }
+=======
+>>>>>>> main
       residences {
         id
         createdAt
