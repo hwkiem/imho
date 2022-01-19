@@ -55,6 +55,9 @@ const main = async () => {
             clientUrl: process.env.DATABASE_URL,
             entities: ['./dist/entities/*.js'],
             type: 'postgresql',
+            driverOptions: {
+                connection: { ssl: { rejectUnauthorized: false } },
+            },
         });
         console.log('Connection secured.');
     } catch (error) {
