@@ -2,13 +2,15 @@ import { MikroORM } from '@mikro-orm/core';
 
 export default {
     migrations: {
-        path: './src/migrations',
+        path:
+            process.env.NODE_DEV === 'true'
+                ? './src/migrations'
+                : './dist/migrations',
         tableName: 'migrations',
         transactional: true,
     },
     tsNode: process.env.NODE_DEV === 'true' ? true : false,
     clientUrl: process.env.DATABASE_URL,
-    debug: true,
     entities: ['./dist/entities/*.js'],
     entitiesTs: ['./src/entities/*.ts'],
     type: 'postgresql',
