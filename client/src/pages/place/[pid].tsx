@@ -1,4 +1,4 @@
-import { Title } from '@mantine/core';
+import { Text, Title } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import {} from 'next';
 import { useRouter } from 'next/router';
@@ -26,13 +26,15 @@ export default function PlacePage() {
         console.log('incorrect query string...');
     }
 
-    const { data, error } = useGetPlaceQuery({
+    const { data, loading, error } = useGetPlaceQuery({
         variables: { placeId: placeId },
     });
 
     console.log(data);
 
-    return data?.getPlace.result ? (
+    return loading ? (
+        <></>
+    ) : data?.getPlace.result ? (
         <MotionContainer
             initial="hidden"
             animate="enter"
@@ -41,13 +43,15 @@ export default function PlacePage() {
             transition={{ type: 'spring' }}
             key={'review'}
         >
-            <Title
-                sx={{ fontSize: 100, fontWeight: 900, letterSpacing: -2 }}
+            <Text
+                sx={{ fontSize: 50, fontWeight: 700, letterSpacing: -2 }}
                 align="center"
                 mt={100}
+                variant="gradient"
+                gradient={{ from: 'green', to: 'purple', deg: 45 }}
             >
                 {data.getPlace.result.formatted_address}
-            </Title>
+            </Text>
         </MotionContainer>
     ) : (
         <MotionContainer
