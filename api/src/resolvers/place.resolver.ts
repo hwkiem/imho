@@ -83,13 +83,13 @@ export class PlaceResolver {
             for (const review of residence.reviews) {
                 const flags: Flags = JSON.parse(review.flag_string);
                 for (const f of flags.pros) {
-                    counter.pros[f] = counter.pros[f] ? counter.pros[f]++ : 1;
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
                 }
                 for (const f of flags.cons) {
-                    counter.cons[f] = counter.cons[f] ? counter.cons[f]++ : 1;
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
                 }
                 for (const f of flags.dbks) {
-                    counter.dbks[f] = counter.dbks[f] ? counter.dbks[f]++ : 1;
+                    counter.dbks[f] = counter.dbks[f] ? ++counter.dbks[f] : 1;
                 }
             }
         }
