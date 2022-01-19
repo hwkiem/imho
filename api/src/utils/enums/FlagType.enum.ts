@@ -13,11 +13,11 @@ export enum ProFlagType {
     NEIGHBORHOOD = 'neighborhood',
     AMENITIES = 'amenities',
     APPLIANCES = 'appliances',
-    GOOD_LANDLORD = 'landlord',
+    GOOD_LANDLORD = 'nice landlord',
 }
 
 export enum ConFlagType {
-    BAD_LANDLORD = 'landlord',
+    BAD_LANDLORD = 'bad landlord',
     UNSAFE = 'unsafe',
     PET_UNFRIENDLY = 'pet unfriendly',
     SHOWER = 'shower',

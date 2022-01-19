@@ -54,6 +54,12 @@ export type FlagInput = {
   pros: Array<ProFlagTypes>;
 };
 
+export type FlagWithCount = {
+  __typename?: 'FlagWithCount';
+  cnt: Scalars['Float'];
+  topic: Scalars['String'];
+};
+
 export type Flags = {
   __typename?: 'Flags';
   cons: Array<ConFlagTypes>;
@@ -78,9 +84,14 @@ export type Place = {
   google_place_id: Scalars['String'];
   id: Scalars['ID'];
   residences: Array<Residence>;
-  topNFlags?: Maybe<Flags>;
+  topNFlags?: Maybe<TopNFlagsResponse>;
   type: PlaceType;
   updatedAt: Scalars['DateTime'];
+};
+
+
+export type PlaceTopNFlagsArgs = {
+  n: Scalars['Float'];
 };
 
 export type PlaceResponse = {
@@ -166,6 +177,13 @@ export type ReviewValidator = {
   rating: Scalars['Float'];
 };
 
+export type TopNFlagsResponse = {
+  __typename?: 'TopNFlagsResponse';
+  cons: Array<FlagWithCount>;
+  dbks: Array<FlagWithCount>;
+  pros: Array<FlagWithCount>;
+};
+
 export type WriteReviewInput = {
   placeInput: PlaceValidator;
   residenceInput: ResidenceValidator;
@@ -177,7 +195,7 @@ export type GetPlaceQueryVariables = Exact<{
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 export type AddReviewMutationVariables = Exact<{
   input: WriteReviewInput;
@@ -195,6 +213,20 @@ export const GetPlaceDocument = gql`
       createdAt
       google_place_id
       formatted_address
+      topNFlags(n: 5) {
+        pros {
+          topic
+          cnt
+        }
+        cons {
+          topic
+          cnt
+        }
+        dbks {
+          topic
+          cnt
+        }
+      }
       residences {
         id
         createdAt
