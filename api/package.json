@@ -9,7 +9,7 @@
         "build": "yarn clean && tsc",
         "watch": "tsc -w",
         "dev": "nodemon dist/index.js",
-        "Start": "node dist/index.js",
+        "start": "node dist/index.js",
         "migrate:initial": "yarn mikro-orm migration:create --initial",
         "migrate:up": "yarn mikro-orm migration:up",
         "migrate:create": "yarn mikro-orm migration:create",
