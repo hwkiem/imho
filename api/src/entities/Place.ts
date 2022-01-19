@@ -1,5 +1,5 @@
 import { Entity, Property, Enum, Collection, OneToMany } from '@mikro-orm/core';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { PlaceType } from '../utils/enums/PlaceType.enum';
@@ -23,6 +23,25 @@ export class Place extends Base<Place> {
     @Field(() => PlaceType)
     @Enum(() => PlaceType)
     public type: PlaceType;
+
+    @Field(() => Float, { nullable: true })
+    averageRating(@Root() place: Place): number | null {
+        let ratingSum = 0;
+        let numReviews = 0;
+
+        for (const residence of place.residences) {
+            for (const review of residence.reviews) {
+                ratingSum += review.rating;
+                numReviews++;
+            }
+        }
+
+        if (numReviews == 0) {
+            return null;
+        } else {
+            return ratingSum / numReviews;
+        }
+    }
 
     constructor(body: PlaceValidator) {
         super(body);

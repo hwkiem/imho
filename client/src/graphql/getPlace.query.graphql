@@ -5,6 +5,7 @@ query GetPlace($placeId: String!) {
             createdAt
             google_place_id
             formatted_address
+            averageRating
             topNFlags(n: 5) {
                 pros {
                     topic

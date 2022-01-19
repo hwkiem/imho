@@ -79,6 +79,7 @@ export type MutationAddReviewArgs = {
 
 export type Place = {
   __typename?: 'Place';
+  averageRating?: Maybe<Scalars['Float']>;
   createdAt: Scalars['DateTime'];
   formatted_address: Scalars['String'];
   google_place_id: Scalars['String'];
@@ -195,7 +196,7 @@ export type GetPlaceQueryVariables = Exact<{
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null | undefined, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, feedback: string }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 export type AddReviewMutationVariables = Exact<{
   input: WriteReviewInput;
@@ -213,7 +214,7 @@ export const GetPlaceDocument = gql`
       createdAt
       google_place_id
       formatted_address
-<<<<<<< HEAD
+      averageRating
       topNFlags(n: 5) {
         pros {
           topic
@@ -228,8 +229,6 @@ export const GetPlaceDocument = gql`
           cnt
         }
       }
-=======
->>>>>>> main
       residences {
         id
         createdAt
