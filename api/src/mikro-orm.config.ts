@@ -2,10 +2,7 @@ import { MikroORM } from '@mikro-orm/core';
 
 export default {
     migrations: {
-        path:
-            process.env.NODE_DEV === 'true'
-                ? './src/migrations'
-                : './dist/migrations',
+        path: './src/migrations',
         tableName: 'migrations',
         transactional: true,
     },
