@@ -15,6 +15,6 @@ export default {
     entitiesTs: ['./src/entities/*.ts'],
     type: 'postgresql',
     driverOptions: {
-        connection: { ssl: true },
+        connection: { ssl: { rejectUnauthorized: false } },
     },
 } as Parameters<typeof MikroORM.init>[0];
