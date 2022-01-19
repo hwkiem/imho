@@ -6,7 +6,7 @@ export default {
         tableName: 'migrations',
         transactional: true,
     },
-    tsNode: process.env.NODE_DEV === 'true' ? true : false,
+    tsNode: true,
     clientUrl: process.env.DATABASE_URL,
     entities: ['./dist/entities/*.js'],
     entitiesTs: ['./src/entities/*.ts'],
