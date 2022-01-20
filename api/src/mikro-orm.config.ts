@@ -21,5 +21,6 @@ export default {
                           rejectUnauthorized: false,
                       },
         },
+        wrap: false,
     },
 } as Parameters<typeof MikroORM.init>[0];
