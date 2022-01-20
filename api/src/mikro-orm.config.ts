@@ -14,8 +14,8 @@ export default {
     type: 'postgresql',
     ssl:
         process.env.NODE_DEV === 'true'
-            ? {
+            ? false
+            : {
                   rejectUnauthorized: false,
-              }
-            : false,
+              },
 } as Parameters<typeof MikroORM.init>[0];
