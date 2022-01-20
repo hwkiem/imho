@@ -4,6 +4,7 @@ export default {
     migrations: {
         path: 'dist/migrations',
         pathTs: 'src/migrations',
+        disableForeignKey: true,
         transactional: true,
     },
     clientUrl: process.env.LOCAL_DB_URL,
