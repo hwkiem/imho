@@ -23,6 +23,7 @@ import {
 } from './utils/enums/FlagType.enum';
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
+import ormConfig from './mikro-orm.config';
 
 const main = async () => {
     const app = express();
@@ -51,15 +52,16 @@ const main = async () => {
     let orm: MikroORM<IDatabaseDriver<Connection>>;
     try {
         orm = await MikroORM.init({
-            tsNode: process.env.NODE_DEV === 'true' ? true : false,
+            ...ormConfig,
             clientUrl: process.env.DATABASE_URL,
-            entities: ['./dist/entities/*.js'],
-            type: 'postgresql',
-            driverOptions: {
-                connection: { ssl: { rejectUnauthorized: false } },
-            },
         });
         console.log('Connection secured.');
+        const migrator = orm.getMigrator();
+        const migrations = await migrator.getPendingMigrations();
+        if (migrations && migrations.length > 0) {
+            await migrator.up();
+            console.log('migrations applied.');
+        }
     } catch (error) {
         console.error('📌 Could not connect to the database', error);
         throw Error(error);

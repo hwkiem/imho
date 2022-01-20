@@ -2,16 +2,20 @@ import { MikroORM } from '@mikro-orm/core';
 
 export default {
     migrations: {
-        path: './src/migrations',
-        tableName: 'migrations',
+        path: 'dist/migrations',
+        pathTs: 'src/migrations',
         transactional: true,
     },
-    tsNode: true,
-    clientUrl: process.env.DATABASE_URL,
+    clientUrl: process.env.LOCAL_DB_URL,
+    port: 5432,
+    debug: true,
     entities: ['./dist/entities/*.js'],
     entitiesTs: ['./src/entities/*.ts'],
     type: 'postgresql',
-    driverOptions: {
-        connection: { ssl: { rejectUnauthorized: false } },
-    },
+    ssl:
+        process.env.NODE_DEV === 'true'
+            ? {
+                  rejectUnauthorized: false,
+              }
+            : false,
 } as Parameters<typeof MikroORM.init>[0];

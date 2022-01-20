@@ -47,13 +47,9 @@ export class PlaceResolver {
         @Arg('placeId') placeId: string
     ): Promise<PlaceResponse> {
         try {
-            const place = await ctx.em.findOneOrFail(
-                Place,
-                {
-                    google_place_id: placeId,
-                },
-                ['residences', 'residences.reviews']
-            );
+            const place = await ctx.em.findOneOrFail(Place, {
+                google_place_id: placeId,
+            });
             return { result: place };
         } catch (e) {
             console.log(e);
@@ -79,9 +75,15 @@ export class PlaceResolver {
             cons: {} as { [key in ConFlagType]: number },
             dbks: {} as { [key in DbkFlagType]: number },
         };
-        for (const residence of place.residences) {
-            for (const review of residence.reviews) {
-                const flags: Flags = JSON.parse(review.flag_string);
+        if (!place.residenceCollection.isInitialized()) {
+            await place.residenceCollection.init();
+        }
+        for (const res of place.residenceCollection) {
+            if (!res.reviewCollection.isInitialized()) {
+                await res.reviewCollection.init();
+            }
+            for (const rev of res.reviewCollection) {
+                const flags: Flags = JSON.parse(rev.flag_string);
                 for (const f of flags.pros) {
                     counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
                 }
