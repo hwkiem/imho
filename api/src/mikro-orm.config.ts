@@ -13,15 +13,15 @@ export default {
     entities: ['./dist/entities/*.js'],
     entitiesTs: ['./src/entities/*.ts'],
     type: 'postgresql',
-    driverOptions: {
-        connection: {
-            ssl:
-                process.env.NODE_DEV === 'true'
-                    ? false
-                    : {
+    driverOptions:
+        process.env.NODE_DEV === 'true'
+            ? undefined
+            : {
+                  connection: {
+                      ssl: {
                           rejectUnauthorized: false,
                       },
-        },
-        wrap: false,
-    },
+                  },
+                  wrap: false,
+              },
 } as Parameters<typeof MikroORM.init>[0];
