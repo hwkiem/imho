@@ -4,11 +4,8 @@ export default {
     migrations: {
         path: 'dist/migrations',
         pathTs: 'src/migrations',
-        disableForeignKey: false,
-        transactional: true,
-        wrap: false,
+        disableForeignKeys: false,
     },
-    wrap: false,
     clientUrl: process.env.LOCAL_DB_URL,
     port: 5432,
     debug: true,
@@ -23,7 +20,6 @@ export default {
                           rejectUnauthorized: false,
                       },
                   },
-                  wrap: false,
               }
             : undefined,
 } as Parameters<typeof MikroORM.init>[0];
