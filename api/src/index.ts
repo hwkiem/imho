@@ -105,7 +105,10 @@ const main = async () => {
 
     // Configure AppolloServer
     const apolloServer = new ApolloServer({
-        plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+        plugins:
+            process.env.NODE_DEV === 'true'
+                ? [ApolloServerPluginLandingPageGraphQLPlayground]
+                : [],
         schema: await buildSchema({
             resolvers: [ReviewResolver, PlaceResolver],
             validate: true,
