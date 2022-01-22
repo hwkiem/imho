@@ -18,7 +18,7 @@ export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);
 
-    @Field({ defaultValue: 'single' })
+    @Field({ defaultValue: 'single', nullable: true })
     @Property({ default: 'single' })
     public unit: string;
 

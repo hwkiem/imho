@@ -1,9 +1,21 @@
-import { Entity, Property, Enum, Collection, OneToMany } from '@mikro-orm/core';
-import { Field, Float, ObjectType, Root } from 'type-graphql';
+import {
+    Entity,
+    Property,
+    Enum,
+    Collection,
+    OneToMany,
+    // MikroORM,
+} from '@mikro-orm/core';
+import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
+import { MyContext } from '../utils/context';
+import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
+// import { MyContext } from '../utils/context';
+// import { EntityManager } from '@mikro-orm/postgresql';
+// import { EntityManager, PostgreSqlDriver } from '@mikro-orm/postgresql';
 
 @ObjectType()
 @Entity()
@@ -33,25 +45,28 @@ export class Place extends Base<Place> {
     }
 
     @Field(() => Float, { nullable: true })
-    async averageRating(@Root() place: Place): Promise<number | null> {
-        if (!place.residenceCollection.isInitialized()) {
-            console.log('[avgRating] initializing residences...');
-            await place.residenceCollection.init();
-        }
-        let ratingSum = 0;
-        let reviewCnt = 0;
-        for (const res of place.residenceCollection) {
-            if (!res.reviewCollection.isInitialized()) {
-                await res.reviewCollection.init();
-            }
-            for (const rev of res.reviewCollection) {
-                reviewCnt++;
-                ratingSum += rev.rating;
-            }
-        }
+    async averageRating(
+        @Root() place: Place,
+        @Ctx() { em }: MyContext
+    ): Promise<number | null> {
+        const knex = (
+            (em as EntityManager).getConnection() as PostgreSqlConnection
+        ).getKnex();
 
-        if (reviewCnt > 0) return ratingSum / reviewCnt;
-        else return null;
+        const res = await knex
+            .avg('rating')
+            .from('review')
+            .where(
+                'review.residence_id',
+                'in',
+                knex
+                    .select('id')
+                    .from('residence')
+                    .where('place_id', '=', place.id)
+            );
+
+        if (!res[0].avg) return null;
+        return +res[0].avg;
     }
 
     @Field(() => PlaceType)
