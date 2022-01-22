@@ -10,7 +10,7 @@ import { Flags } from '../utils/types/Flag';
 @Entity()
 export class Review extends Base<Review> {
     @Field()
-    @Property()
+    @Property({ nullable: true })
     public feedback: string;
 
     @Field()

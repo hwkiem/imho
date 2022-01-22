@@ -4,6 +4,7 @@ import {
     Enum,
     Collection,
     OneToMany,
+    Unique,
     // MikroORM,
 } from '@mikro-orm/core';
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
@@ -25,6 +26,7 @@ export class Place extends Base<Place> {
 
     @Field()
     @Property()
+    @Unique()
     public google_place_id: string;
 
     @Field()
