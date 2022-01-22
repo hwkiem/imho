@@ -43,19 +43,14 @@ export default function HomePage() {
             <Text
                 color="dimmed"
                 align="center"
-                size="lg"
-                sx={{ maxWidth: 580 }}
+                sx={{ maxWidth: 580, fontSize: 30 }}
                 mx="auto"
                 mt="xl"
             >
-                Finding your next home is difficult. We provide answers to all
-                the questions you wish you could ask. Is that restaurant across
-                the street really noisy? How many hot showers will you really
-                get? Is the morning light in the kitchen perfect for your food
-                blog? Let IMHO help you find your oasis!
+                Finally, anonymous apartment reviews by former tenants.
             </Text>
             <Box>
-                <Grid mt={40} justify="space-between">
+                <Grid mt={40} justify="center">
                     <Grid.Col span={3}>
                         <Center>
                             <Link href="/review" passHref>
@@ -87,23 +82,6 @@ export default function HomePage() {
                                     leftIcon={<FaSearchengin size={18} />}
                                 >
                                     Search our Records
-                                </Button>
-                            </Link>
-                        </Center>
-                    </Grid.Col>
-                    <Grid.Col span={3}>
-                        <Center>
-                            <Link href="/login" passHref>
-                                <Button
-                                    variant="gradient"
-                                    gradient={{
-                                        from: 'grape',
-                                        to: 'pink',
-                                        deg: 35,
-                                    }}
-                                    leftIcon={<RiLoginBoxLine size={18} />}
-                                >
-                                    Login to Dashboard
                                 </Button>
                             </Link>
                         </Center>

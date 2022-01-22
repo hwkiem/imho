@@ -71,7 +71,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
                                 animate="animate"
                                 exit="exit"
                                 key={idx}
-                                styles={(theme) => ({
+                                sx={(theme) => ({
                                     root: {
                                         border: 0,
                                         height: 60,
