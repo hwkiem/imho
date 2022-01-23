@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es6",
         "lib": ["dom", "dom.iterable", "esnext"],
-        "types": ["node", "googlemaps", "jest"],
+        "types": ["node", "jest"],
         "skipLibCheck": true,
         "strict": true,
         "noImplicitAny": true,
