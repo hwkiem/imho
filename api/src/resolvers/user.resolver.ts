@@ -1,8 +1,12 @@
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
-import { ApiResponse } from '../utils/types/Response';
+import { ApiResponse, ApiStatus } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
-import { PendingUserInput, UserValidator } from '../validators/UserValidator';
+import {
+    LoginInput,
+    PendingUserInput,
+    UserValidator,
+} from '../validators/UserValidator';
 import argon2 from 'argon2';
 
 declare module 'express-session' {
@@ -72,7 +76,7 @@ export class UserResolver {
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
             });
-            if (user.isActivated) {
+            if (user.isActivated === true) {
                 return {
                     errors: [
                         {
@@ -137,8 +141,77 @@ export class UserResolver {
     }
 
     // login
+    @Mutation(() => UserResponse)
+    public async login(
+        @Arg('input') input: LoginInput,
+        @Ctx() { em, req }: MyContext
+    ): Promise<UserResponse> {
+        try {
+            console.log(input.email);
+            const user = await em.findOneOrFail(ImhoUser, {
+                email: input.email,
+            });
+            console.log(user);
+            if (user.isActivated === false)
+                return {
+                    errors: [
+                        {
+                            field: 'user state',
+                            error: 'Account with this email is pending / not activated',
+                        },
+                    ],
+                };
+            if (!(await argon2.verify(user.password, input.password))) {
+                return {
+                    errors: [
+                        {
+                            field: 'password',
+                            error: 'incorrect password',
+                        },
+                    ],
+                };
+            }
+            // user exists, is activated, and is authenticated
+            req.session.userId = user.id;
+            return { result: user };
+        } catch (e) {
+            console.log(e);
+            return {
+                errors: [
+                    {
+                        field: 'catch',
+                        error: 'user does not exist',
+                    },
+                ],
+            };
+        }
+    }
 
     // logout
+    @Mutation(() => ApiStatus)
+    public async logout(@Ctx() { req }: MyContext): Promise<ApiStatus> {
+        return new Promise((resolve) => {
+            if (req.session.userId === undefined) {
+                resolve({
+                    errors: [{ field: 'session', error: 'not logged in' }],
+                });
+            }
+            req.session.destroy((err) => {
+                // res.clearCookie('oreo'); // not sure how to make this happen
+                if (err) {
+                    resolve({
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'unable to destroy session.',
+                            },
+                        ],
+                    });
+                }
+            });
+            resolve({ success: true });
+        });
+    }
 
     // forgot password
 }
