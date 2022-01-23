@@ -72,9 +72,19 @@ const main = async () => {
     const redis = new Redis(process.env.REDIS_URL);
 
     app.set('trust proxy', 1);
-    const whitelist: string[] = process.env.CORS_ORIGIN
-        ? process.env.CORS_ORIGIN.split(' ')
+
+    // fixed url whitelist
+    let whitelist: (string | RegExp)[] = process.env.CORS_ORIGIN_WHITELIST
+        ? process.env.CORS_ORIGIN_WHITELIST.split(' ')
         : ([] as string[]);
+
+    // regex used for dynamic branch cors origins
+    whitelist.concat(
+        process.env.CORS_ORIGIN_REGEX
+            ? new RegExp(process.env.CORS_ORIGIN_REGEX)
+            : []
+    );
+
     app.use(
         cors({
             origin: whitelist,
