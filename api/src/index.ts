@@ -74,7 +74,7 @@ const main = async () => {
     app.set('trust proxy', 1);
 
     // fixed url whitelist
-    let whitelist: (string | RegExp)[] = process.env.CORS_ORIGIN_WHITELIST
+    const whitelist: (string | RegExp)[] = process.env.CORS_ORIGIN_WHITELIST
         ? process.env.CORS_ORIGIN_WHITELIST.split(' ')
         : ([] as string[]);
 
