@@ -82,12 +82,8 @@ const main = async () => {
     const regex = process.env.CORS_ORIGIN_REGEX
         ? new RegExp(process.env.CORS_ORIGIN_REGEX)
         : null;
-    console.log(regex);
     if (regex) whitelist.push(regex);
 
-    console.log(whitelist);
-
-    console.log(regex?.test('https://imho-qivpi5xtn-hwkiem.vercel.app'));
     app.use(
         cors({
             origin: whitelist,
