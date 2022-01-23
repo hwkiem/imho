@@ -5,6 +5,7 @@ import { MyContext } from '../utils/context';
 import { Place } from '../entities/Place';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
 import { ApiResponse } from '../utils/types/Response';
+import { ImhoUser } from '../entities/ImhoUser';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
@@ -37,7 +38,7 @@ export class ReviewResolver {
     @Mutation(() => ReviewResponse)
     public async addReview(
         @Arg('input') input: WriteReviewInput,
-        @Ctx() { em }: MyContext
+        @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
         try {
             const place: Place = await em.findOneOrFail(Place, {
@@ -55,6 +56,16 @@ export class ReviewResolver {
                 // add relationships
                 residence.place = place;
                 review.residence = residence;
+                if (req.session.userId) {
+                    try {
+                        const user = await em.findOneOrFail(ImhoUser, {
+                            id: req.session.userId,
+                        });
+                        review.author = user;
+                    } catch {
+                        console.log('could not fetch author account');
+                    }
+                }
 
                 em.persist(review).persist(place).persist(residence).flush();
                 return { result: review };
@@ -67,6 +78,16 @@ export class ReviewResolver {
                 // add relationships
                 residence.place = place;
                 review.residence = residence;
+                if (req.session.userId) {
+                    try {
+                        const user = await em.findOneOrFail(ImhoUser, {
+                            id: req.session.userId,
+                        });
+                        review.author = user;
+                    } catch {
+                        console.log('could not fetch author account');
+                    }
+                }
                 em.persist(review).persist(place).persist(residence).flush();
                 return { result: review };
             }
@@ -80,6 +101,16 @@ export class ReviewResolver {
             // add relationships
             residence.place = place;
             review.residence = residence;
+            if (req.session.userId) {
+                try {
+                    const user = await em.findOneOrFail(ImhoUser, {
+                        id: req.session.userId,
+                    });
+                    review.author = user;
+                } catch {
+                    console.log('could not fetch author account');
+                }
+            }
             em.persist(review).persist(place).persist(residence).flush();
             return { result: review };
         }

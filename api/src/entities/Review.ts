@@ -23,6 +23,7 @@ export class Review extends Base<Review> {
     })
     public residence: Residence;
 
+    @Field(() => ImhoUser, { nullable: true })
     @ManyToOne(() => ImhoUser, { nullable: true })
     public author: ImhoUser;
 
