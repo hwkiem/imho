@@ -23,6 +23,7 @@ import {
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
+import { UserResolver } from './resolvers/user.resolver';
 
 const main = async () => {
     const app = express();
@@ -112,7 +113,7 @@ const main = async () => {
                 ? [ApolloServerPluginLandingPageGraphQLPlayground]
                 : [],
         schema: await buildSchema({
-            resolvers: [ReviewResolver, PlaceResolver],
+            resolvers: [ReviewResolver, PlaceResolver, UserResolver],
             validate: true,
         }),
         context: ({ req, res }) =>

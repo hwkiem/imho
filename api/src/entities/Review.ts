@@ -1,10 +1,10 @@
 import { Cascade, Entity, ManyToOne, Property } from '@mikro-orm/core';
-
 import { ReviewValidator } from '../validators/ReviewValidator';
 import { Field, ObjectType } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { Flags } from '../utils/types/Flag';
+import { ImhoUser } from './ImhoUser';
 
 @ObjectType()
 @Entity()
@@ -22,6 +22,9 @@ export class Review extends Base<Review> {
         cascade: [Cascade.PERSIST, Cascade.REMOVE],
     })
     public residence: Residence;
+
+    @ManyToOne(() => ImhoUser, { nullable: true })
+    public author: ImhoUser;
 
     @Field(() => Flags)
     flags: Flags;

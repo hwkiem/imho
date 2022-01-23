@@ -5,7 +5,6 @@ import {
     Collection,
     OneToMany,
     Unique,
-    // MikroORM,
 } from '@mikro-orm/core';
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
@@ -14,9 +13,6 @@ import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
-// import { MyContext } from '../utils/context';
-// import { EntityManager } from '@mikro-orm/postgresql';
-// import { EntityManager, PostgreSqlDriver } from '@mikro-orm/postgresql';
 
 @ObjectType()
 @Entity()
