@@ -392,7 +392,8 @@ export default function ReviewPage() {
                                                 placeholder="What unit do you live in?"
                                                 variant="filled"
                                                 value={
-                                                    values.residenceInput.unit
+                                                    values.residenceInput
+                                                        .unit as string
                                                 }
                                                 onChange={(evt) => {
                                                     setFieldValue(
