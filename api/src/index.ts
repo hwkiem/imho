@@ -83,7 +83,7 @@ const main = async () => {
         ? new RegExp(process.env.CORS_ORIGIN_REGEX)
         : null;
     console.log(regex);
-    if (regex) whitelist.concat(regex);
+    if (regex) whitelist.push(regex);
 
     console.log(whitelist);
 
