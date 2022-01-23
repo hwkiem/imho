@@ -1,0 +1,13 @@
+query Me {
+    me {
+        result {
+            id
+            createdAt
+            email
+        }
+        errors {
+            field
+            error
+        }
+    }
+}

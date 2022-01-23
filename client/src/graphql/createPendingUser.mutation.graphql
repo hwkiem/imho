@@ -1,0 +1,13 @@
+mutation CreatePendingUser($input: PendingUserInput!) {
+    createPendingUser(input: $input) {
+        result {
+            id
+            email
+            createdAt
+        }
+        errors {
+            field
+            error
+        }
+    }
+}

@@ -7,7 +7,6 @@ import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-// import { Container } from 'typedi';
 import {
     Connection,
     IDatabaseDriver,
@@ -24,6 +23,7 @@ import {
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
+import { UserResolver } from './resolvers/user.resolver';
 
 const main = async () => {
     const app = express();
@@ -49,23 +49,26 @@ const main = async () => {
         description: 'All the positive flag topics',
     });
 
-    let orm: MikroORM<IDatabaseDriver<Connection>>;
-    try {
-        orm = await MikroORM.init({
-            ...ormConfig,
-            clientUrl: process.env.DATABASE_URL,
-        });
-        console.log('Connection secured.');
-        const migrator = orm.getMigrator();
-        const migrations = await migrator.getPendingMigrations();
-        if (migrations && migrations.length > 0) {
-            await migrator.up();
-            console.log('migrations applied.');
+    const orm: MikroORM<IDatabaseDriver<Connection>> = await (async () => {
+        try {
+            // const orm = await MikroORM.init<PostgreSqlDriver>({
+            const orm = await MikroORM.init({
+                ...ormConfig,
+                clientUrl: process.env.DATABASE_URL, // overwrite cli setting
+            });
+            console.log('Connection secured.');
+            const migrator = orm.getMigrator();
+            const migrations = await migrator.getPendingMigrations();
+            if (migrations && migrations.length > 0) {
+                await migrator.up();
+                console.log('migrations applied.');
+            }
+            return orm;
+        } catch (error) {
+            console.error('📌 Could not connect to the database', error);
+            throw Error(error);
         }
-    } catch (error) {
-        console.error('📌 Could not connect to the database', error);
-        throw Error(error);
-    }
+    })();
 
     // Redis Cookies / Sessions
     const RedisStore = connectRedis(session);
@@ -118,11 +121,11 @@ const main = async () => {
     // Configure AppolloServer
     const apolloServer = new ApolloServer({
         plugins:
-            process.env.NODE_DEV === 'true'
+            process.env.NODE_ENV === 'dev'
                 ? [ApolloServerPluginLandingPageGraphQLPlayground]
                 : [],
         schema: await buildSchema({
-            resolvers: [ReviewResolver, PlaceResolver],
+            resolvers: [ReviewResolver, PlaceResolver, UserResolver],
             validate: true,
         }),
         context: ({ req, res }) =>

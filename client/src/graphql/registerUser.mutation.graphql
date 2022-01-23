@@ -1,0 +1,13 @@
+mutation RegisterUser($input: UserValidator!) {
+    registerUser(input: $input) {
+        result {
+            id
+            createdAt
+            email
+        }
+        errors {
+            field
+            error
+        }
+    }
+}

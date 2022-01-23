@@ -7,10 +7,12 @@ import {
     Property,
 } from '@mikro-orm/core';
 import { Review } from './Review';
-import { Field, Float, ObjectType, Root } from 'type-graphql';
+import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { ResidenceValidator } from '../validators/ResidenceValidator';
 import { Place } from './Place';
+import { MyContext } from '../utils/context';
+import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
 
 @ObjectType()
 @Entity()
@@ -18,7 +20,7 @@ export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);
 
-    @Field({ defaultValue: 'single' })
+    @Field({ defaultValue: 'single', nullable: true })
     @Property({ default: 'single' })
     public unit: string;
 
@@ -41,24 +43,21 @@ export class Residence extends Base<Residence> {
     public place: Place;
 
     @Field(() => Float, { nullable: true })
-    async averageRating(@Root() residence: Residence): Promise<number | null> {
-        if (!residence.reviewCollection.isInitialized()) {
-            await residence.reviewCollection.init();
-        }
+    async averageRating(
+        @Root() residence: Residence,
+        @Ctx() { em }: MyContext
+    ): Promise<number | null> {
+        const knex = (
+            (em as EntityManager).getConnection() as PostgreSqlConnection
+        ).getKnex();
 
-        let ratingSum = 0;
-        let numReviews = 0;
+        const res = await knex
+            .avg('rating')
+            .from('review')
+            .where('review.residence_id', '=', residence.id);
 
-        for (const review of residence.reviewCollection) {
-            ratingSum += review.rating;
-            numReviews++;
-        }
-
-        if (numReviews == 0) {
-            return null;
-        } else {
-            return ratingSum / numReviews;
-        }
+        if (!res[0].avg) return null;
+        return +res[0].avg;
     }
 
     constructor(body: ResidenceValidator) {
