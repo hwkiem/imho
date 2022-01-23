@@ -25,6 +25,7 @@
         "@mantine/hooks": "^3.5.4",
         "@mantine/next": "^3.5.4",
         "@mantine/notifications": "^3.5.4",
+        "@sentry/nextjs": "^6.16.1",
         "@zeit/next-sass": "^1.0.1",
         "dotenv-safe": "^8.2.0",
         "entities": "1.0.0",
