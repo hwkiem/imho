@@ -79,11 +79,11 @@ const main = async () => {
         : ([] as string[]);
 
     // regex used for dynamic branch cors origins
-    whitelist.concat(
-        process.env.CORS_ORIGIN_REGEX
-            ? new RegExp(process.env.CORS_ORIGIN_REGEX)
-            : []
-    );
+    const regex = process.env.CORS_ORIGIN_REGEX
+        ? new RegExp(process.env.CORS_ORIGIN_REGEX)
+        : null;
+    console.log(regex);
+    if (regex) whitelist.concat(regex);
 
     app.use(
         cors({
