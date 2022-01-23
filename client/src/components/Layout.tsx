@@ -6,22 +6,6 @@ type LayoutProps = {
     children: JSX.Element | JSX.Element[];
 };
 
-const LoginModal = () => {
-    const [opened, setOpened] = useState(false);
-
-    return (
-        <>
-            <Modal
-                opened={opened}
-                onClose={() => setOpened(false)}
-                title="Introduce yourself!"
-            >
-                Content
-            </Modal>
-        </>
-    );
-};
-
 export const Layout = ({ children }: LayoutProps) => {
     const [loggedIn, setIsLoggedIn] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);

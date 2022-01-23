@@ -1,8 +1,19 @@
-import { Accordion, Badge, Box, SimpleGrid, Text, Title } from '@mantine/core';
+import {
+    Accordion,
+    ActionIcon,
+    Badge,
+    Box,
+    Center,
+    Grid,
+    SimpleGrid,
+    Text,
+    Title,
+} from '@mantine/core';
 import { Variants } from 'framer-motion';
 import {} from 'next';
 import { useRouter } from 'next/router';
-import { useGetPlaceQuery } from '../../generated/graphql';
+import { FaEdit } from 'react-icons/fa';
+import { FlagWithCount, useGetPlaceQuery } from '../../generated/graphql';
 import { MotionContainer } from '../../utils/motion';
 
 export default function PlacePage() {
@@ -32,55 +43,87 @@ export default function PlacePage() {
 
     console.log(data);
 
-    return loading ? (
-        <></>
-    ) : data?.getPlace.result ? (
+    if (loading) {
+        return <></>;
+    }
+
+    const place = data?.getPlace.result;
+
+    let topFlagsSorted: (FlagWithCount & { color: string })[] = [];
+
+    if (place?.topNFlags) {
+        topFlagsSorted = place?.topNFlags?.cons
+            .map((con) => ({ ...con, color: 'orange' }))
+            .concat(
+                place.topNFlags.pros.map((pro) => ({ ...pro, color: 'green' }))
+            )
+            .concat(
+                place.topNFlags.dbks.map((dbk) => ({ ...dbk, color: 'red' }))
+            )
+            .sort((a, b) => b.cnt - a.cnt);
+    }
+
+    return data?.getPlace.result ? (
         <MotionContainer
             initial="hidden"
             animate="enter"
             exit="exit"
             variants={variants}
             transition={{ type: 'spring' }}
-            key={'review'}
+            key={'found'}
         >
-            <Title
-                sx={{
-                    fontSize: 30,
-                    fontWeight: 500,
-                    letterSpacing: -2,
-                }}
-                align="center"
-                mt={50}
-            >
-                <Text
-                    sx={{ fontSize: 50, fontWeight: 700, letterSpacing: -2 }}
-                    align="center"
-                    mt={100}
+            <Center>
+                <Badge
                     variant="gradient"
-                    gradient={{ from: 'green', to: 'purple', deg: 45 }}
+                    gradient={{
+                        from: 'pink',
+                        to: 'violet',
+                    }}
+                    size={'xl'}
+                    leftSection={
+                        <ActionIcon
+                            size="xs"
+                            color="blue"
+                            radius="xl"
+                            variant="transparent"
+                            mr={20}
+                            sx={(theme) => ({
+                                color: 'white',
+                                '&:hover': {
+                                    color: theme.colors.gray[4],
+                                },
+                            })}
+                            onClick={() => router.push('/search')}
+                        >
+                            <FaEdit />
+                        </ActionIcon>
+                    }
                 >
                     {data.getPlace.result.formatted_address}
-                </Text>
-            </Title>
-            <Title
-                sx={{
-                    fontSize: 30,
-                    fontWeight: 500,
-                    letterSpacing: -2,
-                }}
-                align="left"
-                mt={50}
-            >
-                Average Rating:<br></br>
+                </Badge>
+            </Center>
+            <Center>
+                <Title
+                    sx={{
+                        fontSize: 30,
+                        fontWeight: 500,
+                        letterSpacing: -2,
+                    }}
+                    align="left"
+                    mt={50}
+                >
+                    Average Rating:
+                </Title>
+            </Center>
+            <Center>
                 <Text
-                    inherit
                     variant="gradient"
                     gradient={{ from: 'orange', to: 'violet', deg: 45 }}
-                    component="span"
+                    sx={{ fontSize: 40 }}
                 >
-                    {data.getPlace.result.averageRating?.toFixed(2)}
+                    {data.getPlace.result.averageRating?.toFixed(1)}%
                 </Text>
-            </Title>
+            </Center>
             <Title
                 sx={{
                     fontSize: 30,
@@ -90,7 +133,7 @@ export default function PlacePage() {
                 align="left"
                 mt={50}
             >
-                Flags
+                Common Flags:
             </Title>
             <SimpleGrid
                 mt={30}
@@ -114,40 +157,16 @@ export default function PlacePage() {
                     },
                 ]}
             >
-                {data.getPlace.result.topNFlags?.pros.map((pro) => (
+                {topFlagsSorted.map((fg) => (
                     <Badge
-                        key={pro.topic}
-                        color={'green'}
+                        key={fg.topic}
+                        color={fg.color}
                         variant={'filled'}
                         size={'xl'}
                         radius={'sm'}
-                        leftSection={<Box mr={10}>{pro.cnt}</Box>}
+                        leftSection={<Box mr={10}>{fg.cnt}</Box>}
                     >
-                        {pro.topic}
-                    </Badge>
-                ))}
-                {data.getPlace.result.topNFlags?.cons.map((con) => (
-                    <Badge
-                        key={con.topic}
-                        color={'orange'}
-                        variant={'filled'}
-                        size={'xl'}
-                        radius={'sm'}
-                        leftSection={<Box mr={10}>{con.cnt}</Box>}
-                    >
-                        {con.topic}
-                    </Badge>
-                ))}
-                {data.getPlace.result.topNFlags?.dbks.map((dbk) => (
-                    <Badge
-                        key={dbk.topic}
-                        color={'red'}
-                        variant={'filled'}
-                        size={'xl'}
-                        radius={'sm'}
-                        leftSection={<Box mr={10}>{dbk.cnt}</Box>}
-                    >
-                        {dbk.topic}
+                        {fg.topic}
                     </Badge>
                 ))}
             </SimpleGrid>
@@ -160,35 +179,17 @@ export default function PlacePage() {
                 align="left"
                 mt={50}
             >
-                Residences
+                Comments:
             </Title>
-            <Accordion>
-                {data.getPlace.result.residences.map((res) => (
-                    <Accordion.Item key={res.id} label={res.unit}>
-                        Average Rating: {res.averageRating}
-                        <br></br>
-                        Number of Reviews: {res.reviews.length}
-                        <Accordion>
-                            {res.reviews.map((rev) => {
-                                const date = new Date(rev.createdAt);
-                                return (
-                                    <Accordion.Item
-                                        key={rev.id}
-                                        label={date.toLocaleDateString(
-                                            'default',
-                                            { month: 'long', year: '2-digit' }
-                                        )}
-                                    >
-                                        {rev.rating}
-                                        <br></br>
-                                        {rev.feedback}
-                                    </Accordion.Item>
-                                );
-                            })}
-                        </Accordion>
-                    </Accordion.Item>
-                ))}
-            </Accordion>
+            {data.getPlace.result.residences.map((res) => (
+                <Grid key={res.id}>
+                    {res.reviews.map((rev) => (
+                        <Box m={20} key={rev.id}>
+                            {rev.feedback}
+                        </Box>
+                    ))}
+                </Grid>
+            ))}
         </MotionContainer>
     ) : (
         <MotionContainer
