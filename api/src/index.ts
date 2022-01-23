@@ -24,9 +24,25 @@ import {
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 const main = async () => {
     const app = express();
+
+    const SENTRY_DSN = process.env.SENTRY_DSN || undefined;
+    if (SENTRY_DSN !== undefined) {
+        Sentry.init({
+            dsn: SENTRY_DSN,
+            integrations: [
+                new Sentry.Integrations.Http({ tracing: true }),
+                new Tracing.Integrations.Express({ app }),
+            ],
+            tracesSampleRate: 1.0,
+        });
+        app.use(Sentry.Handlers.requestHandler());
+        app.use(Sentry.Handlers.tracingHandler());
+    }
 
     // TODO: create service for this
     registerEnumType(PlaceType, {
@@ -136,6 +152,9 @@ const main = async () => {
         cors: false,
     });
 
+    if (SENTRY_DSN) {
+        app.use(Sentry.Handlers.errorHandler());
+    }
     app.listen(process.env.PORT, () => {
         console.log(
             `server started on http://localhost:${process.env.PORT}/graphql`

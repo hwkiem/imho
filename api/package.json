@@ -18,11 +18,13 @@
         "migrate:pending": "yarn mikro-orm migration:pending"
     },
     "dependencies": {
+        "@mikro-orm/cli": "^5.0.0-dev.584",
         "@mikro-orm/core": "^5.0.0-dev.584",
         "@mikro-orm/migrations": "^5.0.0-dev.584",
         "@mikro-orm/postgresql": "^5.0.0-dev.584",
         "@mikro-orm/reflection": "^5.0.0-dev.584",
-        "@mikro-orm/cli": "^5.0.0-dev.584",
+        "@sentry/node": "^6.16.1",
+        "@sentry/tracing": "^6.16.1",
         "apollo-server": "^3.1.2",
         "class-validator": "^0.13.1",
         "connect-redis": "^6.0.0",
