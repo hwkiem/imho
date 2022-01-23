@@ -1,6 +1,6 @@
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
-import { ApiResponse, ApiStatus } from '../utils/types/Response';
+import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
 import {
     LoginInput,
@@ -97,8 +97,9 @@ export class UserResolver {
         } catch (e) {
             // inactive account does not exist, create from scratch
             const user = new ImhoUser(input);
-            req.session.userId = user.id;
+            user.password = await argon2.hash(input.password);
             user.isActivated = true;
+            req.session.userId = user.id;
             em.persist(user).flush();
             return { result: user };
         }
@@ -147,11 +148,9 @@ export class UserResolver {
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         try {
-            console.log(input.email);
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
             });
-            console.log(user);
             if (user.isActivated === false)
                 return {
                     errors: [
@@ -187,30 +186,18 @@ export class UserResolver {
         }
     }
 
-    // logout
-    @Mutation(() => ApiStatus)
-    public async logout(@Ctx() { req }: MyContext): Promise<ApiStatus> {
-        return new Promise((resolve) => {
-            if (req.session.userId === undefined) {
-                resolve({
-                    errors: [{ field: 'session', error: 'not logged in' }],
-                });
-            }
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req, res }: MyContext) {
+        return new Promise((resolve) =>
             req.session.destroy((err) => {
-                // res.clearCookie('oreo'); // not sure how to make this happen
+                res.clearCookie('oreo');
                 if (err) {
-                    resolve({
-                        errors: [
-                            {
-                                field: 'session',
-                                error: 'unable to destroy session.',
-                            },
-                        ],
-                    });
+                    resolve(false);
+                    return;
                 }
-            });
-            resolve({ success: true });
-        });
+                resolve(true);
+            })
+        );
     }
 
     // forgot password

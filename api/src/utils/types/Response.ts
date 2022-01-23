@@ -17,12 +17,3 @@ export function ApiResponse<T>(TClass: ClassType<T>) {
     }
     return ApiResponseClass;
 }
-
-@ObjectType()
-export class ApiStatus {
-    @Field({ nullable: true })
-    public success?: boolean;
-
-    @Field(() => [FieldError], { nullable: true })
-    public errors?: FieldError[];
-}
