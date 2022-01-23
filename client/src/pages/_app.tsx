@@ -12,10 +12,9 @@ import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../lib/apollo';
+import { Layout } from '../components/Layout';
 
-export default function App(props: AppProps) {
-    const { Component, pageProps } = props;
-
+export default function App({ Component, pageProps }: AppProps) {
     // fetch user preferred ColorScheme and set default
     const preferredColorScheme = useColorScheme();
     const [colorScheme, setColorScheme] =
@@ -52,7 +51,12 @@ export default function App(props: AppProps) {
                     >
                         <NotificationsProvider>
                             <AnimatePresence exitBeforeEnter>
-                                <Component {...pageProps} key={router.route} />
+                                <Layout>
+                                    <Component
+                                        {...pageProps}
+                                        key={router.route}
+                                    />
+                                </Layout>
                             </AnimatePresence>
                         </NotificationsProvider>
                     </MantineProvider>

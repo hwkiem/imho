@@ -30,11 +30,11 @@ export default function SearchPage() {
             key={'review'}
         >
             <Title
-                sx={{ fontSize: 80, fontWeight: 900, letterSpacing: -2 }}
+                sx={{ fontSize: 60, fontWeight: 900, letterSpacing: -2 }}
                 align="center"
-                mt={100}
+                mt={50}
             >
-                You've got questions,{' '}
+                You've got questions,<br></br>
                 <Text
                     inherit
                     variant="gradient"
@@ -47,27 +47,12 @@ export default function SearchPage() {
             </Title>
             <Text
                 color="dimmed"
-                align="left"
-                size="lg"
-                sx={{ maxWidth: 580 }}
+                align="center"
+                sx={{ maxWidth: 580, fontSize: 30 }}
                 mx="auto"
-                mt="xl"
+                mt="sm"
             >
-                How is the water pressure? Is the light in the kitchen good for
-                my food instagram? Will I get my security deposit back?
-                <br /> <br /> These are some of the concerns we face while
-                searching for a new place to call home.{' '}
-                <Text
-                    inherit
-                    variant="gradient"
-                    gradient={{ from: 'cyan', to: 'lime', deg: 45 }}
-                    component="span"
-                >
-                    IMHO
-                </Text>{' '}
-                is a centralized database of honest reviews from tenants focused
-                on improving accountability in the rental market. See what
-                people really think of that apartment you're looking at!
+                Do your homework. Read reviews before renting.
             </Text>
             <Center>
                 <TextInput

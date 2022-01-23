@@ -108,19 +108,20 @@ export default function ReviewPage() {
             key={'review'}
         >
             <Title
-                sx={{ fontSize: 80, fontWeight: 900, letterSpacing: -2 }}
+                sx={{ fontSize: 60, fontWeight: 900, letterSpacing: -2 }}
                 align="center"
                 mt={100}
             >
-                Reviews are the backbone of{' '}
+                renters help renters make{' '}
                 <Text
                     inherit
                     variant="gradient"
                     gradient={{ from: 'cyan', to: 'lime', deg: 45 }}
                     component="span"
                 >
-                    IMHO
-                </Text>
+                    informed
+                </Text>{' '}
+                decisions.
             </Title>
             <Text
                 color="dimmed"
@@ -130,9 +131,7 @@ export default function ReviewPage() {
                 mx="auto"
                 mt="xl"
             >
-                Its reviews written by people you that make all the difference!
-                Do your community a solid and tell us what you love (or don't)
-                about your home.
+                Anonymously review your current or former apartment.
             </Text>
             <Formik
                 initialValues={initialState}
