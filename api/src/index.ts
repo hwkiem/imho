@@ -85,6 +85,9 @@ const main = async () => {
     console.log(regex);
     if (regex) whitelist.concat(regex);
 
+    console.log(whitelist);
+
+    console.log(regex?.test('https://imho-qivpi5xtn-hwkiem.vercel.app'));
     app.use(
         cors({
             origin: whitelist,
