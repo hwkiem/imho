@@ -5,9 +5,11 @@ import { ImhoUser } from '../entities/ImhoUser';
 import {
     LoginInput,
     PendingUserInput,
+    TrackPlaceInput,
     UserValidator,
 } from '../validators/UserValidator';
 import argon2 from 'argon2';
+import { Place } from '../entities/Place';
 // import { authenticator } from 'otplib';
 
 declare module 'express-session' {
@@ -140,6 +142,32 @@ export class UserResolver {
             em.persist(user).flush();
             return { result: user };
         }
+    }
+
+    // hit this to track a place, creates pending account first time
+    @Mutation(() => UserResponse)
+    public async trackPlace(
+        @Arg('input') input: TrackPlaceInput,
+        @Ctx() { em }: MyContext
+    ): Promise<UserResponse> {
+        try {
+            const place = await em.findOneOrFail(Place, {
+                google_place_id: input.placeInput.google_place_id,
+            });
+
+            try {
+                const user = await em.findOneOrFail(ImhoUser, {
+                    email: input.userInput.email,
+                });
+                console.log(user, place);
+                // user.notifyOnReview.add(place);
+            } catch {
+                console.log('no user');
+            }
+        } catch {
+            console.log('no place');
+        }
+        return {};
     }
 
     // login

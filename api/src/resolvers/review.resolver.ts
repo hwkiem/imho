@@ -47,7 +47,9 @@ export class ReviewResolver {
 
             try {
                 const residence = await em.findOneOrFail(Residence, {
-                    unit: input.residenceInput.unit,
+                    unit: input.residenceInput.unit
+                        ? input.residenceInput.unit
+                        : 'single', // default value
                 });
 
                 console.log('place and location already  exist');
@@ -58,11 +60,11 @@ export class ReviewResolver {
                 review.residence = residence;
                 if (req.session.userId) {
                     try {
-                        const user = await em.findOneOrFail(ImhoUser, {
+                        review.author = await em.findOneOrFail(ImhoUser, {
                             id: req.session.userId,
                         });
-                        review.author = user;
                     } catch {
+                        // but still make the review without the user
                         console.log('could not fetch author account');
                     }
                 }
@@ -70,7 +72,6 @@ export class ReviewResolver {
                 em.persist(review).persist(place).persist(residence).flush();
                 return { result: review };
             } catch (e) {
-                console.log('place exists but residence did not');
                 console.log(e);
                 const residence = new Residence(input.residenceInput);
                 // place and residence exist, create review

@@ -327,6 +327,16 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "review_author_id_residence_id_unique",
+          "columnNames": [
+            "author_id",
+            "residence_id"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "review_pkey",
           "columnNames": [
             "id"
@@ -361,6 +371,70 @@
           ],
           "referencedTableName": "public.imho_user",
           "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "place_id": {
+          "name": "place_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "imho_user_id": {
+          "name": "imho_user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "place_notify_on_review",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "place_notify_on_review_pkey",
+          "columnNames": [
+            "place_id",
+            "imho_user_id"
+          ],
+          "composite": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "foreignKeys": {
+        "place_notify_on_review_place_id_foreign": {
+          "constraintName": "place_notify_on_review_place_id_foreign",
+          "columnNames": [
+            "place_id"
+          ],
+          "localTableName": "public.place_notify_on_review",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.place",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "place_notify_on_review_imho_user_id_foreign": {
+          "constraintName": "place_notify_on_review_imho_user_id_foreign",
+          "columnNames": [
+            "imho_user_id"
+          ],
+          "localTableName": "public.place_notify_on_review",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.imho_user",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }

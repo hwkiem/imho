@@ -5,6 +5,7 @@ import {
     Collection,
     OneToMany,
     Unique,
+    ManyToMany,
 } from '@mikro-orm/core';
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
@@ -13,6 +14,7 @@ import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
+import { ImhoUser } from './ImhoUser';
 
 @ObjectType()
 @Entity()
@@ -41,6 +43,10 @@ export class Place extends Base<Place> {
             return place.residenceCollection;
         }
     }
+
+    // a Place owns the Users it should ping about new reviews
+    @ManyToMany(() => ImhoUser, 'notifyMeAbout', { owner: true })
+    public notifyOnReview = new Collection<ImhoUser>(this);
 
     @Field(() => Float, { nullable: true })
     async averageRating(

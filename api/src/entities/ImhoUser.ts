@@ -4,17 +4,22 @@ import {
     Collection,
     OneToMany,
     Unique,
+    ManyToMany,
 } from '@mikro-orm/core';
 import { Field, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Review } from './Review';
 import { PendingUserInput, UserValidator } from '../validators/UserValidator';
+import { Place } from './Place';
 
 @ObjectType()
 @Entity()
 export class ImhoUser extends Base<ImhoUser> {
     @OneToMany(() => Review, (r: Review) => r.author)
     public reviewCollection = new Collection<Review>(this);
+
+    @ManyToMany(() => Place, (p: Place) => p.notifyOnReview)
+    public notifyMeAbout = new Collection<Place>(this);
 
     @Field()
     @Property()
