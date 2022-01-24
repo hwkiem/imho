@@ -32,15 +32,22 @@ export class ImhoUser extends Base<ImhoUser> {
     @Property()
     public isActivated: boolean;
 
+    @Field(() => [Place])
+    async myTrackedPlaces(
+        @Root() user: ImhoUser
+    ): Promise<Collection<Place> | null> {
+        if (!user.notifyMeAbout.isInitialized()) {
+            await user.notifyMeAbout.init();
+        }
+        return user.notifyMeAbout;
+    }
+
     @Field(() => [Review])
     async reviews(@Root() user: ImhoUser): Promise<Collection<Review> | null> {
-        if (user.reviewCollection.isInitialized()) {
-            return user.reviewCollection;
-        } else {
-            console.log('[residences] initializing residences...');
+        if (!user.reviewCollection.isInitialized()) {
             await user.reviewCollection.init();
-            return user.reviewCollection;
         }
+        return user.reviewCollection;
     }
 
     constructor(body: UserValidator | PendingUserInput) {

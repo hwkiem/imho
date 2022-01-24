@@ -148,26 +148,50 @@ export class UserResolver {
     @Mutation(() => UserResponse)
     public async trackPlace(
         @Arg('input') input: TrackPlaceInput,
-        @Ctx() { em }: MyContext
+        @Ctx() { em, req, res }: MyContext
     ): Promise<UserResponse> {
         try {
             const place = await em.findOneOrFail(Place, {
                 google_place_id: input.placeInput.google_place_id,
             });
-
+            try {
+                // place and user exist
+                const user = await em.findOneOrFail(ImhoUser, {
+                    email: input.userInput.email,
+                });
+                user.notifyMeAbout.add(place);
+                em.persistAndFlush(user);
+                return { result: user };
+            } catch {
+                // place, no user
+                const user = new ImhoUser(input.userInput);
+                user.isActivated = false;
+                this.createPendingUser(input.userInput, { em, req, res });
+                user.notifyMeAbout.add(place);
+                em.persistAndFlush(user);
+                return { result: user };
+            }
+        } catch {
+            // no place
+            const place = new Place(input.placeInput);
             try {
                 const user = await em.findOneOrFail(ImhoUser, {
                     email: input.userInput.email,
                 });
-                console.log(user, place);
-                // user.notifyOnReview.add(place);
+                // place and user exist
+                user.notifyMeAbout.add(place);
+                em.persistAndFlush(user);
+                return { result: user };
             } catch {
+                // no place or user
                 console.log('no user');
+                const user = new ImhoUser(input.userInput);
+                user.isActivated = false;
+                user.notifyMeAbout.add(place);
+                em.persistAndFlush(user);
+                return { result: user };
             }
-        } catch {
-            console.log('no place');
         }
-        return {};
     }
 
     // login

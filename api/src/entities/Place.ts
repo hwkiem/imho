@@ -35,18 +35,25 @@ export class Place extends Base<Place> {
     async residences(
         @Root() place: Place
     ): Promise<Collection<Residence> | null> {
-        if (place.residenceCollection.isInitialized()) {
-            return place.residenceCollection;
-        } else {
-            console.log('[residences] initializing residences...');
+        if (!place.residenceCollection.isInitialized()) {
             await place.residenceCollection.init();
-            return place.residenceCollection;
         }
+        return place.residenceCollection;
     }
 
     // a Place owns the Users it should ping about new reviews
     @ManyToMany(() => ImhoUser, 'notifyMeAbout', { owner: true })
     public notifyOnReview = new Collection<ImhoUser>(this);
+
+    @Field(() => [ImhoUser])
+    async usersTrackingThisPlace(
+        @Root() place: Place
+    ): Promise<Collection<ImhoUser> | null> {
+        if (!place.notifyOnReview.isInitialized()) {
+            await place.notifyOnReview.init();
+        }
+        return place.notifyOnReview;
+    }
 
     @Field(() => Float, { nullable: true })
     async averageRating(
