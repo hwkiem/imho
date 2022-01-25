@@ -18,10 +18,10 @@ export class ReviewResolver {
         @Ctx() ctx: MyContext
     ): Promise<ReviewResponse> {
         try {
-            const place = await ctx.em.findOneOrFail(Review, {
+            const review = await ctx.em.findOneOrFail(Review, {
                 id: id,
             });
-            return { result: place };
+            return { result: review };
         } catch (e) {
             console.error(e);
             return {
@@ -40,80 +40,72 @@ export class ReviewResolver {
         @Arg('input') input: WriteReviewInput,
         @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
+        let place: Place;
+        let residence: Residence;
         try {
-            const place: Place = await em.findOneOrFail(Place, {
+            place = await em.findOneOrFail(Place, {
                 google_place_id: input.placeInput.google_place_id,
             });
 
             try {
-                const residence = await em.findOneOrFail(Residence, {
+                residence = await em.findOneOrFail(Residence, {
                     unit: input.residenceInput.unit
                         ? input.residenceInput.unit
                         : 'single', // default value
                 });
-
-                console.log('place and location already  exist');
-                // place and residence exist, create review
-                const review = new Review(input.reviewInput);
-                // add relationships
-                residence.place = place;
-                review.residence = residence;
-                if (req.session.userId) {
-                    try {
-                        review.author = await em.findOneOrFail(ImhoUser, {
-                            id: req.session.userId,
-                        });
-                    } catch {
-                        // but still make the review without the user
-                        console.log('could not fetch author account');
-                    }
-                }
-
-                em.persist(review).persist(place).persist(residence).flush();
-                return { result: review };
             } catch (e) {
-                console.log(e);
-                const residence = new Residence(input.residenceInput);
-                // place and residence exist, create review
-                const review = new Review(input.reviewInput);
-                // add relationships
-                residence.place = place;
-                review.residence = residence;
-                if (req.session.userId) {
-                    try {
-                        const user = await em.findOneOrFail(ImhoUser, {
-                            id: req.session.userId,
-                        });
-                        review.author = user;
-                    } catch {
-                        console.log('could not fetch author account');
-                    }
-                }
-                em.persist(review).persist(place).persist(residence).flush();
-                return { result: review };
+                residence = new Residence(input.residenceInput);
             }
         } catch (e) {
-            console.log('place did not exist');
-            console.log(e);
-            const place = new Place(input.placeInput);
-            const residence = new Residence(input.residenceInput);
-            // place and residence exist, create review
-            const review = new Review(input.reviewInput);
-            // add relationships
-            residence.place = place;
-            review.residence = residence;
-            if (req.session.userId) {
-                try {
-                    const user = await em.findOneOrFail(ImhoUser, {
-                        id: req.session.userId,
-                    });
-                    review.author = user;
-                } catch {
-                    console.log('could not fetch author account');
-                }
-            }
-            em.persist(review).persist(place).persist(residence).flush();
-            return { result: review };
+            // place does not exist, residence cannot exist, create both
+            place = new Place(input.placeInput);
+            residence = new Residence(input.residenceInput);
         }
+
+        if (place === undefined || residence === undefined) {
+            return {
+                errors: [
+                    {
+                        field: 'place/residence',
+                        error: 'failed to create entities upon which your review depends',
+                    },
+                ],
+            };
+        }
+
+        const review = new Review(input.reviewInput);
+        console.log(review.flags);
+
+        // add user to review if on session
+        if (req.session.userId) {
+            try {
+                review.author = await em.findOneOrFail(ImhoUser, {
+                    id: req.session.userId,
+                });
+            } catch {
+                // but still make the review without the user
+                console.log('could not fetch author account');
+            }
+        }
+
+        // place and residence exist, add relationships
+        residence.place = place;
+        review.residence = residence;
+        try {
+            await em.persist(review).persist(place).persist(residence).flush();
+        } catch (e) {
+            if (e.code == 23505) {
+                return {
+                    errors: [
+                        {
+                            field: 'insert review',
+                            error: 'you already reviewed this residence',
+                        },
+                    ],
+                };
+            }
+            return { errors: [{ field: 'insert data', error: e.toString() }] };
+        }
+        return { result: review };
     }
 }

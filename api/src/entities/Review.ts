@@ -1,6 +1,6 @@
 import { Cascade, Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { ReviewValidator } from '../validators/ReviewValidator';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { Flags } from '../utils/types/Flag';
@@ -27,11 +27,15 @@ export class Review extends Base<Review> {
     @ManyToOne(() => ImhoUser, { nullable: true })
     public author: ImhoUser;
 
-    @Field(() => Flags)
-    flags: Flags;
-
     @Property()
-    flag_string: string;
+    flag_string = JSON.stringify(new Flags());
+
+    @Field(() => Flags)
+    flags(@Root() review: Review): Flags {
+        return (review.flags = review.flag_string
+            ? JSON.parse(review.flag_string)
+            : undefined);
+    }
 
     constructor(body: ReviewValidator) {
         super(body);

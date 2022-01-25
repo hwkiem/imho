@@ -34,7 +34,6 @@ export class UserResolver {
             });
             return { result: user };
         } catch (e) {
-            console.log(e);
             return {
                 errors: [
                     {
@@ -57,7 +56,6 @@ export class UserResolver {
             });
             return { result: user };
         } catch (e) {
-            console.log(e);
             return {
                 errors: [
                     {
@@ -200,6 +198,11 @@ export class UserResolver {
         @Arg('input') input: LoginInput,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
+        if (req.session.userId) {
+            return {
+                errors: [{ field: 'user session', error: 'already logged in' }],
+            };
+        }
         try {
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
@@ -227,12 +230,11 @@ export class UserResolver {
             req.session.userId = user.id;
             return { result: user };
         } catch (e) {
-            console.log(e);
             return {
                 errors: [
                     {
-                        field: 'catch',
-                        error: 'user does not exist',
+                        field: 'email',
+                        error: 'user with this email does not exist',
                     },
                 ],
             };

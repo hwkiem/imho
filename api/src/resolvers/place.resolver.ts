@@ -52,7 +52,6 @@ export class PlaceResolver {
             });
             return { result: place };
         } catch (e) {
-            console.log(e);
             return {
                 errors: [
                     {
