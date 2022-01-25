@@ -14,5 +14,5 @@ export class ReviewValidator implements Partial<Review> {
     public rating: number;
 
     @Field(() => Flags)
-    public flags: Flags;
+    public flagInput: Flags;
 }

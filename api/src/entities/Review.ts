@@ -37,6 +37,8 @@ export class Review extends Base<Review> {
             : undefined);
     }
 
+    public flagInput: Flags;
+
     constructor(body: ReviewValidator) {
         super(body);
         this.flag_string = JSON.stringify(this.flags);

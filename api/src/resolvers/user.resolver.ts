@@ -148,48 +148,47 @@ export class UserResolver {
         @Arg('input') input: TrackPlaceInput,
         @Ctx() { em, req, res }: MyContext
     ): Promise<UserResponse> {
+        // ensure place
+        let place: Place;
         try {
-            const place = await em.findOneOrFail(Place, {
+            place = await em.findOneOrFail(Place, {
                 google_place_id: input.placeInput.google_place_id,
             });
-            try {
-                // place and user exist
-                const user = await em.findOneOrFail(ImhoUser, {
-                    email: input.userInput.email,
-                });
-                user.notifyMeAbout.add(place);
-                em.persistAndFlush(user);
-                return { result: user };
-            } catch {
-                // place, no user
-                const user = new ImhoUser(input.userInput);
-                user.isActivated = false;
-                this.createPendingUser(input.userInput, { em, req, res });
-                user.notifyMeAbout.add(place);
-                em.persistAndFlush(user);
-                return { result: user };
-            }
         } catch {
-            // no place
-            const place = new Place(input.placeInput);
-            try {
-                const user = await em.findOneOrFail(ImhoUser, {
-                    email: input.userInput.email,
-                });
-                // place and user exist
-                user.notifyMeAbout.add(place);
-                em.persistAndFlush(user);
-                return { result: user };
-            } catch {
-                // no place or user
-                console.log('no user');
-                const user = new ImhoUser(input.userInput);
-                user.isActivated = false;
-                user.notifyMeAbout.add(place);
-                em.persistAndFlush(user);
-                return { result: user };
-            }
+            place = new Place(input.placeInput);
         }
+
+        // ensure user
+        let user: ImhoUser;
+        try {
+            // console.log('userid is', req.session.userId);
+            user = req.session.userId
+                ? await em.findOneOrFail(ImhoUser, {
+                      id: req.session.userId,
+                  })
+                : await em.findOneOrFail(ImhoUser, {
+                      email: input.userInput.email,
+                  });
+            console.log('user is', user);
+        } catch {
+            // place, no user
+            // const user = new ImhoUser(input.userInput);
+            // user.isActivated = false;
+            const userResponse = await this.createPendingUser(input.userInput, {
+                em,
+                req,
+                res,
+            });
+            if (userResponse.errors || userResponse.result === undefined)
+                return userResponse;
+            user = userResponse.result;
+        }
+
+        if (!place.notifyOnReview.isInitialized())
+            await place.notifyOnReview.init();
+        place.notifyOnReview.add(user);
+        await em.persist(user).persist(place).flush();
+        return { result: user };
     }
 
     // login

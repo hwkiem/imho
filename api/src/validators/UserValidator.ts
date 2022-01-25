@@ -1,7 +1,6 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 import { ImhoUser } from '../entities/ImhoUser';
-import { Match } from './Match';
 import { PlaceValidator } from './PlaceValidator';
 
 @InputType()
@@ -14,11 +13,6 @@ export class UserValidator implements Partial<ImhoUser> {
     @IsString()
     @MinLength(6) // decide password complexity here
     public password: string;
-
-    @Field()
-    @IsString()
-    @Match('password')
-    public confirmPassword: string;
 }
 
 @InputType()
