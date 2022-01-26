@@ -13,6 +13,7 @@ import { ResidenceValidator } from '../validators/ResidenceValidator';
 import { Place } from './Place';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
+import { PlaceType } from '../utils/enums/PlaceType.enum';
 
 @ObjectType()
 @Entity()
@@ -20,8 +21,8 @@ export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);
 
-    @Field({ defaultValue: 'single', nullable: true })
-    @Property({ default: 'single' })
+    @Field({ defaultValue: PlaceType.SINGLE, nullable: true })
+    @Property({ default: PlaceType.SINGLE })
     public unit: string;
 
     @Field(() => [Review])
