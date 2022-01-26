@@ -1,42 +1,44 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 import { ImhoUser } from '../entities/ImhoUser';
-import { PlaceValidator } from './PlaceValidator';
+import { CreatePlaceInput } from './PlaceValidator';
 
-@InputType()
 export class UserValidator implements Partial<ImhoUser> {
-    @Field()
     @IsEmail()
     public email: string;
 
-    @Field()
     @IsString()
     @MinLength(6) // decide password complexity here
     public password: string;
 }
+@InputType()
+export class RegisterInput extends UserValidator {
+    @Field()
+    public email: string;
+
+    @Field()
+    public password: string;
+}
 
 @InputType()
-export class PendingUserInput implements Partial<UserValidator> {
+export class PendingUserInput extends UserValidator {
     @Field()
-    @IsEmail()
     public email: string;
 }
 
 @InputType()
-export class LoginInput implements Partial<UserValidator> {
+export class LoginInput extends UserValidator {
     @Field()
-    @IsEmail()
     public email: string;
 
     @Field()
-    @IsString()
     public password: string;
 }
 
 @InputType()
 export class TrackPlaceInput {
-    @Field(() => PlaceValidator)
-    public placeInput: PlaceValidator;
+    @Field(() => CreatePlaceInput)
+    public placeInput: CreatePlaceInput;
 
     @Field(() => PendingUserInput)
     public userInput: PendingUserInput;

@@ -9,7 +9,7 @@ import {
 import { Field, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Review } from './Review';
-import { PendingUserInput, UserValidator } from '../validators/UserValidator';
+import { UserValidator } from '../validators/UserValidator';
 import { Place } from './Place';
 
 @ObjectType()
@@ -50,7 +50,7 @@ export class ImhoUser extends Base<ImhoUser> {
         return user.reviewCollection;
     }
 
-    constructor(body: UserValidator | PendingUserInput) {
+    constructor(body: UserValidator) {
         super(body);
     }
 }

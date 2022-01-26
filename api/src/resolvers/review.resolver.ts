@@ -6,6 +6,7 @@ import { Place } from '../entities/Place';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
+import { PlaceType } from '../utils/enums/PlaceType.enum';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
@@ -23,7 +24,7 @@ export class ReviewResolver {
             });
             return { result: review };
         } catch (e) {
-            console.error(e);
+            // console.error(e);
             return {
                 errors: [
                     {
@@ -51,7 +52,7 @@ export class ReviewResolver {
                 residence = await em.findOneOrFail(Residence, {
                     unit: input.residenceInput.unit
                         ? input.residenceInput.unit
-                        : 'single', // default value
+                        : PlaceType.SINGLE, // default value
                 });
             } catch (e) {
                 residence = new Residence(input.residenceInput);
@@ -62,19 +63,29 @@ export class ReviewResolver {
             residence = new Residence(input.residenceInput);
         }
 
-        if (place === undefined || residence === undefined) {
+        if (place === undefined) {
             return {
                 errors: [
                     {
-                        field: 'place/residence',
-                        error: 'failed to create entities upon which your review depends',
+                        field: 'place',
+                        error: 'Could not find place. Review creation failed.',
+                    },
+                ],
+            };
+        }
+        if (residence === undefined) {
+            return {
+                errors: [
+                    {
+                        field: 'residence',
+                        error: 'Could not find residence. Review creation failed.',
                     },
                 ],
             };
         }
 
         const review = new Review(input.reviewInput);
-        console.log(review.flags);
+        review.flag_string = JSON.stringify(input.reviewInput.flagInput);
 
         // add user to review if on session
         if (req.session.userId) {
@@ -104,7 +115,7 @@ export class ReviewResolver {
                     ],
                 };
             }
-            return { errors: [{ field: 'insert data', error: e.toString() }] };
+            // return { errors: [{ field: 'insert data', error: e.toString() }] };
         }
         return { result: review };
     }

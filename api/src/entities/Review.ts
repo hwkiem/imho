@@ -28,13 +28,11 @@ export class Review extends Base<Review> {
     public author: ImhoUser;
 
     @Property()
-    flag_string = JSON.stringify(new Flags());
+    flag_string: string;
 
-    @Field(() => Flags)
-    flags(@Root() review: Review): Flags {
-        return (review.flags = review.flag_string
-            ? JSON.parse(review.flag_string)
-            : undefined);
+    @Field(() => Flags, { nullable: true })
+    flags(@Root() review: Review): Flags | undefined {
+        return review.flag_string ? JSON.parse(review.flag_string) : undefined;
     }
 
     public flagInput: Flags;

@@ -5,8 +5,8 @@ import { ImhoUser } from '../entities/ImhoUser';
 import {
     LoginInput,
     PendingUserInput,
+    RegisterInput,
     TrackPlaceInput,
-    UserValidator,
 } from '../validators/UserValidator';
 import argon2 from 'argon2';
 import { Place } from '../entities/Place';
@@ -69,7 +69,7 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     public async registerUser(
-        @Arg('input') input: UserValidator,
+        @Arg('input') input: RegisterInput,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         // is there a pending user with this email, create if not
@@ -120,15 +120,15 @@ export class UserResolver {
                 ? {
                       errors: [
                           {
-                              field: 'user status',
-                              error: 'user is already registered with activated account',
+                              field: 'user',
+                              error: 'activated account already exists with this email',
                           },
                       ],
                   }
                 : {
                       errors: [
                           {
-                              field: 'user status',
+                              field: 'user',
                               error: 'pending account already exists with this email',
                           },
                       ],
@@ -158,10 +158,9 @@ export class UserResolver {
             place = new Place(input.placeInput);
         }
 
-        // ensure user
+        // ensure user, from session if possible
         let user: ImhoUser;
         try {
-            // console.log('userid is', req.session.userId);
             user = req.session.userId
                 ? await em.findOneOrFail(ImhoUser, {
                       id: req.session.userId,
@@ -169,11 +168,8 @@ export class UserResolver {
                 : await em.findOneOrFail(ImhoUser, {
                       email: input.userInput.email,
                   });
-            console.log('user is', user);
         } catch {
             // place, no user
-            // const user = new ImhoUser(input.userInput);
-            // user.isActivated = false;
             const userResponse = await this.createPendingUser(input.userInput, {
                 em,
                 req,
@@ -199,7 +195,7 @@ export class UserResolver {
     ): Promise<UserResponse> {
         if (req.session.userId) {
             return {
-                errors: [{ field: 'user session', error: 'already logged in' }],
+                errors: [{ field: 'session', error: 'already logged in' }],
             };
         }
         try {
@@ -210,8 +206,8 @@ export class UserResolver {
                 return {
                     errors: [
                         {
-                            field: 'user state',
-                            error: 'Account with this email is pending / not activated',
+                            field: 'account',
+                            error: 'Account with this email is pending / not yet activated',
                         },
                     ],
                 };

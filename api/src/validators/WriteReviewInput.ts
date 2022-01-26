@@ -1,17 +1,16 @@
-// import { LocationType } from '../enums/LocationType.enum';
 import { Field, InputType } from 'type-graphql';
-import { PlaceValidator } from './PlaceValidator';
-import { ResidenceValidator } from './ResidenceValidator';
-import { ReviewValidator } from './ReviewValidator';
+import { CreatePlaceInput } from './PlaceValidator';
+import { CreateResidenceInput } from './ResidenceValidator';
+import { CreateReviewInput } from './ReviewValidator';
 
 @InputType()
 export class WriteReviewInput {
-    @Field(() => PlaceValidator)
-    public placeInput: PlaceValidator;
+    @Field(() => CreatePlaceInput)
+    public placeInput: CreatePlaceInput;
 
-    @Field(() => ResidenceValidator)
-    public residenceInput: ResidenceValidator;
+    @Field(() => CreateResidenceInput)
+    public residenceInput: CreateResidenceInput;
 
-    @Field(() => ReviewValidator)
-    public reviewInput: ReviewValidator;
+    @Field(() => CreateReviewInput)
+    public reviewInput: CreateReviewInput;
 }
