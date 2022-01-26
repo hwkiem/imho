@@ -7,8 +7,7 @@ import {
     Text,
     LoadingOverlay,
 } from '@mantine/core';
-import { Field, FieldProps, Form, Formik, useFormikContext } from 'formik';
-import React, { useEffect } from 'react';
+import { Field, FieldProps, Form, Formik } from 'formik';
 import { LoginInput } from '../generated/graphql';
 import { SchemaOf, object, string } from 'yup';
 import useAuth from '../lib/useAuth';
@@ -24,7 +23,7 @@ export const LoginForm = () => {
     // validation schema for logging in
     const loginSchema: SchemaOf<LoginInput> = object().shape({
         email: string().email().required(),
-        password: string().required(),
+        password: string().min(8).required(),
     });
 
     // using login auth context function

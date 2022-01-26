@@ -4,7 +4,6 @@ import {
     Button,
     Center,
     Container,
-    MantineTheme,
     Radio,
     RadioGroup,
     SimpleGrid,
@@ -61,7 +60,7 @@ export default function ReviewPage() {
         exit: { opacity: 0, x: 200, y: 0 },
     };
 
-    const [writeReview, { error }] = useAddReviewMutation();
+    const [writeReview] = useAddReviewMutation();
 
     const router = useRouter();
 
@@ -138,19 +137,12 @@ export default function ReviewPage() {
                 validate={(values) => {
                     const errors = {};
 
-                    // if (!values.email) {
-                    //     errors.email = 'Required';
-                    // } else if (
-                    //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
-                    //         values.email
-                    //     )
-                    // ) {
-                    //     errors.email = 'Invalid email address';
-                    // }
+                    console.log('submitting form with values:');
+                    console.dir(values, { depth: 4 });
 
                     return errors;
                 }}
-                onSubmit={async (values, { setSubmitting }) => {
+                onSubmit={async (values) => {
                     const response = await writeReview({
                         variables: { input: values },
                     });
@@ -169,16 +161,7 @@ export default function ReviewPage() {
                     }
                 }}
             >
-                {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    isSubmitting,
-                    setFieldValue,
-                }) => (
+                {({ values, handleSubmit, setFieldValue }) => (
                     <>
                         <Container sx={{ minHeight: 32, marginTop: 40 }}>
                             <AnimatePresence>

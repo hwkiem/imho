@@ -6,17 +6,14 @@ import {
     useMemo,
     useState,
 } from 'react';
-import router from 'next/router';
 import {
     FieldError,
     ImhoUser,
     LoginInput,
-    LoginMutationVariables,
     RegisterInput,
     useLoginMutation,
     useLogoutMutation,
     useMeLazyQuery,
-    useMeQuery,
     useRegisterUserMutation,
 } from '../generated/graphql';
 import { useRouter } from 'next/router';
@@ -56,7 +53,7 @@ export function AuthProvider({
     // If we change page, reset the error state.
     useEffect(() => {
         if (errors) setErrors(undefined);
-    }, [router.route]);
+    }, [router.route, errors]);
 
     // Check if there is a currently active session
     // when the provider is mounted for the first time.
@@ -73,9 +70,10 @@ export function AuthProvider({
             })
             .catch((_err) => {
                 console.log('errors fetching mequery...');
+                console.log(_err);
             })
             .finally(() => setLoadingInitial(false));
-    }, []);
+    }, [apiMe]);
 
     // Flags the component loading state and posts the login
     // data to the server.
@@ -104,6 +102,7 @@ export function AuthProvider({
             })
             .catch((_err) => {
                 console.log('errors logging in...');
+                console.log(_err);
             })
             .finally(() => {
                 setLoading(false);
@@ -130,6 +129,7 @@ export function AuthProvider({
             })
             .catch((_err) => {
                 console.log('errors registering...');
+                console.log(_err);
             })
             .finally(() => {
                 setLoading(false);
@@ -149,6 +149,7 @@ export function AuthProvider({
             })
             .catch((_err) => {
                 console.log('errors logging out...');
+                console.log(_err);
             })
             .finally(() => {
                 setLoading(false);
@@ -174,6 +175,7 @@ export function AuthProvider({
             register,
             logout,
         }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [user, loading, errors]
     );
 

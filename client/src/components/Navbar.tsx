@@ -1,7 +1,6 @@
 import { Button, Grid, Text, Title, UnstyledButton } from '@mantine/core';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { useMeQuery } from '../generated/graphql';
 import useAuth from '../lib/useAuth';
 
 interface NavbarProps {
