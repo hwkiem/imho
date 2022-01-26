@@ -85,28 +85,22 @@ export function AuthProvider({
     // loading state is over.
     const login = ({ email, password }: LoginInput, onFinish?: () => void) => {
         setLoading(true);
-        console.log('loading set to true');
         apiLogin({
             variables: { input: { email: email, password: password } },
         })
             .then(({ data }) => {
-                console.log('data fetched');
                 if (data?.login.result) {
-                    console.log('user exists');
                     setUser(data.login.result);
                 }
                 if (data?.login.errors) {
-                    console.log('errors exist');
                     setErrors(data.login.errors);
                 }
             })
             .catch((_err) => {
-                console.log('errors logging in...');
                 console.log(_err);
             })
             .finally(() => {
                 setLoading(false);
-                console.log('setting loading to false');
                 onFinish ? onFinish() : null;
             });
     };
