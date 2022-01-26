@@ -1,7 +1,6 @@
 import {
     Button,
     Center,
-    Divider,
     Grid,
     TextInput,
     Title,
@@ -10,7 +9,7 @@ import {
 } from '@mantine/core';
 import { Field, FieldProps, Form, Formik } from 'formik';
 import { SchemaOf, object, string, ref } from 'yup';
-import { RegisterInput, useRegisterUserMutation } from '../generated/graphql';
+import { RegisterInput } from '../generated/graphql';
 import useAuth from '../lib/useAuth';
 import { AutoErrorInjection } from './SessionModal';
 
@@ -37,18 +36,25 @@ export const RegisterForm = () => {
 
     return (
         <>
-            <Title sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}>
-                Register to{' '}
+            <Title
+                sx={{
+                    fontSize: 16,
+                    fontWeight: 300,
+                    marginBottom: 10,
+                    marginTop: 20,
+                }}
+            >
+                or{' '}
                 <Text
                     inherit
                     variant={'gradient'}
-                    gradient={{ from: 'pink', to: 'lime', deg: 45 }}
+                    gradient={{ from: 'lime', to: 'blue', deg: -65 }}
                     component={'span'}
                 >
-                    IMHO
+                    register
                 </Text>{' '}
                 to save reviews, get notified about potential apartments, and
-                build a profile.
+                build your IMHO profile.
             </Title>
             <Formik
                 initialValues={initial}
@@ -121,8 +127,8 @@ export const RegisterForm = () => {
                                             type={'submit'}
                                             variant={'gradient'}
                                             gradient={{
-                                                from: 'pink',
-                                                to: 'purple',
+                                                from: 'lime',
+                                                to: 'blue',
                                                 deg: 35,
                                             }}
                                             size={'md'}

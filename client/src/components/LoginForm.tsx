@@ -32,7 +32,10 @@ export const LoginForm = () => {
 
     return (
         <>
-            <Title sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}>
+            <Title
+                sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}
+                align="center"
+            >
                 Login to{' '}
                 <Text
                     inherit
@@ -42,8 +45,6 @@ export const LoginForm = () => {
                 >
                     IMHO
                 </Text>{' '}
-                to save reviews, get notified about potential apartments, and
-                build a profile.
             </Title>
             <Formik
                 initialValues={initial}
@@ -105,10 +106,11 @@ export const LoginForm = () => {
                                                 variant={'gradient'}
                                                 gradient={{
                                                     from: 'pink',
-                                                    to: 'purple',
+                                                    to: 'lime',
                                                     deg: 35,
                                                 }}
                                                 size={'md'}
+                                                mb={10}
                                             >
                                                 Login
                                             </Button>

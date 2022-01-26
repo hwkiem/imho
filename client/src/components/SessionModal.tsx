@@ -1,12 +1,12 @@
 import { Divider, LoadingOverlay, Modal, ModalProps } from '@mantine/core';
 import { useFormikContext } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useAuth from '../lib/useAuth';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
 
 export const AutoErrorInjection = () => {
-    const { login, loading, errors } = useAuth();
+    const { errors } = useAuth();
 
     const { setErrors } = useFormikContext();
 
@@ -26,10 +26,6 @@ export const AutoErrorInjection = () => {
 
 const SessionModal = ({ opened, onClose }: ModalProps) => {
     const { loading } = useAuth();
-
-    useEffect(() => {
-        console.log(`session modal loading hook: ${loading}`);
-    }, [loading]);
 
     return (
         <Modal opened={opened} onClose={onClose}>
