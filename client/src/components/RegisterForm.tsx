@@ -32,7 +32,7 @@ export const RegisterForm = () => {
     });
 
     // using register auth context function
-    const { register, errors } = useAuth();
+    const { register, loading } = useAuth();
 
     return (
         <>
@@ -86,6 +86,7 @@ export const RegisterForm = () => {
                                                     'chilipepperpete@imho.com'
                                                 }
                                                 required
+                                                disabled={loading}
                                             />
                                         )}
                                     </Field>
@@ -102,6 +103,7 @@ export const RegisterForm = () => {
                                                 type={'password'}
                                                 placeholder={'iloveimho!'}
                                                 required
+                                                disabled={loading}
                                             />
                                         )}
                                     </Field>
@@ -117,6 +119,7 @@ export const RegisterForm = () => {
                                                 label={'confirm password'}
                                                 type={'password'}
                                                 required
+                                                disabled={loading}
                                             />
                                         )}
                                     </Field>

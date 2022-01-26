@@ -28,7 +28,7 @@ export const LoginForm = () => {
     });
 
     // using login auth context function
-    const { login } = useAuth();
+    const { login, loading } = useAuth();
 
     return (
         <>
@@ -78,6 +78,7 @@ export const LoginForm = () => {
                                                         'chilipepperpete@imho.com'
                                                     }
                                                     required
+                                                    disabled={loading}
                                                 />
                                             )}
                                         </Field>
@@ -95,6 +96,7 @@ export const LoginForm = () => {
                                                     type={'password'}
                                                     placeholder={'iloveimho!'}
                                                     required
+                                                    disabled={loading}
                                                 />
                                             )}
                                         </Field>
