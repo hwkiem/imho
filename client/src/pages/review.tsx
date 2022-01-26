@@ -4,7 +4,6 @@ import {
     Button,
     Center,
     Container,
-    MantineTheme,
     Radio,
     RadioGroup,
     SimpleGrid,
@@ -61,7 +60,7 @@ export default function ReviewPage() {
         exit: { opacity: 0, x: 200, y: 0 },
     };
 
-    const [writeReview, { error }] = useAddReviewMutation();
+    const [writeReview] = useAddReviewMutation();
 
     const router = useRouter();
 
@@ -94,7 +93,7 @@ export default function ReviewPage() {
         },
         reviewInput: {
             feedback: '',
-            flags: { pros: [], cons: [], dbks: [] },
+            flagInput: { pros: [], cons: [], dbks: [] },
             rating: 75,
         },
     };
@@ -138,19 +137,12 @@ export default function ReviewPage() {
                 validate={(values) => {
                     const errors = {};
 
-                    // if (!values.email) {
-                    //     errors.email = 'Required';
-                    // } else if (
-                    //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
-                    //         values.email
-                    //     )
-                    // ) {
-                    //     errors.email = 'Invalid email address';
-                    // }
+                    console.log('submitting form with values:');
+                    console.dir(values, { depth: 4 });
 
                     return errors;
                 }}
-                onSubmit={async (values, { setSubmitting }) => {
+                onSubmit={async (values) => {
                     const response = await writeReview({
                         variables: { input: values },
                     });
@@ -169,16 +161,7 @@ export default function ReviewPage() {
                     }
                 }}
             >
-                {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    isSubmitting,
-                    setFieldValue,
-                }) => (
+                {({ values, handleSubmit, setFieldValue }) => (
                     <>
                         <Container sx={{ minHeight: 32, marginTop: 40 }}>
                             <AnimatePresence>
@@ -531,7 +514,7 @@ export default function ReviewPage() {
                                                     key={key}
                                                     onClick={() => {
                                                         let copy =
-                                                            values.reviewInput.flags.pros.map(
+                                                            values.reviewInput.flagInput.pros.map(
                                                                 (m) => m
                                                             );
                                                         if (
@@ -560,14 +543,14 @@ export default function ReviewPage() {
                                                         }
 
                                                         setFieldValue(
-                                                            `reviewInput.flags.pros`,
+                                                            `reviewInput.flagInput.pros`,
                                                             copy
                                                         );
                                                     }}
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                values.reviewInput.flags.pros.includes(
+                                                                values.reviewInput.flagInput.pros.includes(
                                                                     ProFlagTypes[
                                                                         key
                                                                     ]
@@ -695,7 +678,7 @@ export default function ReviewPage() {
                                                     key={key}
                                                     onClick={() => {
                                                         let copy =
-                                                            values.reviewInput.flags.cons.map(
+                                                            values.reviewInput.flagInput.cons.map(
                                                                 (m) => m
                                                             );
                                                         if (
@@ -724,14 +707,14 @@ export default function ReviewPage() {
                                                         }
 
                                                         setFieldValue(
-                                                            `reviewInput.flags.cons`,
+                                                            `reviewInput.flagInput.cons`,
                                                             copy
                                                         );
                                                     }}
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                values.reviewInput.flags.cons.includes(
+                                                                values.reviewInput.flagInput.cons.includes(
                                                                     ConFlagTypes[
                                                                         key
                                                                     ]
@@ -788,10 +771,10 @@ export default function ReviewPage() {
                                                 )
                                                     setStepIdx(5);
                                                 else if (
-                                                    values.reviewInput.flags.cons.includes(
+                                                    values.reviewInput.flagInput.cons.includes(
                                                         ConFlagTypes.BadLandlord
                                                     ) ||
-                                                    values.reviewInput.flags.cons.includes(
+                                                    values.reviewInput.flagInput.cons.includes(
                                                         ConFlagTypes.Unsafe
                                                     )
                                                 )
@@ -867,7 +850,7 @@ export default function ReviewPage() {
                                                     key={key}
                                                     onClick={() => {
                                                         let copy =
-                                                            values.reviewInput.flags.dbks.map(
+                                                            values.reviewInput.flagInput.dbks.map(
                                                                 (m) => m
                                                             );
                                                         if (
@@ -903,7 +886,7 @@ export default function ReviewPage() {
                                                     styles={(theme) => ({
                                                         root: {
                                                             backgroundColor:
-                                                                values.reviewInput.flags.dbks.includes(
+                                                                values.reviewInput.flagInput.dbks.includes(
                                                                     DbkFlagTypes[
                                                                         key
                                                                     ]
@@ -1002,7 +985,7 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {values.reviewInput.flags.pros.map(
+                                        {values.reviewInput.flagInput.pros.map(
                                             (f) => {
                                                 return (
                                                     <Badge
@@ -1050,7 +1033,7 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {values.reviewInput.flags.cons.map(
+                                        {values.reviewInput.flagInput.cons.map(
                                             (f) => {
                                                 return (
                                                     <Badge
@@ -1098,7 +1081,7 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {values.reviewInput.flags.dbks.map(
+                                        {values.reviewInput.flagInput.dbks.map(
                                             (f) => {
                                                 return (
                                                     <Badge
@@ -1224,7 +1207,7 @@ export default function ReviewPage() {
                                             },
                                         ]}
                                     >
-                                        {values.reviewInput.flags.pros.map(
+                                        {values.reviewInput.flagInput.pros.map(
                                             (f) => {
                                                 return (
                                                     <Badge
@@ -1239,7 +1222,7 @@ export default function ReviewPage() {
                                                 );
                                             }
                                         )}
-                                        {values.reviewInput.flags.cons.map(
+                                        {values.reviewInput.flagInput.cons.map(
                                             (f) => {
                                                 return (
                                                     <Badge
@@ -1254,7 +1237,7 @@ export default function ReviewPage() {
                                                 );
                                             }
                                         )}
-                                        {values.reviewInput.flags.dbks.map(
+                                        {values.reviewInput.flagInput.dbks.map(
                                             (f) => {
                                                 return (
                                                     <Badge

@@ -1,14 +1,16 @@
 import { Button, Grid, Text, Title, UnstyledButton } from '@mantine/core';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useAuth from '../lib/useAuth';
 
 interface NavbarProps {
-    onLoginLogout: () => void;
-    isLoggedIn: boolean;
+    openModal: () => void;
 }
 
-export const Navbar = ({ onLoginLogout, isLoggedIn }: NavbarProps) => {
+export const Navbar = ({ openModal }: NavbarProps) => {
     const router = useRouter();
+
+    const { user, loading, logout } = useAuth();
 
     return (
         <Grid sx={() => ({ margin: 20 })} align={'center'}>
@@ -38,17 +40,20 @@ export const Navbar = ({ onLoginLogout, isLoggedIn }: NavbarProps) => {
                 </UnstyledButton>
             </Grid.Col>
             <Grid.Col span={3} offset={6}>
-                <Button
-                    onClick={() => {
-                        onLoginLogout();
-                    }}
-                >
-                    {isLoggedIn ? (
-                        <Text color={'white'}>Logout</Text>
-                    ) : (
-                        <Text color={'white'}>Login or Sign Up</Text>
-                    )}
-                </Button>
+                {!loading && (
+                    <Button
+                        onClick={() => {
+                            if (!user) openModal();
+                            else logout();
+                        }}
+                    >
+                        {user ? (
+                            <Text color={'white'}>Logout</Text>
+                        ) : (
+                            <Text color={'white'}>Login or Sign Up</Text>
+                        )}
+                    </Button>
+                )}
             </Grid.Col>
         </Grid>
     );

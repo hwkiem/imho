@@ -1,32 +1,29 @@
-import { Modal } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import useAuth from '../lib/useAuth';
 import { Navbar } from './Navbar';
+import SessionModal from './SessionModal';
 
 type LayoutProps = {
     children: JSX.Element | JSX.Element[];
 };
 
 export const Layout = ({ children }: LayoutProps) => {
-    const [loggedIn, setIsLoggedIn] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
 
-    const handleLoginLogout = () => {
-        if (!loggedIn) setModalOpen(true);
-        else setIsLoggedIn(false);
-    };
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) setModalOpen(false);
+    }, [user]);
 
     return (
         <>
-            <Navbar onLoginLogout={handleLoginLogout} isLoggedIn={loggedIn} />
+            <Navbar openModal={() => setModalOpen(true)} />
             <main>
-                {' '}
-                <Modal
+                <SessionModal
                     opened={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title="Log In!"
-                >
-                    content
-                </Modal>
+                />
                 {children}
             </main>
         </>

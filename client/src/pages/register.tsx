@@ -1,11 +1,11 @@
 import { Variants } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { LoginForm } from '../components/LoginForm';
+import { RegisterForm } from '../components/RegisterForm';
 import useAuth from '../lib/useAuth';
 import { MotionContainer } from '../utils/motion';
 
-export default function LoginPage() {
+export default function RegisterPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
             transition={{ type: 'spring' }}
             key={'review'}
         >
-            <LoginForm />
+            <RegisterForm />
         </MotionContainer>
     );
 }

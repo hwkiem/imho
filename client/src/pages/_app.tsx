@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../lib/apollo';
 import { Layout } from '../components/Layout';
+import { AuthProvider } from '../lib/useAuth';
 
 export default function App({ Component, pageProps }: AppProps) {
     // fetch user preferred ColorScheme and set default
@@ -40,27 +41,29 @@ export default function App({ Component, pageProps }: AppProps) {
                 />
             </Head>
             <ApolloProvider client={apolloClient}>
-                <ColorSchemeProvider
-                    colorScheme={colorScheme}
-                    toggleColorScheme={toggleColorScheme}
-                >
-                    <MantineProvider
-                        theme={{ colorScheme }}
-                        withNormalizeCSS
-                        withGlobalStyles
+                <AuthProvider>
+                    <ColorSchemeProvider
+                        colorScheme={colorScheme}
+                        toggleColorScheme={toggleColorScheme}
                     >
-                        <NotificationsProvider>
-                            <AnimatePresence exitBeforeEnter>
-                                <Layout>
-                                    <Component
-                                        {...pageProps}
-                                        key={router.route}
-                                    />
-                                </Layout>
-                            </AnimatePresence>
-                        </NotificationsProvider>
-                    </MantineProvider>
-                </ColorSchemeProvider>
+                        <MantineProvider
+                            theme={{ colorScheme }}
+                            withNormalizeCSS
+                            withGlobalStyles
+                        >
+                            <NotificationsProvider>
+                                <AnimatePresence exitBeforeEnter>
+                                    <Layout>
+                                        <Component
+                                            {...pageProps}
+                                            key={router.route}
+                                        />
+                                    </Layout>
+                                </AnimatePresence>
+                            </NotificationsProvider>
+                        </MantineProvider>
+                    </ColorSchemeProvider>
+                </AuthProvider>
             </ApolloProvider>
         </>
     );

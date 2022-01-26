@@ -81,8 +81,8 @@ export class UserResolver {
                 return {
                     errors: [
                         {
-                            field: 'user status',
-                            error: 'user is already registered with activated account',
+                            field: 'email',
+                            error: 'an activated account with that email already exists',
                         },
                     ],
                 };
