@@ -31,6 +31,22 @@ export enum ConFlagTypes {
   Unsafe = 'UNSAFE'
 }
 
+export type CreatePlaceInput = {
+  formatted_address: Scalars['String'];
+  google_place_id: Scalars['String'];
+  type: PlaceType;
+};
+
+export type CreateResidenceInput = {
+  unit?: InputMaybe<Scalars['String']>;
+};
+
+export type CreateReviewInput = {
+  feedback: Scalars['String'];
+  flagInput: FlagInput;
+  rating: Scalars['Float'];
+};
+
 /** All the dealbreakers */
 export enum DbkFlagTypes {
   Burglary = 'BURGLARY',
@@ -72,6 +88,7 @@ export type ImhoUser = {
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['ID'];
+  myTrackedPlaces: Array<Place>;
   reviews: Array<Review>;
   updatedAt: Scalars['DateTime'];
 };
@@ -88,6 +105,7 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['Boolean'];
   registerUser: UserResponse;
+  trackPlace: UserResponse;
 };
 
 
@@ -107,7 +125,12 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterUserArgs = {
-  input: UserValidator;
+  input: RegisterInput;
+};
+
+
+export type MutationTrackPlaceArgs = {
+  input: TrackPlaceInput;
 };
 
 export type PendingUserInput = {
@@ -125,6 +148,7 @@ export type Place = {
   topNFlags?: Maybe<TopNFlagsResponse>;
   type: PlaceType;
   updatedAt: Scalars['DateTime'];
+  usersTrackingThisPlace: Array<ImhoUser>;
 };
 
 
@@ -143,12 +167,6 @@ export enum PlaceType {
   Multi = 'MULTI',
   Single = 'SINGLE'
 }
-
-export type PlaceValidator = {
-  formatted_address: Scalars['String'];
-  google_place_id: Scalars['String'];
-  type: PlaceType;
-};
 
 /** All the negative flag topics */
 export enum ProFlagTypes {
@@ -185,6 +203,11 @@ export type QueryGetUserArgs = {
   userId: Scalars['String'];
 };
 
+export type RegisterInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type Residence = {
   __typename?: 'Residence';
   averageRating?: Maybe<Scalars['Float']>;
@@ -196,15 +219,12 @@ export type Residence = {
   updatedAt: Scalars['DateTime'];
 };
 
-export type ResidenceValidator = {
-  unit?: InputMaybe<Scalars['String']>;
-};
-
 export type Review = {
   __typename?: 'Review';
+  author?: Maybe<ImhoUser>;
   createdAt: Scalars['DateTime'];
   feedback?: Maybe<Scalars['String']>;
-  flags: Flags;
+  flags?: Maybe<Flags>;
   id: Scalars['ID'];
   rating: Scalars['Float'];
   residence?: Maybe<Residence>;
@@ -217,17 +237,16 @@ export type ReviewResponse = {
   result?: Maybe<Review>;
 };
 
-export type ReviewValidator = {
-  feedback: Scalars['String'];
-  flags: FlagInput;
-  rating: Scalars['Float'];
-};
-
 export type TopNFlagsResponse = {
   __typename?: 'TopNFlagsResponse';
   cons: Array<FlagWithCount>;
   dbks: Array<FlagWithCount>;
   pros: Array<FlagWithCount>;
+};
+
+export type TrackPlaceInput = {
+  placeInput: CreatePlaceInput;
+  userInput: PendingUserInput;
 };
 
 export type UserResponse = {
@@ -236,16 +255,10 @@ export type UserResponse = {
   result?: Maybe<ImhoUser>;
 };
 
-export type UserValidator = {
-  confirmPassword: Scalars['String'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-};
-
 export type WriteReviewInput = {
-  placeInput: PlaceValidator;
-  residenceInput: ResidenceValidator;
-  reviewInput: ReviewValidator;
+  placeInput: CreatePlaceInput;
+  residenceInput: CreateResidenceInput;
+  reviewInput: CreateReviewInput;
 };
 
 export type CreatePendingUserMutationVariables = Exact<{
@@ -280,7 +293,7 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 export type RegisterUserMutationVariables = Exact<{
-  input: UserValidator;
+  input: RegisterInput;
 }>;
 
 
@@ -291,7 +304,7 @@ export type AddReviewMutationVariables = Exact<{
 }>;
 
 
-export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null | undefined, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null | undefined, flags: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null | undefined, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null | undefined, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
 
 
 export const CreatePendingUserDocument = gql`
@@ -520,7 +533,7 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const RegisterUserDocument = gql`
-    mutation RegisterUser($input: UserValidator!) {
+    mutation RegisterUser($input: RegisterInput!) {
   registerUser(input: $input) {
     result {
       id
