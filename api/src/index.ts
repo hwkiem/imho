@@ -87,6 +87,8 @@ const main = async () => {
         : null;
     if (regex) whitelist.push(regex);
 
+    console.log(whitelist);
+
     app.use(
         cors({
             origin: whitelist,
