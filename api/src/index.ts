@@ -103,7 +103,8 @@ const main = async () => {
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
                 httpOnly: true,
-                secure: false,
+                secure: 'auto',
+                sameSite: 'none',
             },
             saveUninitialized: false,
             secret: process.env.SESSION_SECRET
