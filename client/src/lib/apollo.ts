@@ -36,6 +36,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             // TODO: parameterize env config
             uri: process.env.NEXT_PUBLIC_API_URL, // Server URL (must be absolute)
             credentials: 'include', // Additional fetch() options like `credentials` or `headers`
+            headers: { headers },
             fetch: enhancedFetch,
         }),
         cache: new InMemoryCache(),
