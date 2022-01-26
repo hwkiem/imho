@@ -3,16 +3,22 @@ import { Field, InputType } from 'type-graphql';
 import { Review } from '../entities/Review';
 import { Flags } from '../utils/types/Flag';
 
-@InputType()
 export class ReviewValidator implements Partial<Review> {
-    @Field()
     @IsString()
     public feedback: string;
 
-    @Field()
     @IsNumber()
+    public rating: number;
+}
+
+@InputType()
+export class CreateReviewInput extends ReviewValidator {
+    @Field()
+    public feedback: string;
+
+    @Field()
     public rating: number;
 
     @Field(() => Flags)
-    public flags: Flags;
+    public flagInput: Flags;
 }

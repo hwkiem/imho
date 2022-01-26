@@ -23,5 +23,3 @@ export default {
               }
             : undefined,
 } as Parameters<typeof MikroORM.init>[0];
-
-// Options<PostgreSqlDriver>

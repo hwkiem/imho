@@ -5,6 +5,7 @@ import {
     Collection,
     OneToMany,
     Unique,
+    ManyToMany,
 } from '@mikro-orm/core';
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
@@ -13,6 +14,7 @@ import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
+import { ImhoUser } from './ImhoUser';
 
 @ObjectType()
 @Entity()
@@ -33,13 +35,24 @@ export class Place extends Base<Place> {
     async residences(
         @Root() place: Place
     ): Promise<Collection<Residence> | null> {
-        if (place.residenceCollection.isInitialized()) {
-            return place.residenceCollection;
-        } else {
-            console.log('[residences] initializing residences...');
+        if (!place.residenceCollection.isInitialized()) {
             await place.residenceCollection.init();
-            return place.residenceCollection;
         }
+        return place.residenceCollection;
+    }
+
+    // a Place owns the Users it should ping about new reviews
+    @ManyToMany(() => ImhoUser, 'notifyMeAbout', { owner: true })
+    public notifyOnReview = new Collection<ImhoUser>(this);
+
+    @Field(() => [ImhoUser])
+    async usersTrackingThisPlace(
+        @Root() place: Place
+    ): Promise<Collection<ImhoUser> | null> {
+        if (!place.notifyOnReview.isInitialized()) {
+            await place.notifyOnReview.init();
+        }
+        return place.notifyOnReview;
     }
 
     @Field(() => Float, { nullable: true })
