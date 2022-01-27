@@ -38,3 +38,5 @@ export default function RegisterPage() {
         </MotionContainer>
     );
 }
+
+RegisterPage.requireAuth = false;
