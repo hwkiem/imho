@@ -65,8 +65,12 @@ export function AuthProvider({
     useEffect(() => {
         apiMe()
             .then(({ data }) => {
-                if (data?.me.result) setUser(data.me.result);
-                if (data?.me.errors) setErrors(data.me.errors);
+                if (data?.me.result) {
+                    setUser(data.me.result);
+                }
+                if (data?.me.errors) {
+                    setErrors(data.me.errors);
+                }
             })
             .catch((_err) => {
                 console.log('errors fetching mequery...');
@@ -137,8 +141,9 @@ export function AuthProvider({
         setLoading(true);
         apiLogout()
             .then(({ data }) => {
-                if (data?.logout) setUser(undefined);
-                else
+                if (data?.logout) {
+                    setUser(undefined);
+                } else
                     setErrors([{ field: 'user', error: 'failed to log out.' }]);
             })
             .catch((_err) => {

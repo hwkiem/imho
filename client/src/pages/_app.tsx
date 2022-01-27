@@ -14,8 +14,18 @@ import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../lib/apollo';
 import { Layout } from '../components/Layout';
 import { AuthProvider } from '../lib/useAuth';
+import { AuthGuard } from '../lib/AuthGuard';
+import { NextPage } from 'next';
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithAuth = NextPage & {
+    requireAuth?: boolean;
+};
+
+type AppPropsWithAuth = AppProps & {
+    Component: NextPageWithAuth;
+};
+
+export default function App({ Component, pageProps }: AppPropsWithAuth) {
     // fetch user preferred ColorScheme and set default
     const preferredColorScheme = useColorScheme();
     const [colorScheme, setColorScheme] =
@@ -31,6 +41,8 @@ export default function App({ Component, pageProps }: AppProps) {
     const router = useRouter();
 
     const apolloClient = useApollo(pageProps);
+
+    const shouldGuard = Component.requireAuth;
 
     return (
         <>
@@ -53,12 +65,22 @@ export default function App({ Component, pageProps }: AppProps) {
                         >
                             <NotificationsProvider>
                                 <AnimatePresence exitBeforeEnter>
-                                    <Layout>
-                                        <Component
-                                            {...pageProps}
-                                            key={router.route}
-                                        />
-                                    </Layout>
+                                    <AuthGuard
+                                        guard={
+                                            shouldGuard ??
+                                            (process.env.NODE_ENV ===
+                                            'development'
+                                                ? false
+                                                : true)
+                                        }
+                                    >
+                                        <Layout>
+                                            <Component
+                                                {...pageProps}
+                                                key={router.route}
+                                            />
+                                        </Layout>
+                                    </AuthGuard>
                                 </AnimatePresence>
                             </NotificationsProvider>
                         </MantineProvider>

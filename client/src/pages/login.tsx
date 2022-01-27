@@ -6,7 +6,7 @@ import useAuth from '../lib/useAuth';
 import { MotionContainer } from '../utils/motion';
 
 export default function LoginPage() {
-    const { user, loading } = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -23,8 +23,6 @@ export default function LoginPage() {
         exit: { opacity: 0, x: 200, y: 0 },
     };
 
-    if (user || loading) return <></>;
-
     return (
         <MotionContainer
             initial="hidden"
@@ -38,3 +36,5 @@ export default function LoginPage() {
         </MotionContainer>
     );
 }
+
+LoginPage.requireAuth = false;
