@@ -115,13 +115,15 @@ export class UserResolver {
                 email: input.email,
             });
             return {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: `${user.isActivated ? 'activated' : 'pending'} account already exists with this email`,
-                          },
-                      ],
-                  };
+                errors: [
+                    {
+                        field: 'user',
+                        error: `${
+                            user.isActivated ? 'activated' : 'pending'
+                        } account already exists with this email`,
+                    },
+                ],
+            };
         } catch (e) {
             // no user with this email, create inactive account
             const user = new ImhoUser(input);
