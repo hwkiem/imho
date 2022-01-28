@@ -1,453 +1,407 @@
 {
-  "namespaces": [
-    "public"
-  ],
-  "name": "public",
-  "tables": [
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "google_place_id": {
-          "name": "google_place_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
-        },
-        "formatted_address": {
-          "name": "formatted_address",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
-        },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "enumItems": [
-            "single family",
-            "multi unit"
-          ],
-          "mappedType": "enum"
-        }
-      },
-      "name": "place",
-      "schema": "public",
-      "indexes": [
+    "namespaces": ["public"],
+    "name": "public",
+    "tables": [
         {
-          "columnNames": [
-            "google_place_id"
-          ],
-          "composite": false,
-          "keyName": "place_google_place_id_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "place_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "foreignKeys": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "unit": {
-          "name": "unit",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "'single family'",
-          "mappedType": "string"
-        },
-        "place_id": {
-          "name": "place_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "uuid"
-        }
-      },
-      "name": "residence",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "residence_place_id_unit_unique",
-          "columnNames": [
-            "place_id",
-            "unit"
-          ],
-          "composite": true,
-          "primary": false,
-          "unique": true
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "google_place_id": {
+                    "name": "google_place_id",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "string"
+                },
+                "formatted_address": {
+                    "name": "formatted_address",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "string"
+                },
+                "type": {
+                    "name": "type",
+                    "type": "text",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "enumItems": ["single family", "multi unit"],
+                    "mappedType": "enum"
+                }
+            },
+            "name": "place",
+            "schema": "public",
+            "indexes": [
+                {
+                    "columnNames": ["google_place_id"],
+                    "composite": false,
+                    "keyName": "place_google_place_id_unique",
+                    "primary": false,
+                    "unique": true
+                },
+                {
+                    "keyName": "place_pkey",
+                    "columnNames": ["id"],
+                    "composite": false,
+                    "primary": true,
+                    "unique": true
+                }
+            ],
+            "foreignKeys": {}
         },
         {
-          "keyName": "residence_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "foreignKeys": {
-        "residence_place_id_foreign": {
-          "constraintName": "residence_place_id_foreign",
-          "columnNames": [
-            "place_id"
-          ],
-          "localTableName": "public.residence",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.place",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      }
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "string"
-        },
-        "is_activated": {
-          "name": "is_activated",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "boolean"
-        }
-      },
-      "name": "imho_user",
-      "schema": "public",
-      "indexes": [
-        {
-          "columnNames": [
-            "email"
-          ],
-          "composite": false,
-          "keyName": "imho_user_email_unique",
-          "primary": false,
-          "unique": true
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "unit": {
+                    "name": "unit",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "default": "'single family'",
+                    "mappedType": "string"
+                },
+                "place_id": {
+                    "name": "place_id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": true,
+                    "mappedType": "uuid"
+                }
+            },
+            "name": "residence",
+            "schema": "public",
+            "indexes": [
+                {
+                    "keyName": "residence_place_id_unit_unique",
+                    "columnNames": ["place_id", "unit"],
+                    "composite": true,
+                    "primary": false,
+                    "unique": true
+                },
+                {
+                    "keyName": "residence_pkey",
+                    "columnNames": ["id"],
+                    "composite": false,
+                    "primary": true,
+                    "unique": true
+                }
+            ],
+            "foreignKeys": {
+                "residence_place_id_foreign": {
+                    "constraintName": "residence_place_id_foreign",
+                    "columnNames": ["place_id"],
+                    "localTableName": "public.residence",
+                    "referencedColumnNames": ["id"],
+                    "referencedTableName": "public.place",
+                    "deleteRule": "cascade",
+                    "updateRule": "cascade"
+                }
+            }
         },
         {
-          "keyName": "imho_user_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "foreignKeys": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz(0)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "datetime"
-        },
-        "feedback": {
-          "name": "feedback",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "string"
-        },
-        "rating": {
-          "name": "rating",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "residence_id": {
-          "name": "residence_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "uuid"
-        },
-        "author_id": {
-          "name": "author_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "uuid"
-        },
-        "flag_string": {
-          "name": "flag_string",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
-        }
-      },
-      "name": "review",
-      "schema": "public",
-      "indexes": [
-        {
-          "keyName": "review_author_id_residence_id_unique",
-          "columnNames": [
-            "author_id",
-            "residence_id"
-          ],
-          "composite": true,
-          "primary": false,
-          "unique": true
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "email": {
+                    "name": "email",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "string"
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": true,
+                    "mappedType": "string"
+                },
+                "is_activated": {
+                    "name": "is_activated",
+                    "type": "boolean",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "boolean"
+                }
+            },
+            "name": "imho_user",
+            "schema": "public",
+            "indexes": [
+                {
+                    "columnNames": ["email"],
+                    "composite": false,
+                    "keyName": "imho_user_email_unique",
+                    "primary": false,
+                    "unique": true
+                },
+                {
+                    "keyName": "imho_user_pkey",
+                    "columnNames": ["id"],
+                    "composite": false,
+                    "primary": true,
+                    "unique": true
+                }
+            ],
+            "foreignKeys": {}
         },
         {
-          "keyName": "review_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "foreignKeys": {
-        "review_residence_id_foreign": {
-          "constraintName": "review_residence_id_foreign",
-          "columnNames": [
-            "residence_id"
-          ],
-          "localTableName": "public.review",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.residence",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamptz(0)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "datetime"
+                },
+                "feedback": {
+                    "name": "feedback",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": true,
+                    "mappedType": "string"
+                },
+                "rating": {
+                    "name": "rating",
+                    "type": "int",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "integer"
+                },
+                "residence_id": {
+                    "name": "residence_id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": true,
+                    "mappedType": "uuid"
+                },
+                "author_id": {
+                    "name": "author_id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": true,
+                    "mappedType": "uuid"
+                },
+                "flag_string": {
+                    "name": "flag_string",
+                    "type": "varchar(255)",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "string"
+                }
+            },
+            "name": "review",
+            "schema": "public",
+            "indexes": [
+                {
+                    "keyName": "review_author_id_residence_id_unique",
+                    "columnNames": ["author_id", "residence_id"],
+                    "composite": true,
+                    "primary": false,
+                    "unique": true
+                },
+                {
+                    "keyName": "review_pkey",
+                    "columnNames": ["id"],
+                    "composite": false,
+                    "primary": true,
+                    "unique": true
+                }
+            ],
+            "foreignKeys": {
+                "review_residence_id_foreign": {
+                    "constraintName": "review_residence_id_foreign",
+                    "columnNames": ["residence_id"],
+                    "localTableName": "public.review",
+                    "referencedColumnNames": ["id"],
+                    "referencedTableName": "public.residence",
+                    "deleteRule": "cascade",
+                    "updateRule": "cascade"
+                },
+                "review_author_id_foreign": {
+                    "constraintName": "review_author_id_foreign",
+                    "columnNames": ["author_id"],
+                    "localTableName": "public.review",
+                    "referencedColumnNames": ["id"],
+                    "referencedTableName": "public.imho_user",
+                    "deleteRule": "set null",
+                    "updateRule": "cascade"
+                }
+            }
         },
-        "review_author_id_foreign": {
-          "constraintName": "review_author_id_foreign",
-          "columnNames": [
-            "author_id"
-          ],
-          "localTableName": "public.review",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.imho_user",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      }
-    },
-    {
-      "columns": {
-        "place_id": {
-          "name": "place_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "imho_user_id": {
-          "name": "imho_user_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        }
-      },
-      "name": "place_notify_on_review",
-      "schema": "public",
-      "indexes": [
         {
-          "keyName": "place_notify_on_review_pkey",
-          "columnNames": [
-            "place_id",
-            "imho_user_id"
-          ],
-          "composite": true,
-          "primary": true,
-          "unique": true
+            "columns": {
+                "place_id": {
+                    "name": "place_id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                },
+                "imho_user_id": {
+                    "name": "imho_user_id",
+                    "type": "uuid",
+                    "unsigned": false,
+                    "autoincrement": false,
+                    "primary": false,
+                    "nullable": false,
+                    "mappedType": "uuid"
+                }
+            },
+            "name": "place_notify_on_review",
+            "schema": "public",
+            "indexes": [
+                {
+                    "keyName": "place_notify_on_review_pkey",
+                    "columnNames": ["place_id", "imho_user_id"],
+                    "composite": true,
+                    "primary": true,
+                    "unique": true
+                }
+            ],
+            "foreignKeys": {
+                "place_notify_on_review_place_id_foreign": {
+                    "constraintName": "place_notify_on_review_place_id_foreign",
+                    "columnNames": ["place_id"],
+                    "localTableName": "public.place_notify_on_review",
+                    "referencedColumnNames": ["id"],
+                    "referencedTableName": "public.place",
+                    "deleteRule": "cascade",
+                    "updateRule": "cascade"
+                },
+                "place_notify_on_review_imho_user_id_foreign": {
+                    "constraintName": "place_notify_on_review_imho_user_id_foreign",
+                    "columnNames": ["imho_user_id"],
+                    "localTableName": "public.place_notify_on_review",
+                    "referencedColumnNames": ["id"],
+                    "referencedTableName": "public.imho_user",
+                    "deleteRule": "cascade",
+                    "updateRule": "cascade"
+                }
+            }
         }
-      ],
-      "foreignKeys": {
-        "place_notify_on_review_place_id_foreign": {
-          "constraintName": "place_notify_on_review_place_id_foreign",
-          "columnNames": [
-            "place_id"
-          ],
-          "localTableName": "public.place_notify_on_review",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.place",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "place_notify_on_review_imho_user_id_foreign": {
-          "constraintName": "place_notify_on_review_imho_user_id_foreign",
-          "columnNames": [
-            "imho_user_id"
-          ],
-          "localTableName": "public.place_notify_on_review",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.imho_user",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      }
-    }
-  ]
+    ]
 }
