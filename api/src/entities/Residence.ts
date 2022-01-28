@@ -5,6 +5,7 @@ import {
     ManyToOne,
     OneToMany,
     Property,
+    Unique,
 } from '@mikro-orm/core';
 import { Review } from './Review';
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
@@ -17,6 +18,7 @@ import { PlaceType } from '../utils/enums/PlaceType.enum';
 
 @ObjectType()
 @Entity()
+@Unique({ properties: ['place', 'unit'] })
 export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);

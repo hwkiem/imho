@@ -142,6 +142,16 @@
       "schema": "public",
       "indexes": [
         {
+          "keyName": "residence_place_id_unit_unique",
+          "columnNames": [
+            "place_id",
+            "unit"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "residence_pkey",
           "columnNames": [
             "id"
