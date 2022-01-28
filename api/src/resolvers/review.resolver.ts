@@ -24,7 +24,6 @@ export class ReviewResolver {
             });
             return { result: review };
         } catch (e) {
-            // console.error(e);
             return {
                 errors: [
                     {
@@ -87,7 +86,7 @@ export class ReviewResolver {
         const review = new Review(input.reviewInput);
         review.flag_string = JSON.stringify(input.reviewInput.flagInput);
 
-        // add user to review if on session
+        // add user to review if they have session
         if (req.session.userId) {
             try {
                 review.author = await em.findOneOrFail(ImhoUser, {

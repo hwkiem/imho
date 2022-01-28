@@ -89,8 +89,6 @@ export class UserResolver {
             } else {
                 user.password = await argon2.hash(input.password);
                 user.isActivated = true;
-                if (!user.reviewCollection.isInitialized())
-                    user.reviewCollection.init();
                 req.session.userId = user.id;
                 em.persist(user).flush();
                 return { result: user };
@@ -116,23 +114,16 @@ export class UserResolver {
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
             });
-            return user.isActivated
-                ? {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'activated account already exists with this email',
-                          },
-                      ],
-                  }
-                : {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'pending account already exists with this email',
-                          },
-                      ],
-                  };
+            return {
+                errors: [
+                    {
+                        field: 'user',
+                        error: `${
+                            user.isActivated ? 'activated' : 'pending'
+                        } account already exists with this email`,
+                    },
+                ],
+            };
         } catch (e) {
             // no user with this email, create inactive account
             const user = new ImhoUser(input);
