@@ -1,7 +1,7 @@
 import { IsNumber, IsString } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 import { Review } from '../entities/Review';
-import { Flags } from '../utils/types/Flags';
+import { Flags } from '../utils/types/Flag';
 
 export class ReviewValidator implements Partial<Review> {
     @IsString()

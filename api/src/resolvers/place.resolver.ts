@@ -2,6 +2,7 @@ import { Place } from '../entities/Place';
 import {
     Arg,
     Ctx,
+    Field,
     FieldResolver,
     ObjectType,
     Query,
@@ -10,7 +11,7 @@ import {
 } from 'type-graphql';
 import { MyContext } from '../utils/context';
 import { ApiResponse } from '../utils/types/Response';
-import { Flags, TopNFlagsResponse } from '../utils/types/Flags';
+import { Flags } from '../utils/types/Flag';
 import {
     ConFlagType,
     DbkFlagType,
@@ -19,6 +20,24 @@ import {
 
 @ObjectType()
 class PlaceResponse extends ApiResponse(Place) {}
+
+@ObjectType()
+class FlagWithCount {
+    @Field()
+    topic: string;
+    @Field()
+    cnt: number;
+}
+
+@ObjectType()
+class TopNFlagsResponse {
+    @Field(() => [FlagWithCount])
+    pros: FlagWithCount[];
+    @Field(() => [FlagWithCount])
+    cons: FlagWithCount[];
+    @Field(() => [FlagWithCount])
+    dbks: FlagWithCount[];
+}
 
 @Resolver(() => Place)
 export class PlaceResolver {

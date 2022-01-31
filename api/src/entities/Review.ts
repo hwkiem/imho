@@ -3,11 +3,11 @@ import { ReviewValidator } from '../validators/ReviewValidator';
 import { Field, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
-import { Flags } from '../utils/types/Flags';
+import { Flags } from '../utils/types/Flag';
 import { ImhoUser } from './ImhoUser';
+@Unique({ properties: ['author', 'residence'] })
 @ObjectType()
 @Entity()
-@Unique({ properties: ['author', 'residence'] })
 export class Review extends Base<Review> {
     @Field({ nullable: true })
     @Property({ nullable: true })
