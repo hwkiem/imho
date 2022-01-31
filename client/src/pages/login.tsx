@@ -1,6 +1,7 @@
+import { Container } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { LoginForm } from '../components/LoginForm';
 import useAuth from '../lib/useAuth';
 import { MotionContainer } from '../utils/motion';
@@ -38,3 +39,8 @@ export default function LoginPage() {
 }
 
 LoginPage.requireAuth = false;
+
+// override layout prop for login page
+LoginPage.getLayout = function getLayout(page: ReactElement) {
+    return <Container mt={200}>{page}</Container>;
+};

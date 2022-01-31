@@ -1,13 +1,13 @@
 // AuthGuard.tsx
 import useAuth from './useAuth';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 export function AuthGuard({
     children,
     guard = true,
 }: {
-    children: JSX.Element;
+    children: ReactNode;
     guard?: boolean;
 }) {
     const { user, loading } = useAuth();

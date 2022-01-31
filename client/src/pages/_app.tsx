@@ -7,7 +7,7 @@ import {
 } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
 import { useColorScheme, useHotkeys } from '@mantine/hooks';
-import { useState } from 'react';
+import { ReactElement, ReactNode, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { ApolloProvider } from '@apollo/client';
@@ -17,15 +17,16 @@ import { AuthProvider } from '../lib/useAuth';
 import { AuthGuard } from '../lib/AuthGuard';
 import { NextPage } from 'next';
 
-export type NextPageWithAuth = NextPage & {
+export type CustomNextPage = NextPage & {
     requireAuth?: boolean;
+    getLayout?: (page: ReactElement) => ReactNode;
 };
 
-type AppPropsWithAuth = AppProps & {
-    Component: NextPageWithAuth;
+type CustomAppProps = AppProps & {
+    Component: CustomNextPage;
 };
 
-export default function App({ Component, pageProps }: AppPropsWithAuth) {
+export default function App({ Component, pageProps }: CustomAppProps) {
     // fetch user preferred ColorScheme and set default
     const preferredColorScheme = useColorScheme();
     const [colorScheme, setColorScheme] =
@@ -43,6 +44,9 @@ export default function App({ Component, pageProps }: AppPropsWithAuth) {
     const apolloClient = useApollo(pageProps);
 
     const shouldGuard = Component.requireAuth;
+
+    const getLayout =
+        Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 
     return (
         <>
@@ -74,12 +78,12 @@ export default function App({ Component, pageProps }: AppPropsWithAuth) {
                                                 : true)
                                         }
                                     >
-                                        <Layout>
+                                        {getLayout(
                                             <Component
                                                 {...pageProps}
                                                 key={router.route}
                                             />
-                                        </Layout>
+                                        )}
                                     </AuthGuard>
                                 </AnimatePresence>
                             </NotificationsProvider>
