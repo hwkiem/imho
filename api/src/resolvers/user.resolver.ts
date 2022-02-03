@@ -288,12 +288,13 @@ export class UserResolver {
         if (!process.env.OTP_SECRET) return { success: false };
 
         // create OTP object and write to redis
-        const secret = process.env.OTP_SECRET + user.id.replace('-', '');
+        const secret = process.env.OTP_SECRET + user.id.replaceAll('-', '');
         console.log(secret);
         const token = authenticator.generate(secret); // unique but secret
         console.log(token);
         const otp = new Otp(token, AddMinutesToDate(new Date(), 60));
         const stored = await this.otpService.storeOtp(otp);
+
         if (!stored)
             return {
                 success: false,

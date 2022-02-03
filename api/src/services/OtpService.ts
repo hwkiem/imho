@@ -44,15 +44,13 @@ export class OtpService {
                 now = new Date();
             if (cutoff < now) return false;
             // is identity validated
-            console.log(
-                `(${input.otp} ${
-                    process.env.OTP_SECRET + userId.replace('-', '')
-                })`
-            );
-            const isValid = authenticator.check(
-                input.otp,
-                process.env.OTP_SECRET + userId.replace('-', '')
-            );
+            const secret = process.env.OTP_SECRET + userId.replaceAll('-', '');
+            console.log(`(${input.otp} ${secret})`);
+
+            const isValid = authenticator.verify({
+                secret: secret,
+                token: input.otp,
+            });
             console.log('is token valid:', isValid);
             if (!isValid) return false;
             return true;
