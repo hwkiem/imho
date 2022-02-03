@@ -1,0 +1,16 @@
+mutation TrackPlace($input: TrackPlaceInput!) {
+    trackPlace(input: $input) {
+        result {
+            id
+            email
+            myTrackedPlaces {
+                id
+                formatted_address
+            }
+        }
+        errors {
+            field
+            error
+        }
+    }
+}

@@ -3,17 +3,27 @@ import {
     ActionIcon,
     Badge,
     Box,
+    Button,
     Center,
     Grid,
     SimpleGrid,
     Text,
+    TextInput,
     Title,
 } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import {} from 'next';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
-import { FlagWithCount, useGetPlaceQuery } from '../../generated/graphql';
+import {
+    FlagWithCount,
+    PlaceType,
+    useCreatePendingUserMutation,
+    useGetPlaceQuery,
+    useTrackPlaceMutation,
+} from '../../generated/graphql';
+import useAuth from '../../lib/useAuth';
 import { MotionContainer } from '../../utils/motion';
 
 export default function PlacePage() {
@@ -41,7 +51,12 @@ export default function PlacePage() {
         variables: { placeId: placeId },
     });
 
-    console.log(data);
+    const [email, setEmail] = useState<string | undefined>(undefined);
+    const [errorMessage, setErrorMessage] = useState<string | undefined>(
+        undefined
+    );
+    const [trackPlace] = useTrackPlaceMutation();
+    const { user } = useAuth();
 
     if (loading) {
         return <></>;
@@ -201,12 +216,111 @@ export default function PlacePage() {
             key={'review'}
         >
             <Title
-                sx={{ fontSize: 100, fontWeight: 900, letterSpacing: -2 }}
+                sx={{ fontSize: 60, fontWeight: 900, letterSpacing: -2 }}
                 align="center"
                 mt={100}
             >
-                Address not found.
+                Address not found...
             </Title>
+
+            <Text align="center" size="lg">
+                We hope you can forgive us. We're working on becoming the go-to
+                spot for rental reviews.
+            </Text>
+            <Title align="center" mt={20}>
+                Want to be notified when we have a review for this location?
+            </Title>
+            {user && (
+                <Center mt={20}>
+                    <Button
+                        onClick={() => {
+                            trackPlace({
+                                variables: {
+                                    input: {
+                                        userInput: { email: user.email },
+                                        placeInput: {
+                                            google_place_id: placeId,
+                                            formatted_address: '',
+                                            type: PlaceType.Single,
+                                        },
+                                    },
+                                },
+                            });
+                        }}
+                    >
+                        Yes Please!
+                    </Button>
+                </Center>
+            )}
+            {!user && (
+                <>
+                    <Center>
+                        <TextInput
+                            mt={20}
+                            size={'xl'}
+                            value={email}
+                            onChange={(evt) =>
+                                setEmail(evt.currentTarget.value)
+                            }
+                            placeholder="your.email@imho.com"
+                            sx={{ width: '60%' }}
+                            error={errorMessage}
+                        />
+                    </Center>
+                    <Center>
+                        <Button
+                            mt={20}
+                            variant={'subtle'}
+                            size={'xl'}
+                            onClick={async () => {
+                                if (email) {
+                                    trackPlace({
+                                        variables: {
+                                            input: {
+                                                placeInput: {
+                                                    google_place_id: placeId,
+                                                    formatted_address: '',
+                                                    type: PlaceType.Single,
+                                                },
+                                                userInput: {
+                                                    email: email,
+                                                },
+                                            },
+                                        },
+                                    })
+                                        .then((res) => {
+                                            if (res.data?.trackPlace.result) {
+                                                router.push('/');
+                                            } else if (
+                                                res.data?.trackPlace.errors
+                                            ) {
+                                                console.log(
+                                                    res.data.trackPlace.errors
+                                                );
+                                                setErrorMessage(
+                                                    res.data.trackPlace
+                                                        .errors[0].error
+                                                );
+                                            } else {
+                                                console.log(
+                                                    'failed for some other reason...'
+                                                );
+                                                router.push('/error');
+                                            }
+                                        })
+                                        .catch((err) => {
+                                            console.log('caught some error');
+                                            console.log(err);
+                                            router.push('/error');
+                                        });
+                                }
+                            }}
+                        >
+                            Yes Please!
+                        </Button>
+                    </Center>
+                </>
+            )}
         </MotionContainer>
     );
 }

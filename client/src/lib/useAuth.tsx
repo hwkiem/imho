@@ -19,7 +19,7 @@ import {
 import { useRouter } from 'next/router';
 
 interface AuthContextType {
-    user?: Partial<ImhoUser>;
+    user?: Pick<ImhoUser, 'email' | 'id'>;
     loading: boolean;
     errors?: FieldError[];
     login: (input: LoginInput, cb?: () => void) => void;
@@ -35,7 +35,7 @@ export function AuthProvider({
     children: ReactNode;
 }): JSX.Element {
     // managing context state
-    const [user, setUser] = useState<Partial<ImhoUser>>();
+    const [user, setUser] = useState<Pick<ImhoUser, 'email' | 'id'>>();
     const [errors, setErrors] = useState<FieldError[]>();
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
