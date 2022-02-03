@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 @InputType()
-export class ValidateOtpInput {
+export class OtpValidator {
     @IsString()
     @Field()
     public email: string;
@@ -11,3 +11,7 @@ export class ValidateOtpInput {
     @Field()
     otp: string;
 }
+
+export const AddMinutesToDate = (date: Date, minutes: number): Date => {
+    return new Date(date.getTime() + minutes * 60000);
+};

@@ -3,9 +3,11 @@ import { MyContext } from '../utils/context';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
 import {
+    ChangePasswordInput,
     LoginInput,
     PendingUserInput,
     RegisterInput,
+    ResetPasswordInput,
     TrackPlaceInput,
 } from '../validators/UserValidator';
 import argon2 from 'argon2';
@@ -15,7 +17,7 @@ import { Service } from 'typedi';
 import { Otp, OtpService } from '../services/OtpService';
 import { EmailService } from '../services/EmailService';
 import { SuccessResponse } from '../utils/types/SuccessResonse';
-import { ValidateOtpInput } from '../utils/types/ValidateOtpInput';
+import { OtpValidator } from '../validators/OtpValidator';
 
 declare module 'express-session' {
     interface Session {
@@ -254,7 +256,10 @@ export class UserResolver {
                 if (err) {
                     resolve({
                         success: false,
-                        apiError: { field: '', error: '' },
+                        apiError: {
+                            field: 'session',
+                            error: 'could not destroy session: ' + err,
+                        },
                     });
                     return;
                 }
@@ -269,9 +274,6 @@ export class UserResolver {
         @Ctx() { em }: MyContext,
         @Arg('input') input: PendingUserInput
     ): Promise<SuccessResponse> {
-        const AddMinutesToDate = (date: Date, minutes: number): Date => {
-            return new Date(date.getTime() + minutes * 60000);
-        };
         // ensure user
         let user;
         try {
@@ -284,15 +286,24 @@ export class UserResolver {
                 apiError: { field: 'email', error: 'no user with that email' },
             };
         }
+        // ensure active account with password to forget
+        if (!user.isActivated) return { success: false };
         // ensure env
-        if (!process.env.OTP_SECRET) return { success: false };
+        if (!process.env.OTP_SECRET)
+            return {
+                success: false,
+                apiError: {
+                    field: 'email',
+                    error: 'this account is not yet activated',
+                },
+            };
 
         // create OTP object and write to redis
         const secret = process.env.OTP_SECRET + user.id.replaceAll('-', '');
-        console.log(secret);
+        // console.log(secret);
         const token = authenticator.generate(secret); // unique but secret
-        console.log(token);
-        const otp = new Otp(token, AddMinutesToDate(new Date(), 60));
+        // console.log(token);
+        const otp = new Otp(token);
         const stored = await this.otpService.storeOtp(otp);
 
         if (!stored)
@@ -313,11 +324,11 @@ export class UserResolver {
         return { success: true };
     }
 
-    @Mutation(() => SuccessResponse)
+    @Mutation(() => UserResponse)
     async verify_OTP(
-        @Ctx() { em }: MyContext,
-        @Arg('input') input: ValidateOtpInput
-    ): Promise<SuccessResponse> {
+        @Ctx() { em, req }: MyContext,
+        @Arg('input') input: OtpValidator
+    ): Promise<UserResponse> {
         // fetch user for id
         let user;
         try {
@@ -326,36 +337,100 @@ export class UserResolver {
             });
         } catch {
             return {
-                success: false,
-                apiError: { field: 'email', error: 'no user with that email' },
+                errors: [{ field: 'email', error: 'no user with that email' }],
             };
         }
         // is this otp valid?
-        const result = await this.otpService.validateOtp(input, user.id);
-        if (!result) return { success: false };
+        const authenticated = await this.otpService.validateOtp(input, user.id);
+        if (
+            authenticated.success === false &&
+            authenticated.apiError !== undefined
+        )
+            return {
+                errors: [authenticated.apiError],
+            };
+        // user is authenticated by OTP, add session
+        req.session.userId = user.id;
+        return { result: user };
+    }
+
+    // post OTP, overwrite old forgotten password
+    @Mutation(() => SuccessResponse)
+    async resetPassword(
+        @Ctx() { em, req }: MyContext,
+        @Arg('input') input: ResetPasswordInput
+    ): Promise<SuccessResponse> {
+        if (!req.session.userId) {
+            return {
+                success: false,
+                apiError: { field: 'session', error: 'not logged in' },
+            };
+        }
+
+        let user;
+        try {
+            user = await em.findOneOrFail(ImhoUser, {
+                id: req.session.userId,
+            });
+        } catch {
+            return {
+                success: false,
+                apiError: {
+                    field: 'session',
+                    error: 'failed to fetch user from session',
+                },
+            };
+        }
+        // don't need to check activated ..
+
+        // change their password and persist
+        user.password = await argon2.hash(input.password);
+        em.persist(user).flush();
         return { success: true };
     }
 
-    // @Mutation(() => SuccessResponse)
-    // async changePassword(
-    //     @Ctx() { em }: MyContext,
-    //     @Arg('input') input: ValidateOtpInput
-    // ): Promise<SuccessResponse> {
-    //     // fetch user for id
-    //     let user;
-    //     try {
-    //         user = await em.findOneOrFail(ImhoUser, {
-    //             email: input.email,
-    //         });
-    //     } catch {
-    //         return {
-    //             success: false,
-    //             apiError: { field: 'email', error: 'no user with that email' },
-    //         };
-    //     }
-    //     // is this otp valid?
-    //     const result = await this.otpService.validateOtp(input, user.id);
-    //     if (!result) return { success: false };
-    //     return { success: true };
-    // }
+    // logged in user enters old password to validate and desired their new password
+    @Mutation(() => SuccessResponse)
+    async changePassword(
+        @Ctx() { em, req }: MyContext,
+        @Arg('input') input: ChangePasswordInput
+    ): Promise<SuccessResponse> {
+        if (!req.session.userId) {
+            return {
+                success: false,
+                apiError: { field: 'session', error: 'not logged in' },
+            };
+        }
+
+        let user;
+        try {
+            user = await em.findOneOrFail(ImhoUser, {
+                id: req.session.userId,
+            });
+        } catch {
+            return {
+                success: false,
+                apiError: {
+                    field: 'session',
+                    error: 'failed to fetch user from session',
+                },
+            };
+        }
+
+        // is their old password accurate
+        if (!(await argon2.verify(user.password, input.old_password))) {
+            return {
+                success: false,
+                apiError: {
+                    field: 'password',
+                    error: 'incorrect password',
+                },
+            };
+        }
+
+        // change their password and persist
+        user.password = await argon2.hash(input.new_password);
+        em.persist(user).flush();
+        return { success: true };
+    }
 }

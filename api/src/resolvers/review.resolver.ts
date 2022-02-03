@@ -7,10 +7,12 @@ import { WriteReviewInput } from '../validators/WriteReviewInput';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
 import { PlaceType } from '../utils/enums/PlaceType.enum';
+import { Service } from 'typedi';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
 
+@Service()
 @Resolver(() => Review)
 export class ReviewResolver {
     @Query(() => ReviewResponse)

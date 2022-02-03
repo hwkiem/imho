@@ -16,10 +16,11 @@ import {
     DbkFlagType,
     ProFlagType,
 } from '../utils/enums/FlagType.enum';
+import { Service } from 'typedi';
 
 @ObjectType()
 class PlaceResponse extends ApiResponse(Place) {}
-
+@Service()
 @Resolver(() => Place)
 export class PlaceResolver {
     @Query(() => PlaceResponse)

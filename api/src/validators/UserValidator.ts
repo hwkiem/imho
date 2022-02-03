@@ -21,6 +21,20 @@ export class RegisterInput extends UserValidator {
 }
 
 @InputType()
+export class ResetPasswordInput extends UserValidator {
+    @Field()
+    public password: string;
+}
+
+@InputType()
+export class ChangePasswordInput {
+    @Field()
+    public old_password: string;
+    @Field()
+    public new_password: string;
+}
+
+@InputType()
 export class PendingUserInput extends UserValidator {
     @Field()
     public email: string;

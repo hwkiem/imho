@@ -1,10 +1,14 @@
 import { Service } from 'typedi';
 import Redis from 'ioredis';
-import { ValidateOtpInput } from '../utils/types/ValidateOtpInput';
+import { AddMinutesToDate, OtpValidator } from '../validators/OtpValidator';
 import { authenticator } from 'otplib';
+import { SuccessResponse } from '../utils/types/SuccessResonse';
 
 export class Otp {
-    constructor(public otp: string, public expirationTime: Date) {}
+    constructor(
+        public otp: string,
+        public expirationTime: Date = AddMinutesToDate(new Date(), 60) // default 1 hour lifetime
+    ) {}
 }
 
 @Service()
@@ -18,8 +22,11 @@ export class OtpService {
             }
             // store
             await this.redis.set(otp.otp, otp.expirationTime.toString());
-            // TODO: setup auto expiration if never claimed
-            // this.redis.expireat(otp, )
+            // setup auto expiration if never claimed
+            this.redis.expireat(
+                otp.otp,
+                AddMinutesToDate(new Date(), 60 * 4).getTime() // OTP expires for good 4 hours later
+            );
             return true;
         } catch {
             return false;
@@ -27,35 +34,48 @@ export class OtpService {
     }
 
     public async validateOtp(
-        input: ValidateOtpInput,
+        input: OtpValidator,
         userId: string
-    ): Promise<boolean> {
-        try {
-            if (!(await this.redis.exists(input.otp))) {
-                return false;
-            }
-            const value = await this.redis.get(input.otp);
-            console.log('actually maps to ', value);
-            if (value === null) {
-                return false;
-            }
-            // is otp expired
-            const cutoff = new Date(value),
-                now = new Date();
-            if (cutoff < now) return false;
-            // is identity validated
-            const secret = process.env.OTP_SECRET + userId.replaceAll('-', '');
-            console.log(`(${input.otp} ${secret})`);
-
-            const isValid = authenticator.verify({
-                secret: secret,
-                token: input.otp,
-            });
-            console.log('is token valid:', isValid);
-            if (!isValid) return false;
-            return true;
-        } catch {
-            return false;
+    ): Promise<SuccessResponse> {
+        const value = await this.redis.get(input.otp);
+        if (value === null) {
+            return {
+                success: false,
+                apiError: {
+                    field: 'otp',
+                    error: 'no record of this otp saved',
+                },
+            };
         }
+        // is otp expired
+        const cutoff = new Date(value),
+            now = new Date();
+        if (cutoff < now)
+            return {
+                success: false,
+                apiError: {
+                    field: 'otp',
+                    error: 'otp has expired',
+                },
+            };
+        // is identity validated
+        const secret = process.env.OTP_SECRET + userId.replaceAll('-', '');
+        // console.log(`(${input.otp} ${secret})`);
+
+        const isValid = authenticator.verify({
+            secret: secret,
+            token: input.otp,
+        });
+        if (!isValid)
+            return {
+                success: false,
+                apiError: {
+                    field: 'otp',
+                    error: 'could not validate otp to your profile',
+                },
+            };
+        // user token is validated, delete this key
+        this.redis.del(input.otp);
+        return { success: true };
     }
 }

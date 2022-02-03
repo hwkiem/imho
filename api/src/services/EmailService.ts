@@ -15,7 +15,6 @@ export class EmailService {
     ) {}
 
     public async sendOtp(email: string, otp: string): Promise<boolean> {
-        console.log('in sendOtp, otp is', otp);
         const info = await this.mailer.sendMail({
             from: process.env.EMAIL_ADDRESS,
             to: email,
