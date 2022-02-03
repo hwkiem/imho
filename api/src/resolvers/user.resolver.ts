@@ -10,7 +10,12 @@ import {
 } from '../validators/UserValidator';
 import argon2 from 'argon2';
 import { Place } from '../entities/Place';
-// import { authenticator } from 'otplib';
+import { authenticator } from 'otplib';
+import { Service } from 'typedi';
+import { Otp, OtpService } from '../services/OtpService';
+import { EmailService } from '../services/EmailService';
+import { SuccessResponse } from '../utils/types/SuccessResonse';
+import { ValidateOtpInput } from '../utils/types/ValidateOtpInput';
 
 declare module 'express-session' {
     interface Session {
@@ -22,7 +27,12 @@ declare module 'express-session' {
 class UserResponse extends ApiResponse(ImhoUser) {}
 
 @Resolver(() => ImhoUser)
+@Service()
 export class UserResolver {
+    constructor(
+        public otpService: OtpService,
+        private readonly mailer: EmailService
+    ) {}
     @Query(() => UserResponse)
     public async getUser(
         @Ctx() { em }: MyContext,
@@ -236,19 +246,115 @@ export class UserResolver {
         }
     }
 
-    @Mutation(() => Boolean)
-    logout(@Ctx() { req, res }: MyContext) {
+    @Mutation(() => SuccessResponse)
+    logout(@Ctx() { req, res }: MyContext): Promise<SuccessResponse> {
         return new Promise((resolve) =>
             req.session.destroy((err) => {
                 res.clearCookie('oreo');
                 if (err) {
-                    resolve(false);
+                    resolve({
+                        success: false,
+                        apiError: { field: '', error: '' },
+                    });
                     return;
                 }
-                resolve(true);
+                resolve({ success: true });
             })
         );
     }
 
     // forgot password
+    @Mutation(() => SuccessResponse)
+    async forgotPassword(
+        @Ctx() { em }: MyContext,
+        @Arg('input') input: PendingUserInput
+    ): Promise<SuccessResponse> {
+        const AddMinutesToDate = (date: Date, minutes: number): Date => {
+            return new Date(date.getTime() + minutes * 60000);
+        };
+        // ensure user
+        let user;
+        try {
+            user = await em.findOneOrFail(ImhoUser, {
+                email: input.email,
+            });
+        } catch {
+            return {
+                success: false,
+                apiError: { field: 'email', error: 'no user with that email' },
+            };
+        }
+        // ensure env
+        if (!process.env.OTP_SECRET) return { success: false };
+
+        // create OTP object and write to redis
+        const secret = process.env.OTP_SECRET + user.id.replace('-', '');
+        console.log(secret);
+        const token = authenticator.generate(secret); // unique but secret
+        console.log(token);
+        const otp = new Otp(token, AddMinutesToDate(new Date(), 60));
+        const stored = await this.otpService.storeOtp(otp);
+        if (!stored)
+            return {
+                success: false,
+                apiError: { field: 'OTP', error: 'failed to store' },
+            };
+        // email
+        const mailed = this.mailer.sendOtp(input.email, otp.otp);
+        if (!mailed)
+            return {
+                success: false,
+                apiError: {
+                    field: 'email',
+                    error: 'could not send email to' + input.email,
+                },
+            };
+        return { success: true };
+    }
+
+    @Mutation(() => SuccessResponse)
+    async verify_OTP(
+        @Ctx() { em }: MyContext,
+        @Arg('input') input: ValidateOtpInput
+    ): Promise<SuccessResponse> {
+        // fetch user for id
+        let user;
+        try {
+            user = await em.findOneOrFail(ImhoUser, {
+                email: input.email,
+            });
+        } catch {
+            return {
+                success: false,
+                apiError: { field: 'email', error: 'no user with that email' },
+            };
+        }
+        // is this otp valid?
+        const result = await this.otpService.validateOtp(input, user.id);
+        if (!result) return { success: false };
+        return { success: true };
+    }
+
+    // @Mutation(() => SuccessResponse)
+    // async changePassword(
+    //     @Ctx() { em }: MyContext,
+    //     @Arg('input') input: ValidateOtpInput
+    // ): Promise<SuccessResponse> {
+    //     // fetch user for id
+    //     let user;
+    //     try {
+    //         user = await em.findOneOrFail(ImhoUser, {
+    //             email: input.email,
+    //         });
+    //     } catch {
+    //         return {
+    //             success: false,
+    //             apiError: { field: 'email', error: 'no user with that email' },
+    //         };
+    //     }
+    //     // is this otp valid?
+    //     const result = await this.otpService.validateOtp(input, user.id);
+    //     if (!result) return { success: false };
+    //     return { success: true };
+    // }
 }

@@ -24,6 +24,7 @@ import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
 import { UserResolver } from './resolvers/user.resolver';
+import Container from 'typedi';
 
 const main = async () => {
     const app = express();
@@ -127,6 +128,7 @@ const main = async () => {
         schema: await buildSchema({
             resolvers: [ReviewResolver, PlaceResolver, UserResolver],
             validate: true,
+            container: Container,
         }),
         context: ({ req, res }) =>
             ({ req, res, em: orm.em.fork() } as MyContext),
