@@ -266,21 +266,21 @@ export type CreatePendingUserMutationVariables = Exact<{
 }>;
 
 
-export type CreatePendingUserMutation = { __typename?: 'Mutation', createPendingUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, email: string, createdAt: any } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type CreatePendingUserMutation = { __typename?: 'Mutation', createPendingUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, email: string, createdAt: any } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type GetPlaceQueryVariables = Exact<{
   placeId: Scalars['String'];
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null | undefined, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null | undefined, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, averageRating?: number | null | undefined, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null | undefined }> }> } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null, averageRating?: number | null, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null }> }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -290,21 +290,28 @@ export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type RegisterUserMutationVariables = Exact<{
   input: RegisterInput;
 }>;
 
 
-export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+
+export type TrackPlaceMutationVariables = Exact<{
+  input: TrackPlaceInput;
+}>;
+
+
+export type TrackPlaceMutation = { __typename?: 'Mutation', trackPlace: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, email: string, myTrackedPlaces: Array<{ __typename?: 'Place', id: string, formatted_address: string }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type AddReviewMutationVariables = Exact<{
   input: WriteReviewInput;
 }>;
 
 
-export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null | undefined, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null | undefined, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null | undefined, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null | undefined } };
+export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 
 export const CreatePendingUserDocument = gql`
@@ -573,6 +580,50 @@ export function useRegisterUserMutation(baseOptions?: Apollo.MutationHookOptions
 export type RegisterUserMutationHookResult = ReturnType<typeof useRegisterUserMutation>;
 export type RegisterUserMutationResult = Apollo.MutationResult<RegisterUserMutation>;
 export type RegisterUserMutationOptions = Apollo.BaseMutationOptions<RegisterUserMutation, RegisterUserMutationVariables>;
+export const TrackPlaceDocument = gql`
+    mutation TrackPlace($input: TrackPlaceInput!) {
+  trackPlace(input: $input) {
+    result {
+      id
+      email
+      myTrackedPlaces {
+        id
+        formatted_address
+      }
+    }
+    errors {
+      field
+      error
+    }
+  }
+}
+    `;
+export type TrackPlaceMutationFn = Apollo.MutationFunction<TrackPlaceMutation, TrackPlaceMutationVariables>;
+
+/**
+ * __useTrackPlaceMutation__
+ *
+ * To run a mutation, you first call `useTrackPlaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTrackPlaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [trackPlaceMutation, { data, loading, error }] = useTrackPlaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useTrackPlaceMutation(baseOptions?: Apollo.MutationHookOptions<TrackPlaceMutation, TrackPlaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TrackPlaceMutation, TrackPlaceMutationVariables>(TrackPlaceDocument, options);
+      }
+export type TrackPlaceMutationHookResult = ReturnType<typeof useTrackPlaceMutation>;
+export type TrackPlaceMutationResult = Apollo.MutationResult<TrackPlaceMutation>;
+export type TrackPlaceMutationOptions = Apollo.BaseMutationOptions<TrackPlaceMutation, TrackPlaceMutationVariables>;
 export const AddReviewDocument = gql`
     mutation AddReview($input: WriteReviewInput!) {
   addReview(input: $input) {

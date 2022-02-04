@@ -53,7 +53,7 @@ export default function HomePage() {
                 <Grid mt={40} justify="center">
                     <Grid.Col span={3}>
                         <Center>
-                            <Link href="/review" passHref>
+                            <Link href="/review?step=1" passHref>
                                 <Button
                                     variant="gradient"
                                     gradient={{

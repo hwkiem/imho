@@ -61,7 +61,7 @@ export const SuggestionList: React.FC<SuggestionListProps> = ({
         <Group position="center" direction="column" mt={30}>
             <AnimatePresence>
                 {!selected &&
-                    placePredictions.flatMap((item, idx) => {
+                    placePredictions.slice(0, 3).flatMap((item, idx) => {
                         return (
                             <MotionButton
                                 custom={idx}
