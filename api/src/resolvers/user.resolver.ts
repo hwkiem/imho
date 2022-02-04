@@ -139,7 +139,7 @@ export class UserResolver {
         @Arg('input') input: TrackPlaceInput,
         @Ctx() { em, req, res }: MyContext
     ): Promise<UserResponse> {
-        // 
+        //
         // ensure place
         let place: Place;
         try {
