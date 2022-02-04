@@ -13,8 +13,9 @@ import { Base } from './Base';
 import { ResidenceValidator } from '../validators/ResidenceValidator';
 import { Place } from './Place';
 import { MyContext } from '../utils/context';
-import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
-import { PlaceType } from '../utils/enums/PlaceType.enum';
+import { EntityManager } from '@mikro-orm/postgresql';
+
+export const SINGLE_FAMILY = 'single family';
 
 @ObjectType()
 @Entity()
@@ -23,8 +24,8 @@ export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);
 
-    @Field({ defaultValue: PlaceType.SINGLE, nullable: true })
-    @Property({ default: PlaceType.SINGLE })
+    @Field()
+    @Property({ default: SINGLE_FAMILY })
     public unit: string;
 
     @Field(() => [Review])
@@ -48,9 +49,7 @@ export class Residence extends Base<Residence> {
         @Root() residence: Residence,
         @Ctx() { em }: MyContext
     ): Promise<number | null> {
-        const knex = (
-            (em as EntityManager).getConnection() as PostgreSqlConnection
-        ).getKnex();
+        const knex = (em as EntityManager).getConnection().getKnex();
 
         const res = await knex
             .avg('rating')

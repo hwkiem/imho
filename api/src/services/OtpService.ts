@@ -16,27 +16,25 @@ export class OtpService {
     constructor(private readonly redis = new Redis(process.env.REDIS_URL)) {}
 
     public async storeOtp(otp: Otp): Promise<boolean> {
-        try {
-            if (await this.redis.exists(otp.otp)) {
-                return false;
-            }
-            // store
-            await this.redis.set(otp.otp, otp.expirationTime.toString());
-            // setup auto expiration if never claimed
-            this.redis.expireat(
-                otp.otp,
-                AddMinutesToDate(new Date(), 60 * 4).getTime() // OTP expires for good 4 hours later
-            );
-            return true;
-        } catch {
+        // no duplicate otp's or overwriting keys
+        if (await this.redis.exists(otp.otp)) {
             return false;
         }
+        // store
+        await this.redis.set(otp.otp, otp.expirationTime.toString());
+        // setup auto expiration if never claimed
+        this.redis.expireat(
+            otp.otp,
+            AddMinutesToDate(new Date(), 60 * 4).getTime() // OTP expires for good 4 hours later
+        );
+        return true;
     }
 
     public async validateOtp(
         input: OtpValidator,
         userId: string
     ): Promise<SuccessResponse> {
+        // ensure otp recorded on redis
         const value = await this.redis.get(input.otp);
         if (value === null) {
             return {

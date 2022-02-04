@@ -1,7 +1,9 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20220202014937 extends Migration {
+export class Migration20220204013421 extends Migration {
     async up(): Promise<void> {
+        this.addSql('alter table "place" drop column "type";');
+
         this.addSql(
             'alter table "residence" drop constraint if exists "residence_unit_check";'
         );
@@ -17,6 +19,10 @@ export class Migration20220202014937 extends Migration {
     }
 
     async down(): Promise<void> {
+        this.addSql(
+            'alter table "place" add column "type" text check ("type" in (\'single family\', \'multi unit\')) not null;'
+        );
+
         this.addSql(
             'alter table "residence" drop constraint if exists "residence_unit_check";'
         );

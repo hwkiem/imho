@@ -27,7 +27,7 @@ export class ImhoUser extends Base<ImhoUser> {
     public email: string;
 
     @Property({ nullable: true })
-    public password: string;
+    public password?: string;
 
     @Property()
     public isActivated: boolean;

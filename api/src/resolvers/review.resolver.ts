@@ -6,7 +6,6 @@ import { Place } from '../entities/Place';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
-import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { Service } from 'typedi';
 
 @ObjectType()
@@ -52,9 +51,7 @@ export class ReviewResolver {
 
             try {
                 residence = await em.findOneOrFail(Residence, {
-                    unit: input.residenceInput.unit
-                        ? input.residenceInput.unit
-                        : PlaceType.SINGLE, // default value
+                    unit: input.residenceInput.unit,
                 });
             } catch (e) {
                 residence = new Residence(input.residenceInput);

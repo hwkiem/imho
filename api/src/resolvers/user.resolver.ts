@@ -35,27 +35,6 @@ export class UserResolver {
         public otpService: OtpService,
         private readonly mailer: EmailService
     ) {}
-    @Query(() => UserResponse)
-    public async getUser(
-        @Ctx() { em }: MyContext,
-        @Arg('userId') userId: string
-    ): Promise<UserResponse> {
-        try {
-            const user = await em.findOneOrFail(ImhoUser, {
-                id: userId,
-            });
-            return { result: user };
-        } catch (e) {
-            return {
-                errors: [
-                    {
-                        field: 'userId',
-                        error: 'Could not find matching user.',
-                    },
-                ],
-            };
-        }
-    }
 
     @Query(() => UserResponse)
     public async me(@Ctx() { em, req }: MyContext): Promise<UserResponse> {
@@ -67,7 +46,7 @@ export class UserResolver {
                 id: req.session.userId,
             });
             return { result: user };
-        } catch (e) {
+        } catch {
             return {
                 errors: [
                     {
@@ -145,7 +124,7 @@ export class UserResolver {
                           },
                       ],
                   };
-        } catch (e) {
+        } catch {
             // no user with this email, create inactive account
             const user = new ImhoUser(input);
             user.isActivated = false;
@@ -154,12 +133,13 @@ export class UserResolver {
         }
     }
 
-    // hit this to track a place, creates pending account first time
+    // hit this to track a place, creates pending account for first time email
     @Mutation(() => UserResponse)
     public async trackPlace(
         @Arg('input') input: TrackPlaceInput,
         @Ctx() { em, req, res }: MyContext
     ): Promise<UserResponse> {
+        // 
         // ensure place
         let place: Place;
         try {
@@ -214,7 +194,7 @@ export class UserResolver {
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
             });
-            if (user.isActivated === false)
+            if (user.isActivated === false || user.password === undefined)
                 return {
                     errors: [
                         {
@@ -223,6 +203,7 @@ export class UserResolver {
                         },
                     ],
                 };
+
             if (!(await argon2.verify(user.password, input.password))) {
                 return {
                     errors: [
@@ -236,7 +217,7 @@ export class UserResolver {
             // user exists, is activated, and is authenticated
             req.session.userId = user.id;
             return { result: user };
-        } catch (e) {
+        } catch {
             return {
                 errors: [
                     {
@@ -258,7 +239,7 @@ export class UserResolver {
                         success: false,
                         apiError: {
                             field: 'session',
-                            error: 'could not destroy session: ' + err,
+                            error: 'could not destroy session',
                         },
                     });
                     return;
@@ -275,7 +256,7 @@ export class UserResolver {
         @Arg('input') input: PendingUserInput
     ): Promise<SuccessResponse> {
         // ensure user
-        let user;
+        let user: ImhoUser;
         try {
             user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
@@ -330,7 +311,7 @@ export class UserResolver {
         @Arg('input') input: OtpValidator
     ): Promise<UserResponse> {
         // fetch user for id
-        let user;
+        let user: ImhoUser;
         try {
             user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
@@ -367,7 +348,7 @@ export class UserResolver {
             };
         }
 
-        let user;
+        let user: ImhoUser;
         try {
             user = await em.findOneOrFail(ImhoUser, {
                 id: req.session.userId,
@@ -389,7 +370,7 @@ export class UserResolver {
         return { success: true };
     }
 
-    // logged in user enters old password to validate and desired their new password
+    // logged in user enters old password to validate and their desired new password
     @Mutation(() => SuccessResponse)
     async changePassword(
         @Ctx() { em, req }: MyContext,
@@ -402,7 +383,7 @@ export class UserResolver {
             };
         }
 
-        let user;
+        let user: ImhoUser;
         try {
             user = await em.findOneOrFail(ImhoUser, {
                 id: req.session.userId,
@@ -416,6 +397,15 @@ export class UserResolver {
                 },
             };
         }
+        // if on session, should be activated; meant to type guard user.password
+        if (user.isActivated === false || user.password === undefined)
+            return {
+                success: false,
+                apiError: {
+                    field: 'account',
+                    error: 'Account with this email is pending / not yet activated',
+                },
+            };
 
         // is their old password accurate
         if (!(await argon2.verify(user.password, input.old_password))) {

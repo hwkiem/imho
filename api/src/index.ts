@@ -14,7 +14,6 @@ import {
     RequestContext,
 } from '@mikro-orm/core';
 import { ReviewResolver } from './resolvers/review.resolver';
-import { PlaceType } from './utils/enums/PlaceType.enum';
 import {
     ConFlagType,
     DbkFlagType,
@@ -30,14 +29,9 @@ const main = async () => {
     const app = express();
 
     // TODO: create service for this
-    registerEnumType(PlaceType, {
-        name: 'PlaceType',
-        description: 'Type of the this address',
-    });
-
     registerEnumType(ProFlagType, {
         name: 'ProFlagTypes',
-        description: 'All the negative flag topics',
+        description: 'All the positive flag topics',
     });
 
     registerEnumType(DbkFlagType, {
@@ -47,7 +41,7 @@ const main = async () => {
 
     registerEnumType(ConFlagType, {
         name: 'ConFlagTypes',
-        description: 'All the positive flag topics',
+        description: 'All the negative flag topics',
     });
 
     const orm: MikroORM<IDatabaseDriver<Connection>> = await (async () => {
