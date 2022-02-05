@@ -1,11 +1,11 @@
 import { Field, ObjectType } from 'type-graphql';
-import { FieldError } from './FieldError';
+import { ApiResponse } from './Response';
 
 @ObjectType()
-export class SuccessResponse {
+class Success {
     @Field()
     success: boolean;
-
-    @Field({ nullable: true })
-    apiError?: FieldError;
 }
+
+@ObjectType()
+export class SuccessResponse extends ApiResponse(Success) {}

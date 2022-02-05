@@ -38,11 +38,13 @@ export class OtpService {
         const value = await this.redis.get(input.otp);
         if (value === null) {
             return {
-                success: false,
-                apiError: {
-                    field: 'otp',
-                    error: 'no record of this otp saved',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'otp',
+                        error: 'no record of this otp saved',
+                    },
+                ],
             };
         }
         // is otp expired
@@ -50,15 +52,17 @@ export class OtpService {
             now = new Date();
         if (cutoff < now)
             return {
-                success: false,
-                apiError: {
-                    field: 'otp',
-                    error: 'otp has expired',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'otp',
+                        error: 'otp has expired',
+                    },
+                ],
             };
+
         // is identity validated
         const secret = process.env.OTP_SECRET + userId.replaceAll('-', '');
-        // console.log(`(${input.otp} ${secret})`);
 
         const isValid = authenticator.verify({
             secret: secret,
@@ -66,14 +70,16 @@ export class OtpService {
         });
         if (!isValid)
             return {
-                success: false,
-                apiError: {
-                    field: 'otp',
-                    error: 'could not validate otp to your profile',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'otp',
+                        error: 'could not validate otp to your account',
+                    },
+                ],
             };
         // user token is validated, delete this key
         this.redis.del(input.otp);
-        return { success: true };
+        return { result: { success: true } };
     }
 }

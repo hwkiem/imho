@@ -8,12 +8,3 @@ export class FieldError {
     @Field()
     error: string;
 }
-
-@ObjectType()
-export class OtpResponse {
-    @Field()
-    otp?: string;
-
-    @Field(() => FieldError)
-    error?: FieldError;
-}

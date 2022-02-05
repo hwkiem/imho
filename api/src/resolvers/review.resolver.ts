@@ -1,4 +1,4 @@
-import { Residence } from '../entities/Residence';
+import { Residence, SINGLE_FAMILY } from '../entities/Residence';
 import { Review } from '../entities/Review';
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
@@ -42,6 +42,12 @@ export class ReviewResolver {
         @Arg('input') input: WriteReviewInput,
         @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
+        // make sure review.flags are unique from client
+        input.reviewInput.flagInput = {
+            pros: [...new Set(input.reviewInput.flagInput.pros)],
+            cons: [...new Set(input.reviewInput.flagInput.cons)],
+            dbks: [...new Set(input.reviewInput.flagInput.dbks)],
+        };
         let place: Place;
         let residence: Residence;
         try {
@@ -51,10 +57,15 @@ export class ReviewResolver {
 
             try {
                 residence = await em.findOneOrFail(Residence, {
-                    unit: input.residenceInput.unit,
+                    unit: input.residenceInput.unit
+                        ? input.residenceInput.unit
+                        : SINGLE_FAMILY,
+                    place: place,
                 });
+                console.log('found a residence:', residence);
             } catch (e) {
                 residence = new Residence(input.residenceInput);
+                console.log('made a new residence:', residence);
             }
         } catch (e) {
             // place does not exist, residence cannot exist, create both

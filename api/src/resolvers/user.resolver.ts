@@ -139,7 +139,6 @@ export class UserResolver {
         @Arg('input') input: TrackPlaceInput,
         @Ctx() { em, req, res }: MyContext
     ): Promise<UserResponse> {
-        //
         // ensure place
         let place: Place;
         try {
@@ -236,15 +235,17 @@ export class UserResolver {
                 res.clearCookie('oreo');
                 if (err) {
                     resolve({
-                        success: false,
-                        apiError: {
-                            field: 'session',
-                            error: 'could not destroy session',
-                        },
+                        result: { success: false },
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'could not destroy session',
+                            },
+                        ],
                     });
                     return;
                 }
-                resolve({ success: true });
+                resolve({ result: { success: true } });
             })
         );
     }
@@ -263,50 +264,71 @@ export class UserResolver {
             });
         } catch {
             return {
-                success: false,
-                apiError: { field: 'email', error: 'no user with that email' },
+                result: { success: false },
+                errors: [{ field: 'email', error: 'no user with that email' }],
             };
         }
         // ensure active account with password to forget
-        if (!user.isActivated) return { success: false };
+        if (!user.isActivated)
+            return {
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'email',
+                        error: 'account with this email is not yet activated',
+                    },
+                ],
+            };
+
         // ensure env
         if (!process.env.OTP_SECRET)
             return {
-                success: false,
-                apiError: {
-                    field: 'email',
-                    error: 'this account is not yet activated',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'email',
+                        error: 'this account is not yet activated',
+                    },
+                ],
             };
 
         // create OTP object and write to redis
-        const secret = process.env.OTP_SECRET + user.id.replaceAll('-', '');
-        // console.log(secret);
-        const token = authenticator.generate(secret); // unique but secret
-        // console.log(token);
+        const secret = process.env.OTP_SECRET + user.id.replaceAll('-', ''); // unique but secret
+        const token = authenticator.generate(secret);
         const otp = new Otp(token);
         const stored = await this.otpService.storeOtp(otp);
 
         if (!stored)
             return {
-                success: false,
-                apiError: { field: 'OTP', error: 'failed to store' },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'OTP',
+                        error: 'failed to store',
+                    },
+                ],
             };
+
         // email
         const mailed = this.mailer.sendOtp(input.email, otp.otp);
         if (!mailed)
             return {
-                success: false,
-                apiError: {
-                    field: 'email',
-                    error: 'could not send email to' + input.email,
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'email',
+                        error: 'could not send email to' + input.email,
+                    },
+                ],
             };
-        return { success: true };
+
+        return {
+            result: { success: true },
+        };
     }
 
     @Mutation(() => UserResponse)
-    async verify_OTP(
+    async verifyOtp(
         @Ctx() { em, req }: MyContext,
         @Arg('input') input: OtpValidator
     ): Promise<UserResponse> {
@@ -324,11 +346,12 @@ export class UserResolver {
         // is this otp valid?
         const authenticated = await this.otpService.validateOtp(input, user.id);
         if (
-            authenticated.success === false &&
-            authenticated.apiError !== undefined
+            authenticated.result !== undefined &&
+            authenticated.result.success === false &&
+            authenticated.errors !== undefined
         )
             return {
-                errors: [authenticated.apiError],
+                errors: authenticated.errors,
             };
         // user is authenticated by OTP, add session
         req.session.userId = user.id;
@@ -343,8 +366,13 @@ export class UserResolver {
     ): Promise<SuccessResponse> {
         if (!req.session.userId) {
             return {
-                success: false,
-                apiError: { field: 'session', error: 'not logged in' },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'not logged in',
+                    },
+                ],
             };
         }
 
@@ -355,11 +383,13 @@ export class UserResolver {
             });
         } catch {
             return {
-                success: false,
-                apiError: {
-                    field: 'session',
-                    error: 'failed to fetch user from session',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'failed to fetch user from session',
+                    },
+                ],
             };
         }
         // don't need to check activated ..
@@ -367,7 +397,7 @@ export class UserResolver {
         // change their password and persist
         user.password = await argon2.hash(input.password);
         em.persist(user).flush();
-        return { success: true };
+        return { result: { success: true } };
     }
 
     // logged in user enters old password to validate and their desired new password
@@ -378,8 +408,13 @@ export class UserResolver {
     ): Promise<SuccessResponse> {
         if (!req.session.userId) {
             return {
-                success: false,
-                apiError: { field: 'session', error: 'not logged in' },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'not logged in',
+                    },
+                ],
             };
         }
 
@@ -390,37 +425,43 @@ export class UserResolver {
             });
         } catch {
             return {
-                success: false,
-                apiError: {
-                    field: 'session',
-                    error: 'failed to fetch user from session',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'failed to fetch user from session',
+                    },
+                ],
             };
         }
         // if on session, should be activated; meant to type guard user.password
         if (user.isActivated === false || user.password === undefined)
             return {
-                success: false,
-                apiError: {
-                    field: 'account',
-                    error: 'Account with this email is pending / not yet activated',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'account',
+                        error: 'Account with this email is pending / not yet activated',
+                    },
+                ],
             };
 
         // is their old password accurate
         if (!(await argon2.verify(user.password, input.old_password))) {
             return {
-                success: false,
-                apiError: {
-                    field: 'password',
-                    error: 'incorrect password',
-                },
+                result: { success: false },
+                errors: [
+                    {
+                        field: 'password',
+                        error: 'incorrect password',
+                    },
+                ],
             };
         }
 
         // change their password and persist
         user.password = await argon2.hash(input.new_password);
         em.persist(user).flush();
-        return { success: true };
+        return { result: { success: true } };
     }
 }
