@@ -12,9 +12,9 @@ import {
 } from '../validators/UserValidator';
 import argon2 from 'argon2';
 import { Place } from '../entities/Place';
-import { authenticator } from 'otplib';
+
 import { Service } from 'typedi';
-import { Otp, OtpService } from '../services/OtpService';
+import { OtpService } from '../services/OtpService';
 import { EmailService } from '../services/EmailService';
 import { SuccessResponse } from '../utils/types/SuccessResonse';
 import { OtpValidator } from '../validators/OtpValidator';
@@ -293,12 +293,10 @@ export class UserResolver {
             };
 
         // create OTP object and write to redis
-        const secret = process.env.OTP_SECRET + user.id.replaceAll('-', ''); // unique but secret
-        const token = authenticator.generate(secret);
-        const otp = new Otp(token);
-        const stored = await this.otpService.storeOtp(otp);
 
-        if (!stored)
+        const otp = await this.otpService.generateOtp(user.id);
+
+        if (otp === undefined)
             return {
                 result: { success: false },
                 errors: [
@@ -310,7 +308,7 @@ export class UserResolver {
             };
 
         // email
-        const mailed = this.mailer.sendOtp(input.email, otp.otp);
+        const mailed = this.mailer.sendOtp(input.email, otp);
         if (!mailed)
             return {
                 result: { success: false },
@@ -344,7 +342,7 @@ export class UserResolver {
             };
         }
         // is this otp valid?
-        const authenticated = await this.otpService.validateOtp(input, user.id);
+        const authenticated = await this.otpService.validateOtp(input);
         if (
             authenticated.result !== undefined &&
             authenticated.result.success === false &&
