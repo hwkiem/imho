@@ -125,7 +125,7 @@ const main = async () => {
             container: Container,
         }),
         context: ({ req, res }) =>
-            ({ req, res, em: orm.em.fork() } as MyContext),
+            ({ req, res, em: orm.em.fork(), redis } as MyContext),
     });
 
     await apolloServer.start();

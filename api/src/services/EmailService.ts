@@ -19,9 +19,10 @@ export class EmailService {
             from: process.env.EMAIL_ADDRESS,
             to: email,
             subject: 'Your OTP, as requested', // Subject line
-            html: `<b>Forgot your password? Happens dude. Type this in: ${otp}</b>`, // html body
+            html: `<b>Forgot your password? Happens dude. Click our link and you'll be on your way.</b> 
+            <a href="http://localhost:3000/change-password/${otp}">reset password</a>`, // html body
         });
-        if (email in info.accepted) {
+        if (info.accepted.includes(email)) {
             return true;
         }
         return false;
