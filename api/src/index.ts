@@ -24,6 +24,7 @@ import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
 import { UserResolver } from './resolvers/user.resolver';
 import Container from 'typedi';
+import { UserRoles } from './utils/enums/UserRoles';
 
 const main = async () => {
     const app = express();
@@ -42,6 +43,11 @@ const main = async () => {
     registerEnumType(ConFlagType, {
         name: 'ConFlagTypes',
         description: 'All the negative flag topics',
+    });
+
+    registerEnumType(UserRoles, {
+        name: 'UserRoles',
+        description: 'Users are admin or normal privilege',
     });
 
     const orm: MikroORM<IDatabaseDriver<Connection>> = await (async () => {

@@ -17,9 +17,11 @@ import {
     ProFlagType,
 } from '../utils/enums/FlagType.enum';
 import { Service } from 'typedi';
+import { Residence } from '../entities/Residence';
 
 @ObjectType()
-class PlaceResponse extends ApiResponse(Place) {}
+export class PlaceResponse extends ApiResponse(Place) {}
+export class ResidenceResponse extends ApiResponse(Residence) {}
 @Service()
 @Resolver(() => Place)
 export class PlaceResolver {

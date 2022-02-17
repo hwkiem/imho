@@ -1,12 +1,14 @@
-import { Residence, SINGLE_FAMILY } from '../entities/Residence';
 import { Review } from '../entities/Review';
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
-import { Place } from '../entities/Place';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
 import { Service } from 'typedi';
+import {
+    createPlaceIfNotExists,
+    createResidenceIfNotExists,
+} from '../utils/createIfNotExists';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
@@ -48,51 +50,69 @@ export class ReviewResolver {
             cons: [...new Set(input.reviewInput.flagInput.cons)],
             dbks: [...new Set(input.reviewInput.flagInput.dbks)],
         };
-        let place: Place;
-        let residence: Residence;
-        try {
-            place = await em.findOneOrFail(Place, {
-                google_place_id: input.placeInput.google_place_id,
-            });
 
-            try {
-                residence = await em.findOneOrFail(Residence, {
-                    unit: input.residenceInput.unit
-                        ? input.residenceInput.unit
-                        : SINGLE_FAMILY,
-                    place: place,
-                });
-                console.log('found a residence:', residence);
-            } catch (e) {
-                residence = new Residence(input.residenceInput);
-                console.log('made a new residence:', residence);
-            }
-        } catch (e) {
-            // place does not exist, residence cannot exist, create both
-            place = new Place(input.placeInput);
-            residence = new Residence(input.residenceInput);
-        }
+        const placeResponse = await createPlaceIfNotExists(
+            em,
+            input.placeInput
+        );
+        if (placeResponse.errors || placeResponse.result === undefined)
+            return { errors: placeResponse.errors };
+        const place = placeResponse.result;
 
-        if (place === undefined) {
-            return {
-                errors: [
-                    {
-                        field: 'place',
-                        error: 'Could not find place. Review creation failed.',
-                    },
-                ],
-            };
-        }
-        if (residence === undefined) {
-            return {
-                errors: [
-                    {
-                        field: 'residence',
-                        error: 'Could not find residence. Review creation failed.',
-                    },
-                ],
-            };
-        }
+        const residenceResponse = await createResidenceIfNotExists(
+            em,
+            place,
+            input.residenceInput
+        );
+        if (residenceResponse.errors || residenceResponse.result === undefined)
+            return { errors: residenceResponse.errors };
+        const residence = residenceResponse.result;
+
+        // let place: Place;
+        // let residence: Residence;
+        // try {
+        //     place = await em.findOneOrFail(Place, {
+        //         google_place_id: input.placeInput.google_place_id,
+        //     });
+
+        //     try {
+        //         residence = await em.findOneOrFail(Residence, {
+        //             unit: input.residenceInput.unit
+        //                 ? input.residenceInput.unit
+        //                 : SINGLE_FAMILY,
+        //             place: place,
+        //         });
+        //         console.log('found a residence:', residence);
+        //     } catch (e) {
+        //         residence = new Residence(input.residenceInput);
+        //         console.log('made a new residence:', residence);
+        //     }
+        // } catch (e) {
+        //     // place does not exist, residence cannot exist, create both
+        //     place = new Place(input.placeInput);
+        //     residence = new Residence(input.residenceInput);
+        // }
+
+        // if (place === undefined) {
+        //     return {
+        //         errors: [
+        //             {
+        //                 field: 'place',
+        //                 error: 'Could not find place. Review creation failed.',
+        //             },
+        //         ],
+        //     };
+        // }
+        // if (residence === undefined) {
+        //     return {
+        //         errors: [
+        //             {
+        //                 field: 'residence',
+        //                 error: 'Could not find residence. Review creation failed.',
+        //             },
+        //         ],
+        //     };
+        // }
 
         const review = new Review(input.reviewInput);
         review.flag_string = JSON.stringify(input.reviewInput.flagInput);

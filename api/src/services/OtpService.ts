@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import Redis from 'ioredis';
 import { AddMinutesToDate, OtpValidator } from '../validators/OtpValidator';
 import { authenticator } from 'otplib';
-import { SuccessResponse } from '../utils/types/SuccessResonse';
+import { SuccessResponse } from '../utils/types/Response';
 
 // import { encode, decode } from 'hi-base32';
 
@@ -63,7 +63,7 @@ export class OtpService {
         const value = await this.redis.get(input.otp);
         if (value === null) {
             return {
-                result: { success: false },
+                result: false,
                 errors: [
                     {
                         field: 'otp',
@@ -84,7 +84,7 @@ export class OtpService {
             now = new Date();
         if (cutoff < now)
             return {
-                result: { success: false },
+                result: false,
                 errors: [
                     {
                         field: 'otp',
@@ -118,7 +118,7 @@ export class OtpService {
         });
         if (!isValid)
             return {
-                result: { success: false },
+                result: false,
                 errors: [
                     {
                         field: 'otp',
@@ -128,6 +128,6 @@ export class OtpService {
             };
         // user token is validated, delete this key
         this.redis.del(input.otp);
-        return { result: { success: true } };
+        return { result: true };
     }
 }

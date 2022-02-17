@@ -2,24 +2,20 @@ import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
-import {
-    // ChangePasswordInput,
-    LoginInput,
-    PendingUserInput,
-    RegisterInput,
-    // ResetPasswordInput,
-    TrackPlaceInput,
-} from '../validators/UserValidator';
+import { LoginInput, RegisterInput } from '../validators/UserValidator';
 import argon2 from 'argon2';
-import { Place } from '../entities/Place';
-
 import { Service } from 'typedi';
 import { OtpService } from '../services/OtpService';
 import { EmailService } from '../services/EmailService';
-import { SuccessResponse } from '../utils/types/SuccessResonse';
+import { SuccessResponse } from '../utils/types/Response';
 import { v4 } from 'uuid';
-import { FORGET_PASSWORD_PREFIX } from '../utils/constants';
-// import { OtpValidator } from '../validators/OtpValidator';
+import { ADMIN_SECRET, FORGET_PASSWORD_PREFIX } from '../utils/constants';
+import { CreatePlaceInput } from '../validators/PlaceValidator';
+import {
+    createPendingUserIfNotExists,
+    createPlaceIfNotExists,
+} from '../utils/createIfNotExists';
+import { UserRoles } from '../utils/enums/UserRoles';
 
 declare module 'express-session' {
     interface Session {
@@ -28,7 +24,7 @@ declare module 'express-session' {
 }
 
 @ObjectType()
-class UserResponse extends ApiResponse(ImhoUser) {}
+export class UserResponse extends ApiResponse(ImhoUser) {}
 
 @Resolver(() => ImhoUser)
 @Service()
@@ -99,85 +95,49 @@ export class UserResolver {
         }
     }
 
-    @Mutation(() => UserResponse)
-    public async createPendingUser(
-        @Arg('input') input: PendingUserInput,
-        @Ctx() { em }: MyContext
-    ): Promise<UserResponse> {
-        // is there a pending user with this email, create if not
-        try {
-            const user = await em.findOneOrFail(ImhoUser, {
-                email: input.email,
-            });
-            return user.isActivated
-                ? {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'activated account already exists with this email',
-                          },
-                      ],
-                  }
-                : {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'pending account already exists with this email',
-                          },
-                      ],
-                  };
-        } catch {
-            // no user with this email, create inactive account
-            const user = new ImhoUser(input);
-            user.isActivated = false;
-            em.persist(user).flush();
-            return { result: user };
-        }
-    }
-
     // hit this to track a place, creates pending account for first time email
     @Mutation(() => UserResponse)
     public async trackPlace(
-        @Arg('input') input: TrackPlaceInput,
-        @Ctx() { em, req, res, redis }: MyContext
+        @Arg('placeInput') placeInput: CreatePlaceInput,
+        @Arg('email', { nullable: true }) email: string,
+        @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
+        // need either session or email for identity
+        if (email === undefined && req.session.userId === undefined) {
+            return {
+                errors: [
+                    {
+                        field: 'email',
+                        error: 'You are not logged in and we have no email for your updates!',
+                    },
+                ],
+            };
+        }
+
         // ensure place
-        let place: Place;
-        try {
-            place = await em.findOneOrFail(Place, {
-                google_place_id: input.placeInput.google_place_id,
-            });
-        } catch {
-            place = new Place(input.placeInput);
-        }
+        const placeResponse = await createPlaceIfNotExists(em, placeInput);
+        if (placeResponse.errors || placeResponse.result === undefined)
+            return { errors: placeResponse.errors };
+        const place = placeResponse.result;
 
-        // ensure user, from session if possible
-        let user: ImhoUser;
-        try {
-            user = req.session.userId
-                ? await em.findOneOrFail(ImhoUser, {
-                      id: req.session.userId,
-                  })
-                : await em.findOneOrFail(ImhoUser, {
-                      email: input.userInput.email,
-                  });
-        } catch {
-            // place, no user
-            const userResponse = await this.createPendingUser(input.userInput, {
-                em,
-                req,
-                res,
-                redis,
-            });
-            if (userResponse.errors || userResponse.result === undefined)
-                return userResponse;
-            user = userResponse.result;
-        }
+        // ensure user, from session if possible or if both provided
+        const userResponse = await createPendingUserIfNotExists(
+            em,
+            req.session.userId
+                ? { id: req.session.userId }
+                : email
+                ? { email: email }
+                : {}
+        );
+        if (userResponse.errors || userResponse.result === undefined)
+            return userResponse;
+        const user = userResponse.result;
 
+        // have dependencies, append user to place's notify array
         if (!place.notifyOnReview.isInitialized())
             await place.notifyOnReview.init();
         place.notifyOnReview.add(user);
-        await em.persist(user).persist(place).flush();
+        await em.persist(place).flush();
         return { result: user };
     }
 
@@ -238,7 +198,7 @@ export class UserResolver {
                 res.clearCookie('oreo');
                 if (err) {
                     resolve({
-                        result: { success: false },
+                        result: false,
                         errors: [
                             {
                                 field: 'session',
@@ -248,7 +208,7 @@ export class UserResolver {
                     });
                     return;
                 }
-                resolve({ result: { success: true } });
+                resolve({ result: true });
             })
         );
     }
@@ -260,20 +220,20 @@ export class UserResolver {
         @Arg('newPassword') newPassword: string,
         @Ctx() { redis, req, em }: MyContext
     ): Promise<UserResponse> {
-        if (newPassword.length <= 2) {
-            return {
-                errors: [
-                    {
-                        field: 'newPassword',
-                        error: 'length must be greater than 2',
-                    },
-                ],
-            };
-        }
+        // if (newPassword.length <= 2) {
+        //     return {
+        //         errors: [
+        //             {
+        //                 field: 'newPassword',
+        //                 error: 'length must be greater than 2',
+        //             },
+        //         ],
+        //     };
+        // }
 
         const key = FORGET_PASSWORD_PREFIX + token;
         const userId = await redis.get(key);
-        if (!userId) {
+        if (userId === null) {
             return {
                 errors: [
                     {
@@ -286,7 +246,7 @@ export class UserResolver {
 
         const user = await em.findOne(ImhoUser, { id: userId });
 
-        if (!user) {
+        if (user === null) {
             return {
                 errors: [
                     {
@@ -308,17 +268,22 @@ export class UserResolver {
         return { result: user };
     }
 
-    @Mutation(() => Boolean)
+    @Mutation(() => SuccessResponse)
     async forgotPassword(
         @Arg('email') email: string,
         @Ctx() { redis, em }: MyContext
-    ) {
+    ): Promise<SuccessResponse> {
         const user = await em.findOne(ImhoUser, {
             email: email,
         });
-        if (!user) {
+        if (user === null) {
             // the email is not in the db
-            return false;
+            return {
+                result: false,
+                errors: [
+                    { field: 'email', error: 'no user exists with this email' },
+                ],
+            };
         }
 
         const token = v4();
@@ -332,219 +297,47 @@ export class UserResolver {
 
         await this.mailer.sendOtp(email, token);
 
-        return true;
+        return { result: true };
     }
 
-    // forgot password
-    // @Mutation(() => SuccessResponse)
-    // async forgotPassword(
-    //     @Ctx() { em }: MyContext,
-    //     @Arg('input') input: PendingUserInput
-    // ): Promise<SuccessResponse> {
-    //     // ensure user
-    //     let user: ImhoUser;
-    //     try {
-    //         user = await em.findOneOrFail(ImhoUser, {
-    //             email: input.email,
-    //         });
-    //     } catch {
-    //         return {
-    //             result: { success: false },
-    //             errors: [{ field: 'email', error: 'no user with that email' }],
-    //         };
-    //     }
-    //     // ensure active account with password to forget
-    //     if (!user.isActivated)
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'email',
-    //                     error: 'account with this email is not yet activated',
-    //                 },
-    //             ],
-    //         };
+    @Mutation(() => SuccessResponse)
+    async becomeAdmin(
+        @Arg('adminSecret') secret: string,
+        @Ctx() { req, em }: MyContext
+    ): Promise<SuccessResponse> {
+        if (req.session.userId) {
+            return {
+                errors: [{ field: 'session', error: 'already logged in' }],
+            };
+        }
+        const user = await em.findOne(ImhoUser, {
+            id: req.session.userId,
+        });
+        if (user === null) {
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'no user exists with this your session id',
+                    },
+                ],
+            };
+        }
 
-    //     // ensure env
-    //     if (!process.env.OTP_SECRET)
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'email',
-    //                     error: 'this account is not yet activated',
-    //                 },
-    //             ],
-    //         };
+        if (secret !== ADMIN_SECRET)
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'secret',
+                        error: 'invalid secret',
+                    },
+                ],
+            };
 
-    //     // create OTP object and write to redis
-
-    //     const otp = await this.otpService.generateOtp(user.id);
-
-    //     if (otp === undefined)
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'OTP',
-    //                     error: 'failed to store',
-    //                 },
-    //             ],
-    //         };
-
-    //     // email
-    //     const mailed = this.mailer.sendOtp(input.email, otp);
-    //     if (!mailed)
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'email',
-    //                     error: 'could not send email to' + input.email,
-    //                 },
-    //             ],
-    //         };
-
-    //     return {
-    //         result: { success: true },
-    //     };
-    // }
-
-    // @Mutation(() => UserResponse)
-    // async verifyOtp(
-    //     @Ctx() { em, req }: MyContext,
-    //     @Arg('input') input: OtpValidator
-    // ): Promise<UserResponse> {
-    //     // fetch user for id
-    //     let user: ImhoUser;
-    //     try {
-    //         user = await em.findOneOrFail(ImhoUser, {
-    //             email: input.email,
-    //         });
-    //     } catch {
-    //         return {
-    //             errors: [{ field: 'email', error: 'no user with that email' }],
-    //         };
-    //     }
-    //     // is this otp valid?
-    //     const authenticated = await this.otpService.validateOtp(input);
-    //     if (
-    //         authenticated.result !== undefined &&
-    //         authenticated.result.success === false &&
-    //         authenticated.errors !== undefined
-    //     )
-    //         return {
-    //             errors: authenticated.errors,
-    //         };
-    //     // user is authenticated by OTP, add session
-    //     req.session.userId = user.id;
-    //     return { result: user };
-    // }
-
-    // // post OTP, overwrite old forgotten password
-    // @Mutation(() => SuccessResponse)
-    // async resetPassword(
-    //     @Ctx() { em, req }: MyContext,
-    //     @Arg('input') input: ResetPasswordInput
-    // ): Promise<SuccessResponse> {
-    //     if (!req.session.userId) {
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'session',
-    //                     error: 'not logged in',
-    //                 },
-    //             ],
-    //         };
-    //     }
-
-    //     let user: ImhoUser;
-    //     try {
-    //         user = await em.findOneOrFail(ImhoUser, {
-    //             id: req.session.userId,
-    //         });
-    //     } catch {
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'session',
-    //                     error: 'failed to fetch user from session',
-    //                 },
-    //             ],
-    //         };
-    //     }
-    //     // don't need to check activated ..
-
-    //     // change their password and persist
-    //     user.password = await argon2.hash(input.password);
-    //     em.persist(user).flush();
-    //     return { result: { success: true } };
-    // }
-
-    // // logged in user enters old password to validate and their desired new password
-    // @Mutation(() => SuccessResponse)
-    // async changePassword(
-    //     @Ctx() { em, req }: MyContext,
-    //     @Arg('input') input: ChangePasswordInput
-    // ): Promise<SuccessResponse> {
-    //     if (!req.session.userId) {
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'session',
-    //                     error: 'not logged in',
-    //                 },
-    //             ],
-    //         };
-    //     }
-
-    //     let user: ImhoUser;
-    //     try {
-    //         user = await em.findOneOrFail(ImhoUser, {
-    //             id: req.session.userId,
-    //         });
-    //     } catch {
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'session',
-    //                     error: 'failed to fetch user from session',
-    //                 },
-    //             ],
-    //         };
-    //     }
-    //     // if on session, should be activated; meant to type guard user.password
-    //     if (user.isActivated === false || user.password === undefined)
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'account',
-    //                     error: 'Account with this email is pending / not yet activated',
-    //                 },
-    //             ],
-    //         };
-
-    //     // is their old password accurate
-    //     if (!(await argon2.verify(user.password, input.old_password))) {
-    //         return {
-    //             result: { success: false },
-    //             errors: [
-    //                 {
-    //                     field: 'password',
-    //                     error: 'incorrect password',
-    //                 },
-    //             ],
-    //         };
-    //     }
-
-    //     // change their password and persist
-    //     user.password = await argon2.hash(input.new_password);
-    //     em.persist(user).flush();
-    //     return { result: { success: true } };
-    // }
+        user.role = UserRoles.ADMIN;
+        em.persist(user).flush();
+        return { result: true };
+    }
 }

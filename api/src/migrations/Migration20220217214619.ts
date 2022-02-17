@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20220204013421 extends Migration {
+export class Migration20220217214619 extends Migration {
     async up(): Promise<void> {
         this.addSql('alter table "place" drop column "type";');
 
@@ -15,6 +15,10 @@ export class Migration20220204013421 extends Migration {
         );
         this.addSql(
             'alter table "residence" add constraint "residence_unit_place_id_unique" unique ("unit", "place_id");'
+        );
+
+        this.addSql(
+            'alter table "imho_user" add column "role" text check ("role" in (\'user\', \'admin\')) not null default \'user\';'
         );
     }
 
@@ -35,5 +39,7 @@ export class Migration20220204013421 extends Migration {
         this.addSql(
             'alter table "residence" drop constraint "residence_unit_place_id_unique";'
         );
+
+        this.addSql('alter table "imho_user" drop column "role";');
     }
 }

@@ -17,3 +17,6 @@ export function ApiResponse<T>(TClass: ClassType<T>) {
     }
     return ApiResponseClass;
 }
+
+@ObjectType()
+export class SuccessResponse extends ApiResponse(Boolean) {}

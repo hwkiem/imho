@@ -20,7 +20,7 @@ export class EmailService {
             to: email,
             subject: 'Your OTP, as requested', // Subject line
             html: `<b>Forgot your password? Happens dude. Click our link and you'll be on your way.</b> 
-            <a href="http://localhost:3000/change-password/${otp}">reset password</a>`, // html body
+            <a href="http://localhost:3000/change-password/?token=${otp}">reset password</a>`, // html body
         });
         if (info.accepted.includes(email)) {
             return true;
