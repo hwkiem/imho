@@ -5,7 +5,6 @@ import { ImhoUser } from '../entities/ImhoUser';
 import { LoginInput, RegisterInput } from '../validators/UserValidator';
 import argon2 from 'argon2';
 import { Service } from 'typedi';
-import { OtpService } from '../services/OtpService';
 import { EmailService } from '../services/EmailService';
 import { SuccessResponse } from '../utils/types/Response';
 import { v4 } from 'uuid';
@@ -29,10 +28,7 @@ export class UserResponse extends ApiResponse(ImhoUser) {}
 @Resolver(() => ImhoUser)
 @Service()
 export class UserResolver {
-    constructor(
-        public otpService: OtpService,
-        private readonly mailer: EmailService
-    ) {}
+    constructor(private readonly mailer: EmailService) {}
 
     @Query(() => UserResponse)
     public async me(@Ctx() { em, req }: MyContext): Promise<UserResponse> {
@@ -220,17 +216,6 @@ export class UserResolver {
         @Arg('newPassword') newPassword: string,
         @Ctx() { redis, req, em }: MyContext
     ): Promise<UserResponse> {
-        // if (newPassword.length <= 2) {
-        //     return {
-        //         errors: [
-        //             {
-        //                 field: 'newPassword',
-        //                 error: 'length must be greater than 2',
-        //             },
-        //         ],
-        //     };
-        // }
-
         const key = FORGET_PASSWORD_PREFIX + token;
         const userId = await redis.get(key);
         if (userId === null) {
@@ -305,9 +290,9 @@ export class UserResolver {
         @Arg('adminSecret') secret: string,
         @Ctx() { req, em }: MyContext
     ): Promise<SuccessResponse> {
-        if (req.session.userId) {
+        if (!req.session.userId) {
             return {
-                errors: [{ field: 'session', error: 'already logged in' }],
+                errors: [{ field: 'session', error: 'not logged in' }],
             };
         }
         const user = await em.findOne(ImhoUser, {
