@@ -17,7 +17,6 @@ export enum ProFlagType {
 }
 
 export enum ConFlagType {
-    BAD_LANDLORD = 'bad landlord',
     UNSAFE = 'unsafe',
     PET_UNFRIENDLY = 'pet unfriendly',
     SHOWER = 'shower',
@@ -32,7 +31,6 @@ export enum ConFlagType {
 export enum DbkFlagType {
     LEASE = 'lease issues',
     BURGLARY = 'burglary',
-    MUSHROOM = 'illegal mushroom activity',
     DEPOSIT = 'security deposit',
     CONSTRUCTION = 'construction harrasment',
     PRIVACY = 'privacy',
