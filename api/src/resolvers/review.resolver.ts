@@ -2,7 +2,7 @@ import { Review } from '../entities/Review';
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
-import { ApiResponse } from '../utils/types/Response';
+import { ApiResponse, SuccessResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
 import { Service } from 'typedi';
 import {
@@ -51,6 +51,7 @@ export class ReviewResolver {
             dbks: [...new Set(input.reviewInput.flagInput.dbks)],
         };
 
+        // ensure place, residence
         const placeResponse = await createPlaceIfNotExists(
             em,
             input.placeInput
@@ -68,52 +69,7 @@ export class ReviewResolver {
             return { errors: residenceResponse.errors };
         const residence = residenceResponse.result;
 
-        // let place: Place;
-        // let residence: Residence;
-        // try {
-        //     place = await em.findOneOrFail(Place, {
-        //         google_place_id: input.placeInput.google_place_id,
-        //     });
-
-        //     try {
-        //         residence = await em.findOneOrFail(Residence, {
-        //             unit: input.residenceInput.unit
-        //                 ? input.residenceInput.unit
-        //                 : SINGLE_FAMILY,
-        //             place: place,
-        //         });
-        //         console.log('found a residence:', residence);
-        //     } catch (e) {
-        //         residence = new Residence(input.residenceInput);
-        //         console.log('made a new residence:', residence);
-        //     }
-        // } catch (e) {
-        //     // place does not exist, residence cannot exist, create both
-        //     place = new Place(input.placeInput);
-        //     residence = new Residence(input.residenceInput);
-        // }
-
-        // if (place === undefined) {
-        //     return {
-        //         errors: [
-        //             {
-        //                 field: 'place',
-        //                 error: 'Could not find place. Review creation failed.',
-        //             },
-        //         ],
-        //     };
-        // }
-        // if (residence === undefined) {
-        //     return {
-        //         errors: [
-        //             {
-        //                 field: 'residence',
-        //                 error: 'Could not find residence. Review creation failed.',
-        //             },
-        //         ],
-        //     };
-        // }
-
+        // create new review
         const review = new Review(input.reviewInput);
         review.flag_string = JSON.stringify(input.reviewInput.flagInput);
 
@@ -148,5 +104,55 @@ export class ReviewResolver {
             // return { errors: [{ field: 'insert data', error: e.toString() }] };
         }
         return { result: review };
+    }
+
+    @Mutation(() => SuccessResponse)
+    public async deleteReview(
+        @Arg('reviewId') reviewId: string,
+        @Ctx() { em, req }: MyContext
+    ): Promise<SuccessResponse> {
+        try {
+            const review = await em.findOneOrFail(Review, { id: reviewId });
+            if (review.author) {
+                if (req.session.userId === null) {
+                    return {
+                        result: false,
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'this review has an author and you are not logged in',
+                            },
+                        ],
+                    };
+                }
+                if (review.author.id === req.session.userId) {
+                    await em.remove(review).flush();
+                    return { result: true };
+                }
+                return {
+                    result: false,
+                    errors: [
+                        {
+                            field: 'session',
+                            error: 'you are not the author of this review',
+                        },
+                    ],
+                };
+            }
+
+            // review has no author, for now allow deletion
+            await em.remove(review).flush();
+            return { result: true };
+        } catch {
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'reviewId',
+                        error: 'no review exists with this id',
+                    },
+                ],
+            };
+        }
     }
 }

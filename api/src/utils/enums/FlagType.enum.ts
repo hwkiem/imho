@@ -26,6 +26,7 @@ export enum ConFlagType {
     NOISE = 'noise',
     MAINTENANCE = 'maintenance issues',
     CONNECTIVITY = 'cell / wifi connectivity',
+    BAD_LANDLORD = 'bad landlord',
 }
 
 export enum DbkFlagType {
