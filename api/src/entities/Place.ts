@@ -1,7 +1,6 @@
 import {
     Entity,
     Property,
-    Enum,
     Collection,
     OneToMany,
     Unique,
@@ -10,7 +9,6 @@ import {
 import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
-import { PlaceType } from '../utils/enums/PlaceType.enum';
 import { PlaceValidator } from '../validators/PlaceValidator';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
@@ -79,10 +77,6 @@ export class Place extends Base<Place> {
         if (!res[0].avg) return null;
         return +res[0].avg;
     }
-
-    @Field(() => PlaceType)
-    @Enum(() => PlaceType)
-    public type: PlaceType;
 
     constructor(body: PlaceValidator) {
         super(body);

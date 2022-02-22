@@ -13,3 +13,21 @@ export class Flags {
     @Field(() => [DbkFlagType])
     dbks: DbkFlagType[];
 }
+
+@ObjectType()
+class FlagWithCount {
+    @Field()
+    topic: string;
+    @Field()
+    cnt: number;
+}
+
+@ObjectType()
+export class TopNFlagsResponse {
+    @Field(() => [FlagWithCount])
+    pros: FlagWithCount[];
+    @Field(() => [FlagWithCount])
+    cons: FlagWithCount[];
+    @Field(() => [FlagWithCount])
+    dbks: FlagWithCount[];
+}

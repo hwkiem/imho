@@ -1,5 +1,4 @@
-import { PlaceType } from '../utils/enums/PlaceType.enum';
-import { IsString, IsEnum } from 'class-validator';
+import { IsString } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 import { Place } from '../entities/Place';
 
@@ -9,9 +8,6 @@ export class PlaceValidator implements Partial<Place> {
 
     @IsString()
     formatted_address: string;
-
-    @IsEnum(PlaceType)
-    public type: PlaceType;
 }
 
 @InputType()
@@ -21,7 +17,4 @@ export class CreatePlaceInput extends PlaceValidator {
 
     @Field()
     formatted_address: string;
-
-    @Field(() => PlaceType)
-    public type: PlaceType;
 }

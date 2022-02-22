@@ -2,15 +2,19 @@ import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
 import { ApiResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
-import {
-    LoginInput,
-    PendingUserInput,
-    RegisterInput,
-    TrackPlaceInput,
-} from '../validators/UserValidator';
+import { LoginInput, RegisterInput } from '../validators/UserValidator';
 import argon2 from 'argon2';
-import { Place } from '../entities/Place';
-// import { authenticator } from 'otplib';
+import { Service } from 'typedi';
+import { EmailService } from '../services/EmailService';
+import { SuccessResponse } from '../utils/types/Response';
+import { v4 } from 'uuid';
+import { ADMIN_SECRET, FORGET_PASSWORD_PREFIX } from '../utils/constants';
+import { CreatePlaceInput } from '../validators/PlaceValidator';
+import {
+    createPendingUserIfNotExists,
+    createPlaceIfNotExists,
+} from '../utils/createIfNotExists';
+import { UserRoles } from '../utils/enums/UserRoles';
 
 declare module 'express-session' {
     interface Session {
@@ -19,31 +23,12 @@ declare module 'express-session' {
 }
 
 @ObjectType()
-class UserResponse extends ApiResponse(ImhoUser) {}
+export class UserResponse extends ApiResponse(ImhoUser) {}
 
 @Resolver(() => ImhoUser)
+@Service()
 export class UserResolver {
-    @Query(() => UserResponse)
-    public async getUser(
-        @Ctx() { em }: MyContext,
-        @Arg('userId') userId: string
-    ): Promise<UserResponse> {
-        try {
-            const user = await em.findOneOrFail(ImhoUser, {
-                id: userId,
-            });
-            return { result: user };
-        } catch (e) {
-            return {
-                errors: [
-                    {
-                        field: 'userId',
-                        error: 'Could not find matching user.',
-                    },
-                ],
-            };
-        }
-    }
+    constructor(private readonly mailer: EmailService) {}
 
     @Query(() => UserResponse)
     public async me(@Ctx() { em, req }: MyContext): Promise<UserResponse> {
@@ -55,7 +40,7 @@ export class UserResolver {
                 id: req.session.userId,
             });
             return { result: user };
-        } catch (e) {
+        } catch {
             return {
                 errors: [
                     {
@@ -106,84 +91,49 @@ export class UserResolver {
         }
     }
 
-    @Mutation(() => UserResponse)
-    public async createPendingUser(
-        @Arg('input') input: PendingUserInput,
-        @Ctx() { em }: MyContext
-    ): Promise<UserResponse> {
-        // is there a pending user with this email, create if not
-        try {
-            const user = await em.findOneOrFail(ImhoUser, {
-                email: input.email,
-            });
-            return user.isActivated
-                ? {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'activated account already exists with this email',
-                          },
-                      ],
-                  }
-                : {
-                      errors: [
-                          {
-                              field: 'user',
-                              error: 'pending account already exists with this email',
-                          },
-                      ],
-                  };
-        } catch (e) {
-            // no user with this email, create inactive account
-            const user = new ImhoUser(input);
-            user.isActivated = false;
-            em.persist(user).flush();
-            return { result: user };
-        }
-    }
-
-    // hit this to track a place, creates pending account first time
+    // hit this to track a place, creates pending account for first time email
     @Mutation(() => UserResponse)
     public async trackPlace(
-        @Arg('input') input: TrackPlaceInput,
-        @Ctx() { em, req, res }: MyContext
+        @Arg('placeInput') placeInput: CreatePlaceInput,
+        @Arg('email', { nullable: true }) email: string,
+        @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
+        // need either session or email for identity
+        if (email === undefined && req.session.userId === undefined) {
+            return {
+                errors: [
+                    {
+                        field: 'email',
+                        error: 'You are not logged in and we have no email for your updates!',
+                    },
+                ],
+            };
+        }
+
         // ensure place
-        let place: Place;
-        try {
-            place = await em.findOneOrFail(Place, {
-                google_place_id: input.placeInput.google_place_id,
-            });
-        } catch {
-            place = new Place(input.placeInput);
-        }
+        const placeResponse = await createPlaceIfNotExists(em, placeInput);
+        if (placeResponse.errors || placeResponse.result === undefined)
+            return { errors: placeResponse.errors };
+        const place = placeResponse.result;
 
-        // ensure user, from session if possible
-        let user: ImhoUser;
-        try {
-            user = req.session.userId
-                ? await em.findOneOrFail(ImhoUser, {
-                      id: req.session.userId,
-                  })
-                : await em.findOneOrFail(ImhoUser, {
-                      email: input.userInput.email,
-                  });
-        } catch {
-            // place, no user
-            const userResponse = await this.createPendingUser(input.userInput, {
-                em,
-                req,
-                res,
-            });
-            if (userResponse.errors || userResponse.result === undefined)
-                return userResponse;
-            user = userResponse.result;
-        }
+        // ensure user, from session if possible or if both provided
+        const userResponse = await createPendingUserIfNotExists(
+            em,
+            req.session.userId
+                ? { id: req.session.userId }
+                : email
+                ? { email: email }
+                : {}
+        );
+        if (userResponse.errors || userResponse.result === undefined)
+            return userResponse;
+        const user = userResponse.result;
 
+        // have dependencies, append user to place's notify array
         if (!place.notifyOnReview.isInitialized())
             await place.notifyOnReview.init();
         place.notifyOnReview.add(user);
-        await em.persist(user).persist(place).flush();
+        await em.persist(place).flush();
         return { result: user };
     }
 
@@ -202,7 +152,7 @@ export class UserResolver {
             const user = await em.findOneOrFail(ImhoUser, {
                 email: input.email,
             });
-            if (user.isActivated === false)
+            if (user.isActivated === false || user.password === undefined)
                 return {
                     errors: [
                         {
@@ -211,6 +161,7 @@ export class UserResolver {
                         },
                     ],
                 };
+
             if (!(await argon2.verify(user.password, input.password))) {
                 return {
                     errors: [
@@ -224,7 +175,7 @@ export class UserResolver {
             // user exists, is activated, and is authenticated
             req.session.userId = user.id;
             return { result: user };
-        } catch (e) {
+        } catch {
             return {
                 errors: [
                     {
@@ -236,19 +187,142 @@ export class UserResolver {
         }
     }
 
-    @Mutation(() => Boolean)
-    logout(@Ctx() { req, res }: MyContext) {
+    @Mutation(() => SuccessResponse)
+    logout(@Ctx() { req, res }: MyContext): Promise<SuccessResponse> {
         return new Promise((resolve) =>
             req.session.destroy((err) => {
                 res.clearCookie('oreo');
                 if (err) {
-                    resolve(false);
+                    resolve({
+                        result: false,
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'could not destroy session',
+                            },
+                        ],
+                    });
                     return;
                 }
-                resolve(true);
+                resolve({ result: true });
             })
         );
     }
 
-    // forgot password
+    // Ben changPassword and forgotPassword
+    @Mutation(() => UserResponse)
+    async changePassword(
+        @Arg('token') token: string,
+        @Arg('newPassword') newPassword: string,
+        @Ctx() { redis, req, em }: MyContext
+    ): Promise<UserResponse> {
+        const key = FORGET_PASSWORD_PREFIX + token;
+        const userId = await redis.get(key);
+        if (userId === null) {
+            return {
+                errors: [
+                    {
+                        field: 'token',
+                        error: 'token expired',
+                    },
+                ],
+            };
+        }
+
+        const user = await em.findOne(ImhoUser, { id: userId });
+
+        if (user === null) {
+            return {
+                errors: [
+                    {
+                        field: 'token',
+                        error: 'user no longer exists',
+                    },
+                ],
+            };
+        }
+
+        user.password = await argon2.hash(newPassword);
+        em.persist(user).flush();
+
+        await redis.del(key);
+
+        // log in user after change password
+        req.session.userId = user.id;
+
+        return { result: user };
+    }
+
+    @Mutation(() => SuccessResponse)
+    async forgotPassword(
+        @Arg('email') email: string,
+        @Ctx() { redis, em }: MyContext
+    ): Promise<SuccessResponse> {
+        const user = await em.findOne(ImhoUser, {
+            email: email,
+        });
+        if (user === null) {
+            // the email is not in the db
+            return {
+                result: false,
+                errors: [
+                    { field: 'email', error: 'no user exists with this email' },
+                ],
+            };
+        }
+
+        const token = v4();
+
+        await redis.set(
+            FORGET_PASSWORD_PREFIX + token,
+            user.id,
+            'ex',
+            1000 * 60 * 60 * 24
+        ); // 1 day
+
+        await this.mailer.sendOtp(email, token);
+
+        return { result: true };
+    }
+
+    @Mutation(() => SuccessResponse)
+    async becomeAdmin(
+        @Arg('adminSecret') secret: string,
+        @Ctx() { req, em }: MyContext
+    ): Promise<SuccessResponse> {
+        if (!req.session.userId) {
+            return {
+                errors: [{ field: 'session', error: 'not logged in' }],
+            };
+        }
+        const user = await em.findOne(ImhoUser, {
+            id: req.session.userId,
+        });
+        if (user === null) {
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'session',
+                        error: 'no user exists with this your session id',
+                    },
+                ],
+            };
+        }
+
+        if (secret !== ADMIN_SECRET)
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'secret',
+                        error: 'invalid secret',
+                    },
+                ],
+            };
+
+        user.role = UserRoles.ADMIN;
+        em.persist(user).flush();
+        return { result: true };
+    }
 }

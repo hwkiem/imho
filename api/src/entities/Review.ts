@@ -5,9 +5,9 @@ import { Base } from './Base';
 import { Residence } from './Residence';
 import { Flags } from '../utils/types/Flag';
 import { ImhoUser } from './ImhoUser';
-@Unique({ properties: ['author', 'residence'] })
 @ObjectType()
 @Entity()
+@Unique({ properties: ['author', 'residence'] })
 export class Review extends Base<Review> {
     @Field({ nullable: true })
     @Property({ nullable: true })
@@ -34,8 +34,6 @@ export class Review extends Base<Review> {
     flags(@Root() review: Review): Flags | undefined {
         return review.flag_string ? JSON.parse(review.flag_string) : undefined;
     }
-
-    public flagInput: Flags;
 
     constructor(body: ReviewValidator) {
         super(body);
