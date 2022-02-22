@@ -9,6 +9,7 @@ import {
     createPlaceIfNotExists,
     createResidenceIfNotExists,
 } from '../utils/createIfNotExists';
+import { CreateReviewInput } from '../validators/ReviewValidator';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
@@ -146,6 +147,69 @@ export class ReviewResolver {
         } catch {
             return {
                 result: false,
+                errors: [
+                    {
+                        field: 'reviewId',
+                        error: 'no review exists with this id',
+                    },
+                ],
+            };
+        }
+    }
+    @Mutation(() => ReviewResponse)
+    public async editReview(
+        @Arg('input') input: CreateReviewInput,
+        @Arg('reviewId') reviewId: string,
+        @Ctx() { em, req }: MyContext
+    ): Promise<ReviewResponse> {
+        // make sure review.flags are unique from client
+        input.flagInput = {
+            pros: [...new Set(input.flagInput.pros)],
+            cons: [...new Set(input.flagInput.cons)],
+            dbks: [...new Set(input.flagInput.dbks)],
+        };
+
+        try {
+            const review = await em.findOneOrFail(
+                Review,
+                { id: reviewId },
+                { populate: ['author'] }
+            );
+            if (review.author) {
+                if (req.session.userId === null) {
+                    return {
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'this review has an author and you are not logged in',
+                            },
+                        ],
+                    };
+                }
+                if (review.author.id === req.session.userId) {
+                    review.assign(input);
+                    review.flag_string = JSON.stringify(input.flagInput);
+                    em.persistAndFlush(review);
+                    return { result: review };
+                }
+                return {
+                    errors: [
+                        {
+                            field: 'session',
+                            error: 'you are not the author of this review',
+                        },
+                    ],
+                };
+            }
+
+            // review has no author, for now allow edits
+            review.assign(input);
+            review.flag_string = JSON.stringify(input.flagInput);
+            em.persistAndFlush(review);
+
+            return { result: review };
+        } catch {
+            return {
                 errors: [
                     {
                         field: 'reviewId',
