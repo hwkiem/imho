@@ -1,23 +1,10 @@
-import {
-    Button,
-    Center,
-    Container,
-    Text,
-    TextInput,
-    Title,
-} from '@mantine/core';
+import { Button, Center, Container, Text, Title } from '@mantine/core';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { useCreatePendingUserMutation } from '../generated/graphql';
 import useAuth from '../lib/useAuth';
 
 export default function SuccessPage() {
     const router = useRouter();
-    const [email, setEmail] = useState<string | undefined>(undefined);
-    const [errorMessage, setErrorMessage] = useState<string | undefined>(
-        undefined
-    );
-    const [createPendingUser] = useCreatePendingUserMutation();
     const { user } = useAuth();
     return (
         <Container>
@@ -50,63 +37,8 @@ export default function SuccessPage() {
                         We are on a mission to fix renting. Want to stay up to
                         date on new features?
                     </Title>
-                    <Center>
-                        <TextInput
-                            mt={20}
-                            label="yes please!"
-                            size={'xl'}
-                            value={email}
-                            onChange={(evt) =>
-                                setEmail(evt.currentTarget.value)
-                            }
-                            placeholder="your.email@imho.com"
-                            sx={{ width: '60%' }}
-                            error={errorMessage}
-                        />
-                    </Center>
-                    <Center>
-                        <Button
-                            mt={20}
-                            variant={'subtle'}
-                            size={'xl'}
-                            onClick={async () => {
-                                if (email) {
-                                    createPendingUser({
-                                        variables: { input: { email: email } },
-                                    })
-                                        .then((res) => {
-                                            if (
-                                                res.data?.createPendingUser
-                                                    .result
-                                            ) {
-                                                router.push('/');
-                                            } else if (
-                                                res.data?.createPendingUser
-                                                    .errors
-                                            ) {
-                                                console.log(
-                                                    res.data.createPendingUser
-                                                        .errors
-                                                );
-                                                setErrorMessage(
-                                                    res.data.createPendingUser
-                                                        .errors[0].error
-                                                );
-                                            } else {
-                                                console.log(
-                                                    'failed for some other reason...'
-                                                );
-                                                router.push('/error');
-                                            }
-                                        })
-                                        .catch((err) => {
-                                            console.log('caught some error');
-                                            console.log(err);
-                                            router.push('/error');
-                                        });
-                                }
-                            }}
-                        >
+                    <Center mt={20}>
+                        <Button onClick={() => router.push('/register')}>
                             Sign Me Up!
                         </Button>
                     </Center>

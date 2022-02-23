@@ -24,7 +24,6 @@ import { SuggestionList } from '../components/SuggestionList';
 import {
     ConFlagTypes,
     DbkFlagTypes,
-    PlaceType,
     ProFlagTypes,
     useAddReviewMutation,
     WriteReviewInput,
@@ -57,7 +56,6 @@ export default function ReviewPage() {
         placeInput: {
             formatted_address: '',
             google_place_id: '',
-            type: PlaceType.Single,
         },
         residenceInput: {
             unit: undefined,
@@ -82,6 +80,8 @@ export default function ReviewPage() {
         }
         setActiveStep(idx);
     };
+
+    const [placeType, setPlaceType] = useState('multi');
 
     useEffect(() => {
         if ([3, 4, 5, 6, 7].includes(curStep)) {
@@ -332,38 +332,26 @@ export default function ReviewPage() {
                                                             color="pink"
                                                             size="lg"
                                                             spacing="xl"
-                                                            value={
-                                                                values
-                                                                    .placeInput
-                                                                    .type
+                                                            value={placeType}
+                                                            onChange={
+                                                                setPlaceType
                                                             }
-                                                            onChange={(v) => {
-                                                                setFieldValue(
-                                                                    'placeInput.type',
-                                                                    v
-                                                                );
-                                                            }}
                                                         >
                                                             <Radio
-                                                                value={
-                                                                    PlaceType.Multi
-                                                                }
+                                                                value={'multi'}
                                                             >
                                                                 Multi Unit
                                                             </Radio>
                                                             <Radio
-                                                                value={
-                                                                    PlaceType.Single
-                                                                }
+                                                                value={'single'}
                                                             >
                                                                 Single Family
                                                             </Radio>
                                                         </RadioGroup>
                                                     </Center>
                                                     <Center mt={20}>
-                                                        {values.placeInput
-                                                            .type ===
-                                                            PlaceType.Multi && (
+                                                        {placeType ==
+                                                            'multi' && (
                                                             <TextInput
                                                                 size="sm"
                                                                 placeholder="What unit do you live in?"
@@ -532,6 +520,14 @@ export default function ReviewPage() {
                                                         {Object.values(
                                                             ProFlagTypes
                                                         ).map((key) => {
+                                                            if (
+                                                                key ==
+                                                                    ProFlagTypes.GoodLandlord &&
+                                                                values.reviewInput.flagInput.cons.includes(
+                                                                    ConFlagTypes.BadLandlord
+                                                                )
+                                                            )
+                                                                return <></>;
                                                             return (
                                                                 <Field
                                                                     name={
@@ -693,6 +689,14 @@ export default function ReviewPage() {
                                                         {Object.values(
                                                             ConFlagTypes
                                                         ).map((key) => {
+                                                            if (
+                                                                key ==
+                                                                    ConFlagTypes.BadLandlord &&
+                                                                values.reviewInput.flagInput.pros.includes(
+                                                                    ProFlagTypes.GoodLandlord
+                                                                )
+                                                            )
+                                                                return <></>;
                                                             return (
                                                                 <Field
                                                                     name={

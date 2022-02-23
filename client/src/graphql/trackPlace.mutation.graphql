@@ -1,5 +1,5 @@
-mutation TrackPlace($input: TrackPlaceInput!) {
-    trackPlace(input: $input) {
+mutation TrackPlace($email: String, $placeInput: CreatePlaceInput!) {
+    trackPlace(email: $email, placeInput: $placeInput) {
         result {
             id
             email

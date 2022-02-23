@@ -17,7 +17,7 @@ export type Scalars = {
   DateTime: any;
 };
 
-/** All the positive flag topics */
+/** All the negative flag topics */
 export enum ConFlagTypes {
   BadLandlord = 'BAD_LANDLORD',
   Connectivity = 'CONNECTIVITY',
@@ -34,7 +34,6 @@ export enum ConFlagTypes {
 export type CreatePlaceInput = {
   formatted_address: Scalars['String'];
   google_place_id: Scalars['String'];
-  type: PlaceType;
 };
 
 export type CreateResidenceInput = {
@@ -53,7 +52,6 @@ export enum DbkFlagTypes {
   Construction = 'CONSTRUCTION',
   Deposit = 'DEPOSIT',
   Lease = 'LEASE',
-  Mushroom = 'MUSHROOM',
   Privacy = 'PRIVACY',
   Unresponsive = 'UNRESPONSIVE'
 }
@@ -90,6 +88,7 @@ export type ImhoUser = {
   id: Scalars['ID'];
   myTrackedPlaces: Array<Place>;
   reviews: Array<Review>;
+  role: UserRoles;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -101,9 +100,13 @@ export type LoginInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addReview: ReviewResponse;
-  createPendingUser: UserResponse;
+  becomeAdmin: SuccessResponse;
+  changePassword: UserResponse;
+  deleteReview: SuccessResponse;
+  editReview: ReviewResponse;
+  forgotPassword: SuccessResponse;
   login: UserResponse;
-  logout: Scalars['Boolean'];
+  logout: SuccessResponse;
   registerUser: UserResponse;
   trackPlace: UserResponse;
 };
@@ -114,8 +117,30 @@ export type MutationAddReviewArgs = {
 };
 
 
-export type MutationCreatePendingUserArgs = {
-  input: PendingUserInput;
+export type MutationBecomeAdminArgs = {
+  adminSecret: Scalars['String'];
+};
+
+
+export type MutationChangePasswordArgs = {
+  newPassword: Scalars['String'];
+  token: Scalars['String'];
+};
+
+
+export type MutationDeleteReviewArgs = {
+  reviewId: Scalars['String'];
+};
+
+
+export type MutationEditReviewArgs = {
+  input: CreateReviewInput;
+  reviewId: Scalars['String'];
+};
+
+
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String'];
 };
 
 
@@ -130,11 +155,8 @@ export type MutationRegisterUserArgs = {
 
 
 export type MutationTrackPlaceArgs = {
-  input: TrackPlaceInput;
-};
-
-export type PendingUserInput = {
-  email: Scalars['String'];
+  email?: InputMaybe<Scalars['String']>;
+  placeInput: CreatePlaceInput;
 };
 
 export type Place = {
@@ -146,7 +168,6 @@ export type Place = {
   id: Scalars['ID'];
   residences: Array<Residence>;
   topNFlags?: Maybe<TopNFlagsResponse>;
-  type: PlaceType;
   updatedAt: Scalars['DateTime'];
   usersTrackingThisPlace: Array<ImhoUser>;
 };
@@ -162,13 +183,7 @@ export type PlaceResponse = {
   result?: Maybe<Place>;
 };
 
-/** Type of the this address */
-export enum PlaceType {
-  Multi = 'MULTI',
-  Single = 'SINGLE'
-}
-
-/** All the negative flag topics */
+/** All the positive flag topics */
 export enum ProFlagTypes {
   Amenities = 'AMENITIES',
   Appliances = 'APPLIANCES',
@@ -184,7 +199,6 @@ export type Query = {
   __typename?: 'Query';
   getPlace: PlaceResponse;
   getReview: ReviewResponse;
-  getUser: UserResponse;
   me: UserResponse;
 };
 
@@ -196,11 +210,6 @@ export type QueryGetPlaceArgs = {
 
 export type QueryGetReviewArgs = {
   id: Scalars['String'];
-};
-
-
-export type QueryGetUserArgs = {
-  userId: Scalars['String'];
 };
 
 export type RegisterInput = {
@@ -215,7 +224,7 @@ export type Residence = {
   id: Scalars['ID'];
   place: Place;
   reviews: Array<Review>;
-  unit?: Maybe<Scalars['String']>;
+  unit: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -237,16 +246,17 @@ export type ReviewResponse = {
   result?: Maybe<Review>;
 };
 
+export type SuccessResponse = {
+  __typename?: 'SuccessResponse';
+  errors?: Maybe<Array<FieldError>>;
+  result?: Maybe<Scalars['Boolean']>;
+};
+
 export type TopNFlagsResponse = {
   __typename?: 'TopNFlagsResponse';
   cons: Array<FlagWithCount>;
   dbks: Array<FlagWithCount>;
   pros: Array<FlagWithCount>;
-};
-
-export type TrackPlaceInput = {
-  placeInput: CreatePlaceInput;
-  userInput: PendingUserInput;
 };
 
 export type UserResponse = {
@@ -255,25 +265,24 @@ export type UserResponse = {
   result?: Maybe<ImhoUser>;
 };
 
+/** Users are admin or normal privilege */
+export enum UserRoles {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
+
 export type WriteReviewInput = {
   placeInput: CreatePlaceInput;
   residenceInput: CreateResidenceInput;
   reviewInput: CreateReviewInput;
 };
 
-export type CreatePendingUserMutationVariables = Exact<{
-  input: PendingUserInput;
-}>;
-
-
-export type CreatePendingUserMutation = { __typename?: 'Mutation', createPendingUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, email: string, createdAt: any } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
-
 export type GetPlaceQueryVariables = Exact<{
   placeId: Scalars['String'];
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit?: string | null, averageRating?: number | null, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null }> }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit: string, averageRating?: number | null, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null }> }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -285,7 +294,7 @@ export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'Us
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+export type LogoutMutation = { __typename?: 'Mutation', logout: { __typename?: 'SuccessResponse', result?: boolean | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -300,7 +309,8 @@ export type RegisterUserMutationVariables = Exact<{
 export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: { __typename?: 'UserResponse', result?: { __typename?: 'ImhoUser', id: string, createdAt: any, email: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type TrackPlaceMutationVariables = Exact<{
-  input: TrackPlaceInput;
+  email?: InputMaybe<Scalars['String']>;
+  placeInput: CreatePlaceInput;
 }>;
 
 
@@ -311,50 +321,9 @@ export type AddReviewMutationVariables = Exact<{
 }>;
 
 
-export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit?: string | null, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit: string, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 
-export const CreatePendingUserDocument = gql`
-    mutation CreatePendingUser($input: PendingUserInput!) {
-  createPendingUser(input: $input) {
-    result {
-      id
-      email
-      createdAt
-    }
-    errors {
-      field
-      error
-    }
-  }
-}
-    `;
-export type CreatePendingUserMutationFn = Apollo.MutationFunction<CreatePendingUserMutation, CreatePendingUserMutationVariables>;
-
-/**
- * __useCreatePendingUserMutation__
- *
- * To run a mutation, you first call `useCreatePendingUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreatePendingUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createPendingUserMutation, { data, loading, error }] = useCreatePendingUserMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreatePendingUserMutation(baseOptions?: Apollo.MutationHookOptions<CreatePendingUserMutation, CreatePendingUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreatePendingUserMutation, CreatePendingUserMutationVariables>(CreatePendingUserDocument, options);
-      }
-export type CreatePendingUserMutationHookResult = ReturnType<typeof useCreatePendingUserMutation>;
-export type CreatePendingUserMutationResult = Apollo.MutationResult<CreatePendingUserMutation>;
-export type CreatePendingUserMutationOptions = Apollo.BaseMutationOptions<CreatePendingUserMutation, CreatePendingUserMutationVariables>;
 export const GetPlaceDocument = gql`
     query GetPlace($placeId: String!) {
   getPlace(placeId: $placeId) {
@@ -469,7 +438,13 @@ export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
-  logout
+  logout {
+    result
+    errors {
+      field
+      error
+    }
+  }
 }
     `;
 export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
@@ -581,8 +556,8 @@ export type RegisterUserMutationHookResult = ReturnType<typeof useRegisterUserMu
 export type RegisterUserMutationResult = Apollo.MutationResult<RegisterUserMutation>;
 export type RegisterUserMutationOptions = Apollo.BaseMutationOptions<RegisterUserMutation, RegisterUserMutationVariables>;
 export const TrackPlaceDocument = gql`
-    mutation TrackPlace($input: TrackPlaceInput!) {
-  trackPlace(input: $input) {
+    mutation TrackPlace($email: String, $placeInput: CreatePlaceInput!) {
+  trackPlace(email: $email, placeInput: $placeInput) {
     result {
       id
       email
@@ -613,7 +588,8 @@ export type TrackPlaceMutationFn = Apollo.MutationFunction<TrackPlaceMutation, T
  * @example
  * const [trackPlaceMutation, { data, loading, error }] = useTrackPlaceMutation({
  *   variables: {
- *      input: // value for 'input'
+ *      email: // value for 'email'
+ *      placeInput: // value for 'placeInput'
  *   },
  * });
  */
