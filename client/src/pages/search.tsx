@@ -1,4 +1,4 @@
-import { Center, Container, Text, TextInput, Title } from '@mantine/core';
+import { Center, Text, TextInput, Title } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useState } from 'react';

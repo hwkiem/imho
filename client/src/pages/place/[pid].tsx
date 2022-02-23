@@ -1,5 +1,4 @@
 import {
-    Accordion,
     ActionIcon,
     Badge,
     Box,
@@ -18,13 +17,12 @@ import { useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import {
     FlagWithCount,
-    PlaceType,
-    useCreatePendingUserMutation,
     useGetPlaceQuery,
     useTrackPlaceMutation,
 } from '../../generated/graphql';
 import useAuth from '../../lib/useAuth';
 import { MotionContainer } from '../../utils/motion';
+import usePlacesService from 'react-google-autocomplete/lib/usePlacesAutocompleteService';
 
 export default function PlacePage() {
     const variants: Variants = {
@@ -57,6 +55,16 @@ export default function PlacePage() {
     );
     const [trackPlace] = useTrackPlaceMutation();
     const { user } = useAuth();
+
+    const { placesService } = usePlacesService({
+        apiKey: process.env.NEXT_PUBLIC_MAPS_API_KEY,
+    });
+
+    const [address, setAddress] = useState('');
+
+    placesService?.getDetails({ placeId: placeId }, (place) =>
+        place ? setAddress(place.formatted_address ?? '') : null
+    );
 
     if (loading) {
         return <></>;
@@ -152,7 +160,7 @@ export default function PlacePage() {
             </Title>
             <SimpleGrid
                 mt={30}
-                cols={5}
+                cols={4}
                 spacing="lg"
                 breakpoints={[
                     {
@@ -236,13 +244,9 @@ export default function PlacePage() {
                         onClick={() => {
                             trackPlace({
                                 variables: {
-                                    input: {
-                                        userInput: { email: user.email },
-                                        placeInput: {
-                                            google_place_id: placeId,
-                                            formatted_address: '',
-                                            type: PlaceType.Single,
-                                        },
+                                    placeInput: {
+                                        google_place_id: placeId,
+                                        formatted_address: address,
                                     },
                                 },
                             });
@@ -276,15 +280,10 @@ export default function PlacePage() {
                                 if (email) {
                                     trackPlace({
                                         variables: {
-                                            input: {
-                                                placeInput: {
-                                                    google_place_id: placeId,
-                                                    formatted_address: '',
-                                                    type: PlaceType.Single,
-                                                },
-                                                userInput: {
-                                                    email: email,
-                                                },
+                                            email: email,
+                                            placeInput: {
+                                                google_place_id: placeId,
+                                                formatted_address: address,
                                             },
                                         },
                                     })

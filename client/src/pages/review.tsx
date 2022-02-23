@@ -5,10 +5,13 @@ import {
     Button,
     Center,
     Container,
+    Dialog,
+    Popover,
     Radio,
     RadioGroup,
     SimpleGrid,
     Slider,
+    Stepper,
     Text,
     Textarea,
     TextInput,
@@ -17,12 +20,12 @@ import {
 import { Field, FieldProps, Form, Formik } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { FaEdit, FaSearchLocation } from 'react-icons/fa';
 import { SuggestionList } from '../components/SuggestionList';
 import {
     ConFlagTypes,
     DbkFlagTypes,
-    PlaceType,
     ProFlagTypes,
     useAddReviewMutation,
     WriteReviewInput,
@@ -55,7 +58,6 @@ export default function ReviewPage() {
         placeInput: {
             formatted_address: '',
             google_place_id: '',
-            type: PlaceType.Single,
         },
         residenceInput: {
             unit: undefined,
@@ -69,8 +71,51 @@ export default function ReviewPage() {
 
     const [addReview] = useAddReviewMutation();
 
+    const [activeStep, setActiveStep] = useState(0);
+
+    const onStepClick = (idx: number) => {
+        console.log(idx);
+        if (idx == 3) {
+            router.push('/review?step=8');
+        } else {
+            router.push(`/review?step=${idx + 1}`);
+        }
+        setActiveStep(idx);
+    };
+
+    const [placeType, setPlaceType] = useState('multi');
+
+    useEffect(() => {
+        if ([3, 4, 5, 6, 7].includes(curStep)) {
+            setActiveStep(2);
+        } else if (curStep == 8) {
+            setActiveStep(3);
+        } else {
+            setActiveStep(curStep - 1);
+        }
+    }, [curStep]);
+
+    const [subErrDialog, setSubErrDialog] = useState<string | null>(null);
+
     return (
         <Container>
+            <Stepper
+                active={activeStep}
+                onStepClick={onStepClick}
+                radius="md"
+                color="pink"
+            >
+                <Stepper.Step label="The whereabouts" />
+                <Stepper.Step
+                    label="The logistics"
+                    allowStepSelect={curStep > 1}
+                />
+                <Stepper.Step
+                    label="the good, the bad, the ugly"
+                    allowStepSelect={curStep > 2}
+                />
+                <Stepper.Step label="comments" allowStepSelect={curStep > 2} />
+            </Stepper>
             <Title
                 sx={{ fontSize: 40, fontWeight: 900, letterSpacing: -2 }}
                 align="center"
@@ -87,7 +132,6 @@ export default function ReviewPage() {
                 </Text>{' '}
                 decisions.
             </Title>
-
             <Formik
                 initialValues={initialValues}
                 onSubmit={async (values) => {
@@ -98,8 +142,9 @@ export default function ReviewPage() {
                             if (res.data?.addReview.result) {
                                 router.push('/success');
                             } else if (res.data?.addReview.errors) {
-                                console.log(res.data.addReview.errors);
-                                router.push('/error');
+                                setSubErrDialog(
+                                    res.data.addReview.errors[0].error
+                                );
                             } else {
                                 console.log(
                                     'failed for some other weird reason...'
@@ -291,38 +336,26 @@ export default function ReviewPage() {
                                                             color="pink"
                                                             size="lg"
                                                             spacing="xl"
-                                                            value={
-                                                                values
-                                                                    .placeInput
-                                                                    .type
+                                                            value={placeType}
+                                                            onChange={
+                                                                setPlaceType
                                                             }
-                                                            onChange={(v) => {
-                                                                setFieldValue(
-                                                                    'placeInput.type',
-                                                                    v
-                                                                );
-                                                            }}
                                                         >
                                                             <Radio
-                                                                value={
-                                                                    PlaceType.Multi
-                                                                }
+                                                                value={'multi'}
                                                             >
                                                                 Multi Unit
                                                             </Radio>
                                                             <Radio
-                                                                value={
-                                                                    PlaceType.Single
-                                                                }
+                                                                value={'single'}
                                                             >
                                                                 Single Family
                                                             </Radio>
                                                         </RadioGroup>
                                                     </Center>
                                                     <Center mt={20}>
-                                                        {values.placeInput
-                                                            .type ===
-                                                            PlaceType.Multi && (
+                                                        {placeType ==
+                                                            'multi' && (
                                                             <TextInput
                                                                 size="sm"
                                                                 placeholder="What unit do you live in?"
@@ -491,6 +524,14 @@ export default function ReviewPage() {
                                                         {Object.values(
                                                             ProFlagTypes
                                                         ).map((key) => {
+                                                            if (
+                                                                key ==
+                                                                    ProFlagTypes.GoodLandlord &&
+                                                                values.reviewInput.flagInput.cons.includes(
+                                                                    ConFlagTypes.BadLandlord
+                                                                )
+                                                            )
+                                                                return <></>;
                                                             return (
                                                                 <Field
                                                                     name={
@@ -652,6 +693,14 @@ export default function ReviewPage() {
                                                         {Object.values(
                                                             ConFlagTypes
                                                         ).map((key) => {
+                                                            if (
+                                                                key ==
+                                                                    ConFlagTypes.BadLandlord &&
+                                                                values.reviewInput.flagInput.pros.includes(
+                                                                    ProFlagTypes.GoodLandlord
+                                                                )
+                                                            )
+                                                                return <></>;
                                                             return (
                                                                 <Field
                                                                     name={
@@ -958,7 +1007,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
@@ -1042,7 +1091,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
@@ -1123,7 +1172,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
@@ -1210,19 +1259,69 @@ export default function ReviewPage() {
                                                     </Field>
 
                                                     <Center>
-                                                        <Button
-                                                            type={'submit'}
-                                                            mt={60}
-                                                            size="lg"
-                                                            variant="gradient"
-                                                            gradient={{
-                                                                from: 'teal',
-                                                                to: 'lime',
-                                                                deg: 35,
+                                                        <Popover
+                                                            radius="lg"
+                                                            shadow="lg"
+                                                            opened={
+                                                                subErrDialog
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            onClose={() => {
+                                                                setSubErrDialog(
+                                                                    null
+                                                                );
+                                                                console.log(
+                                                                    'closed dialog'
+                                                                );
                                                             }}
+                                                            target={
+                                                                <Button
+                                                                    type={
+                                                                        'submit'
+                                                                    }
+                                                                    mt={60}
+                                                                    size="lg"
+                                                                    variant="gradient"
+                                                                    gradient={{
+                                                                        from: 'teal',
+                                                                        to: 'lime',
+                                                                        deg: 35,
+                                                                    }}
+                                                                >
+                                                                    Ready to
+                                                                    Submit?
+                                                                </Button>
+                                                            }
+                                                            width={260}
+                                                            position="bottom"
+                                                            withArrow
                                                         >
-                                                            Ready to Submit?
-                                                        </Button>
+                                                            <Text
+                                                                size="sm"
+                                                                style={{
+                                                                    marginBottom: 10,
+                                                                }}
+                                                                weight={500}
+                                                                align="center"
+                                                            >
+                                                                {subErrDialog}
+                                                            </Text>
+
+                                                            <Center>
+                                                                <Button
+                                                                    onClick={() =>
+                                                                        console.log(
+                                                                            'clicked edit.'
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Edit
+                                                                    Existing
+                                                                    Review?
+                                                                </Button>
+                                                            </Center>
+                                                        </Popover>
                                                     </Center>
                                                 </>
                                             )}
