@@ -5,6 +5,8 @@ import {
     Button,
     Center,
     Container,
+    Dialog,
+    Popover,
     Radio,
     RadioGroup,
     SimpleGrid,
@@ -93,6 +95,8 @@ export default function ReviewPage() {
         }
     }, [curStep]);
 
+    const [subErrDialog, setSubErrDialog] = useState<string | null>(null);
+
     return (
         <Container>
             <Stepper
@@ -128,7 +132,6 @@ export default function ReviewPage() {
                 </Text>{' '}
                 decisions.
             </Title>
-
             <Formik
                 initialValues={initialValues}
                 onSubmit={async (values) => {
@@ -139,8 +142,9 @@ export default function ReviewPage() {
                             if (res.data?.addReview.result) {
                                 router.push('/success');
                             } else if (res.data?.addReview.errors) {
-                                console.log(res.data.addReview.errors);
-                                router.push('/error');
+                                setSubErrDialog(
+                                    res.data.addReview.errors[0].error
+                                );
                             } else {
                                 console.log(
                                     'failed for some other weird reason...'
@@ -1255,19 +1259,69 @@ export default function ReviewPage() {
                                                     </Field>
 
                                                     <Center>
-                                                        <Button
-                                                            type={'submit'}
-                                                            mt={60}
-                                                            size="lg"
-                                                            variant="gradient"
-                                                            gradient={{
-                                                                from: 'teal',
-                                                                to: 'lime',
-                                                                deg: 35,
+                                                        <Popover
+                                                            radius="lg"
+                                                            shadow="lg"
+                                                            opened={
+                                                                subErrDialog
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            onClose={() => {
+                                                                setSubErrDialog(
+                                                                    null
+                                                                );
+                                                                console.log(
+                                                                    'closed dialog'
+                                                                );
                                                             }}
+                                                            target={
+                                                                <Button
+                                                                    type={
+                                                                        'submit'
+                                                                    }
+                                                                    mt={60}
+                                                                    size="lg"
+                                                                    variant="gradient"
+                                                                    gradient={{
+                                                                        from: 'teal',
+                                                                        to: 'lime',
+                                                                        deg: 35,
+                                                                    }}
+                                                                >
+                                                                    Ready to
+                                                                    Submit?
+                                                                </Button>
+                                                            }
+                                                            width={260}
+                                                            position="bottom"
+                                                            withArrow
                                                         >
-                                                            Ready to Submit?
-                                                        </Button>
+                                                            <Text
+                                                                size="sm"
+                                                                style={{
+                                                                    marginBottom: 10,
+                                                                }}
+                                                                weight={500}
+                                                                align="center"
+                                                            >
+                                                                {subErrDialog}
+                                                            </Text>
+
+                                                            <Center>
+                                                                <Button
+                                                                    onClick={() =>
+                                                                        console.log(
+                                                                            'clicked edit.'
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Edit
+                                                                    Existing
+                                                                    Review?
+                                                                </Button>
+                                                            </Center>
+                                                        </Popover>
                                                     </Center>
                                                 </>
                                             )}
