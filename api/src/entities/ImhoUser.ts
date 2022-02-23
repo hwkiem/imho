@@ -11,6 +11,7 @@ import { Base } from './Base';
 import { Review } from './Review';
 import { UserValidator } from '../validators/UserValidator';
 import { Place } from './Place';
+import { UserRoles } from '../utils/enums/UserRoles';
 
 @ObjectType()
 @Entity()
@@ -27,10 +28,14 @@ export class ImhoUser extends Base<ImhoUser> {
     public email: string;
 
     @Property({ nullable: true })
-    public password: string;
+    public password?: string;
 
     @Property()
     public isActivated: boolean;
+
+    @Field(() => UserRoles)
+    @Property({ default: UserRoles.USER })
+    public role: UserRoles;
 
     @Field(() => [Place])
     async myTrackedPlaces(

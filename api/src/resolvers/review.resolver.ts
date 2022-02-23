@@ -1,16 +1,20 @@
-import { Residence } from '../entities/Residence';
 import { Review } from '../entities/Review';
 import { Arg, Ctx, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import { MyContext } from '../utils/context';
-import { Place } from '../entities/Place';
 import { WriteReviewInput } from '../validators/WriteReviewInput';
-import { ApiResponse } from '../utils/types/Response';
+import { ApiResponse, SuccessResponse } from '../utils/types/Response';
 import { ImhoUser } from '../entities/ImhoUser';
-import { PlaceType } from '../utils/enums/PlaceType.enum';
+import { Service } from 'typedi';
+import {
+    createPlaceIfNotExists,
+    createResidenceIfNotExists,
+} from '../utils/createIfNotExists';
+import { CreateReviewInput } from '../validators/ReviewValidator';
 
 @ObjectType()
 class ReviewResponse extends ApiResponse(Review) {}
 
+@Service()
 @Resolver(() => Review)
 export class ReviewResolver {
     @Query(() => ReviewResponse)
@@ -41,49 +45,32 @@ export class ReviewResolver {
         @Arg('input') input: WriteReviewInput,
         @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
-        let place: Place;
-        let residence: Residence;
-        try {
-            place = await em.findOneOrFail(Place, {
-                google_place_id: input.placeInput.google_place_id,
-            });
+        // make sure review.flags are unique from client
+        input.reviewInput.flagInput = {
+            pros: [...new Set(input.reviewInput.flagInput.pros)],
+            cons: [...new Set(input.reviewInput.flagInput.cons)],
+            dbks: [...new Set(input.reviewInput.flagInput.dbks)],
+        };
 
-            try {
-                residence = await em.findOneOrFail(Residence, {
-                    unit: input.residenceInput.unit
-                        ? input.residenceInput.unit
-                        : PlaceType.SINGLE, // default value
-                });
-            } catch (e) {
-                residence = new Residence(input.residenceInput);
-            }
-        } catch (e) {
-            // place does not exist, residence cannot exist, create both
-            place = new Place(input.placeInput);
-            residence = new Residence(input.residenceInput);
-        }
+        // ensure place, residence
+        const placeResponse = await createPlaceIfNotExists(
+            em,
+            input.placeInput
+        );
+        if (placeResponse.errors || placeResponse.result === undefined)
+            return { errors: placeResponse.errors };
+        const place = placeResponse.result;
 
-        if (place === undefined) {
-            return {
-                errors: [
-                    {
-                        field: 'place',
-                        error: 'Could not find place. Review creation failed.',
-                    },
-                ],
-            };
-        }
-        if (residence === undefined) {
-            return {
-                errors: [
-                    {
-                        field: 'residence',
-                        error: 'Could not find residence. Review creation failed.',
-                    },
-                ],
-            };
-        }
+        const residenceResponse = await createResidenceIfNotExists(
+            em,
+            place,
+            input.residenceInput
+        );
+        if (residenceResponse.errors || residenceResponse.result === undefined)
+            return { errors: residenceResponse.errors };
+        const residence = residenceResponse.result;
 
+        // create new review
         const review = new Review(input.reviewInput);
         review.flag_string = JSON.stringify(input.reviewInput.flagInput);
 
@@ -118,5 +105,118 @@ export class ReviewResolver {
             // return { errors: [{ field: 'insert data', error: e.toString() }] };
         }
         return { result: review };
+    }
+
+    @Mutation(() => SuccessResponse)
+    public async deleteReview(
+        @Arg('reviewId') reviewId: string,
+        @Ctx() { em, req }: MyContext
+    ): Promise<SuccessResponse> {
+        try {
+            const review = await em.findOneOrFail(Review, { id: reviewId });
+            if (review.author) {
+                if (req.session.userId === null) {
+                    return {
+                        result: false,
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'this review has an author and you are not logged in',
+                            },
+                        ],
+                    };
+                }
+                if (review.author.id === req.session.userId) {
+                    await em.remove(review).flush();
+                    return { result: true };
+                }
+                return {
+                    result: false,
+                    errors: [
+                        {
+                            field: 'session',
+                            error: 'you are not the author of this review',
+                        },
+                    ],
+                };
+            }
+
+            // review has no author, for now allow deletion
+            await em.remove(review).flush();
+            return { result: true };
+        } catch {
+            return {
+                result: false,
+                errors: [
+                    {
+                        field: 'reviewId',
+                        error: 'no review exists with this id',
+                    },
+                ],
+            };
+        }
+    }
+    @Mutation(() => ReviewResponse)
+    public async editReview(
+        @Arg('input') input: CreateReviewInput,
+        @Arg('reviewId') reviewId: string,
+        @Ctx() { em, req }: MyContext
+    ): Promise<ReviewResponse> {
+        // make sure review.flags are unique from client
+        input.flagInput = {
+            pros: [...new Set(input.flagInput.pros)],
+            cons: [...new Set(input.flagInput.cons)],
+            dbks: [...new Set(input.flagInput.dbks)],
+        };
+
+        try {
+            const review = await em.findOneOrFail(
+                Review,
+                { id: reviewId },
+                { populate: ['author'] }
+            );
+            if (review.author) {
+                if (req.session.userId === null) {
+                    return {
+                        errors: [
+                            {
+                                field: 'session',
+                                error: 'this review has an author and you are not logged in',
+                            },
+                        ],
+                    };
+                }
+                if (review.author.id === req.session.userId) {
+                    review.assign(input);
+                    review.flag_string = JSON.stringify(input.flagInput);
+                    em.persistAndFlush(review);
+                    return { result: review };
+                }
+                return {
+                    errors: [
+                        {
+                            field: 'session',
+                            error: 'you are not the author of this review',
+                        },
+                    ],
+                };
+            }
+
+            // review has no author, for now allow edits
+            review.assign(input);
+            review.flag_string = JSON.stringify(input.flagInput);
+            em.persistAndFlush(review);
+
+            return { result: review };
+        } catch {
+            return {
+                errors: [
+                    {
+                        field: 'reviewId',
+                        error: 'no review exists with this id',
+                    },
+                ],
+            };
+        }
     }
 }
