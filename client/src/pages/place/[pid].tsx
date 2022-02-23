@@ -1,5 +1,4 @@
 import {
-    Accordion,
     ActionIcon,
     Badge,
     Box,
@@ -161,7 +160,7 @@ export default function PlacePage() {
             </Title>
             <SimpleGrid
                 mt={30}
-                cols={5}
+                cols={4}
                 spacing="lg"
                 breakpoints={[
                     {

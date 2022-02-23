@@ -1,6 +1,5 @@
 import { Button, Center, Container, Text, Title } from '@mantine/core';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import useAuth from '../lib/useAuth';
 
 export default function SuccessPage() {
