@@ -9,6 +9,7 @@ import {
     RadioGroup,
     SimpleGrid,
     Slider,
+    Stepper,
     Text,
     Textarea,
     TextInput,
@@ -17,6 +18,7 @@ import {
 import { Field, FieldProps, Form, Formik } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { FaEdit, FaSearchLocation } from 'react-icons/fa';
 import { SuggestionList } from '../components/SuggestionList';
 import {
@@ -69,8 +71,47 @@ export default function ReviewPage() {
 
     const [addReview] = useAddReviewMutation();
 
+    const [activeStep, setActiveStep] = useState(0);
+
+    const onStepClick = (idx: number) => {
+        console.log(idx);
+        if (idx == 3) {
+            router.push('/review?step=8');
+        } else {
+            router.push(`/review?step=${idx + 1}`);
+        }
+        setActiveStep(idx);
+    };
+
+    useEffect(() => {
+        if ([3, 4, 5, 6, 7].includes(curStep)) {
+            setActiveStep(2);
+        } else if (curStep == 8) {
+            setActiveStep(3);
+        } else {
+            setActiveStep(curStep - 1);
+        }
+    }, [curStep]);
+
     return (
         <Container>
+            <Stepper
+                active={activeStep}
+                onStepClick={onStepClick}
+                radius="md"
+                color="pink"
+            >
+                <Stepper.Step label="The whereabouts" />
+                <Stepper.Step
+                    label="The logistics"
+                    allowStepSelect={curStep > 1}
+                />
+                <Stepper.Step
+                    label="the good, the bad, the ugly"
+                    allowStepSelect={curStep > 2}
+                />
+                <Stepper.Step label="comments" allowStepSelect={curStep > 2} />
+            </Stepper>
             <Title
                 sx={{ fontSize: 40, fontWeight: 900, letterSpacing: -2 }}
                 align="center"
@@ -958,7 +999,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
@@ -1042,7 +1083,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
@@ -1123,7 +1164,7 @@ export default function ReviewPage() {
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
-                                                                    cols={2}
+                                                                    cols={1}
                                                                     spacing="sm"
                                                                     breakpoints={[
                                                                         {
