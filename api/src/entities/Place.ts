@@ -13,6 +13,15 @@ import { PlaceValidator } from '../validators/PlaceValidator';
 import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { ImhoUser } from './ImhoUser';
+import { Review } from './Review';
+
+@ObjectType()
+class RecommendRatio {
+    @Field()
+    recommend: number;
+    @Field()
+    total: number;
+}
 
 @ObjectType()
 @Entity()
@@ -76,6 +85,36 @@ export class Place extends Base<Place> {
 
         if (!res[0].avg) return null;
         return +res[0].avg;
+    }
+
+    async reviews(): Promise<Review[] | null> {
+        const residencesRef = await this.residences(this);
+        if (residencesRef === null) return null;
+        const residences = await residencesRef.loadItems();
+
+        let reviews: Review[] = [];
+        for (const residence of residences) {
+            const loadedReviews = await residence.reviews(residence);
+            if (loadedReviews == null) continue;
+            const myReviews = await loadedReviews.loadItems();
+            for (const review of myReviews) reviews.push(review);
+        }
+
+        return reviews;
+    }
+
+    @Field(() => RecommendRatio, { nullable: true })
+    async wouldRecommendRatio(): Promise<RecommendRatio | null> {
+        const reviews = await this.reviews();
+        if (reviews === null) return null;
+        let recommend = 0,
+            total = 0;
+        for (const review of reviews) {
+            if (review.rating >= 75) recommend++;
+            total++;
+        }
+
+        return { recommend: recommend, total: total };
     }
 
     constructor(body: PlaceValidator) {
