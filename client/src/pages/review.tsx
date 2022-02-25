@@ -552,6 +552,15 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    color:
+                                                                                        theme.colorScheme ==
+                                                                                        'dark'
+                                                                                            ? theme
+                                                                                                  .colors
+                                                                                                  .gray[2]
+                                                                                            : theme
+                                                                                                  .colors
+                                                                                                  .dark[5],
                                                                                     backgroundColor:
                                                                                         field.checked
                                                                                             ? '#32a852'
@@ -721,6 +730,15 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    color:
+                                                                                        theme.colorScheme ==
+                                                                                        'dark'
+                                                                                            ? theme
+                                                                                                  .colors
+                                                                                                  .gray[2]
+                                                                                            : theme
+                                                                                                  .colors
+                                                                                                  .dark[5],
                                                                                     backgroundColor:
                                                                                         field.checked
                                                                                             ? '#85581b'
@@ -896,6 +914,15 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    color:
+                                                                                        theme.colorScheme ==
+                                                                                        'dark'
+                                                                                            ? theme
+                                                                                                  .colors
+                                                                                                  .gray[2]
+                                                                                            : theme
+                                                                                                  .colors
+                                                                                                  .dark[5],
                                                                                     backgroundColor:
                                                                                         field.checked
                                                                                             ? '#940c1e'
