@@ -22,9 +22,9 @@ export class EmailService {
             html: `<b>Forgot your password? Happens dude. Click our link and you'll be on your way.</b> 
             <a href="${
                 process.env.NODE_ENV === 'dev'
-                    ? 'http://localhost:3000'
+                    ? 'http://localhost:4000'
                     : 'http://imho.vercel.app'
-            }/change-password/?token=${otp}">reset password</a>`, // html body
+            }/change-password/${otp}">reset password</a>`, // html body
         });
         if (info.accepted.includes(email)) {
             return true;

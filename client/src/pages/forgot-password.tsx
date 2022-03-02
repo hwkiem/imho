@@ -2,11 +2,11 @@ import { Container } from '@mantine/core';
 import { Variants } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect } from 'react';
-import { LoginForm } from '../components/LoginForm';
+import { ForgotPasswordForm } from '../components/ForgotPasswordForm';
 import useAuth from '../lib/useAuth';
 import { MotionContainer } from '../utils/motion';
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
     const { user } = useAuth();
     const router = useRouter();
 
@@ -31,15 +31,16 @@ export default function LoginPage() {
             exit="exit"
             variants={variants}
             transition={{ type: 'spring' }}
+            key={'review'}
         >
-            <LoginForm />
+            <ForgotPasswordForm />
         </MotionContainer>
     );
 }
 
-LoginPage.requireAuth = false;
+ForgotPasswordPage.requireAuth = false;
 
 // override layout prop for login page
-LoginPage.getLayout = function getLayout(page: ReactElement) {
+ForgotPasswordPage.getLayout = function getLayout(page: ReactElement) {
     return <Container mt={200}>{page}</Container>;
 };

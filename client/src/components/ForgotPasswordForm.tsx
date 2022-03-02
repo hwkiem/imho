@@ -8,37 +8,55 @@ import {
     LoadingOverlay,
 } from '@mantine/core';
 import { Field, FieldProps, Form, Formik } from 'formik';
-import { LoginInput } from '../generated/graphql';
+import {
+    ForgotPasswordMutationVariables,
+    useForgotPasswordMutation,
+} from '../generated/graphql';
 import { SchemaOf, object, string } from 'yup';
-import useAuth from '../lib/useAuth';
 import { AutoErrorInjection } from './SessionModal';
-import { useRouter } from 'next/router';
+import router from 'next/router';
+import { useState } from 'react';
 
-export const LoginForm = () => {
+export const ForgotPasswordForm = () => {
     // initial state is undefined
-    const initial: LoginInput = {
+    const initial: ForgotPasswordMutationVariables = {
         email: '',
-        password: '',
     };
 
-    const router = useRouter();
-
     // validation schema for logging in
-    const loginSchema: SchemaOf<LoginInput> = object().shape({
-        email: string().email().required(),
-        password: string().min(8).required(),
-    });
+    const forgotPasswordSchema: SchemaOf<ForgotPasswordMutationVariables> =
+        object().shape({
+            email: string().email().required(),
+        });
 
-    // using login auth context function
-    const { login, loading } = useAuth();
+    const [forgotPassword, { loading }] = useForgotPasswordMutation();
+    const [successful, setSuccessful] = useState(false);
 
-    return (
+    return successful ? (
         <>
             <Title
                 sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}
                 align="center"
             >
-                Login to{' '}
+                Check your inbox for a password reset link from{' '}
+                <Text
+                    inherit
+                    variant={'gradient'}
+                    gradient={{ from: 'pink', to: 'lime', deg: 45 }}
+                    component={'span'}
+                >
+                    imho.teams@gmail.com.
+                </Text>{' '}
+                Try again in 5 minutes if you don't hear from us!
+            </Title>
+        </>
+    ) : (
+        <>
+            <Title
+                sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}
+                align="center"
+            >
+                Forgot your{' '}
                 <Text
                     inherit
                     variant={'gradient'}
@@ -47,15 +65,33 @@ export const LoginForm = () => {
                 >
                     IMHO
                 </Text>{' '}
+                password? No worries! We'll send you a link.
             </Title>
             <Formik
                 initialValues={initial}
-                validationSchema={loginSchema}
-                onSubmit={async (values) => {
-                    login({
-                        email: values.email,
-                        password: values.password,
+                validationSchema={forgotPasswordSchema}
+                onSubmit={async (values, { setErrors }) => {
+                    const results = await forgotPassword({
+                        variables: { email: values.email },
                     });
+                    if (results.data?.forgotPassword.result) {
+                        setSuccessful(true);
+                    } else {
+                        if (
+                            results.data?.forgotPassword.errors &&
+                            results.data?.forgotPassword.errors[0].field ==
+                                'email'
+                        ) {
+                            setErrors({
+                                email: results.data.forgotPassword.errors[0]
+                                    .error,
+                            });
+                        } else {
+                            setErrors({
+                                email: 'Something went wrong... Please try again later or contact support.',
+                            });
+                        }
+                    }
                 }}
             >
                 {({ handleSubmit, isSubmitting }) => {
@@ -63,7 +99,6 @@ export const LoginForm = () => {
                         <>
                             <LoadingOverlay visible={isSubmitting} />
                             <Form onSubmit={handleSubmit}>
-                                <AutoErrorInjection />
                                 <Grid justify={'center'} gutter={'xl'}>
                                     <Grid.Col span={12}>
                                         <Field name={'email'}>
@@ -80,25 +115,7 @@ export const LoginForm = () => {
                                                         'chilipepperpete@imho.com'
                                                     }
                                                     required
-                                                    disabled={loading}
-                                                />
-                                            )}
-                                        </Field>
-                                    </Grid.Col>
-                                    <Grid.Col span={12}>
-                                        <Field name={'password'}>
-                                            {({ field, meta }: FieldProps) => (
-                                                <TextInput
-                                                    {...field}
-                                                    error={
-                                                        meta.touched &&
-                                                        meta.error
-                                                    }
-                                                    label={'password'}
-                                                    type={'password'}
-                                                    placeholder={'iloveimho!'}
-                                                    required
-                                                    disabled={loading}
+                                                    disabled={isSubmitting}
                                                 />
                                             )}
                                         </Field>
@@ -114,23 +131,9 @@ export const LoginForm = () => {
                                                     deg: 35,
                                                 }}
                                                 size={'md'}
+                                                mb={10}
                                             >
-                                                Login
-                                            </Button>
-                                        </Center>
-                                    </Grid.Col>
-                                    <Grid.Col span={12}>
-                                        <Center>
-                                            <Button
-                                                variant={'subtle'}
-                                                size={'xs'}
-                                                onClick={() =>
-                                                    router.push(
-                                                        '/forgot-password'
-                                                    )
-                                                }
-                                            >
-                                                Forgot Password
+                                                Submit
                                             </Button>
                                         </Center>
                                     </Grid.Col>
