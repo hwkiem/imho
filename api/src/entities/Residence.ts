@@ -24,10 +24,9 @@ export class Residence extends Base<Residence> {
     @OneToMany(() => Review, (r: Review) => r.residence)
     public reviewCollection = new Collection<Review>(this);
 
-    @Field()
-    @Property({ default: SINGLE_FAMILY })
-    public unit: string;
-
+    /**
+     * Reviews written about this residence
+     */
     @Field(() => [Review])
     async reviews(
         @Root() residence: Residence
@@ -38,12 +37,28 @@ export class Residence extends Base<Residence> {
         return residence.reviewCollection;
     }
 
-    @Field(() => Place)
     @ManyToOne(() => Place, {
         cascade: [Cascade.PERSIST, Cascade.REMOVE],
     })
     public place: Place;
 
+    /**
+     * The place where this residence exists
+     */
+    @Field(() => Place)
+    async myPlace(@Root() residence: Residence): Promise<Place | null> {
+        if (!residence.place.isInitialized()) {
+            await residence.place.init();
+        }
+        return residence.place;
+    }
+
+    /* Properties */
+    @Field()
+    @Property({ default: SINGLE_FAMILY })
+    public unit: string;
+
+    /* Averages and stats across reviews */
     @Field(() => Float, { nullable: true })
     async averageRating(
         @Root() residence: Residence,
