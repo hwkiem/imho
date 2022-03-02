@@ -3,11 +3,11 @@ mutation AddReview($input: WriteReviewInput!) {
         result {
             id
             createdAt
-            residence {
+            myResidence {
                 id
                 createdAt
                 unit
-                place {
+                myPlace {
                     id
                     createdAt
                     google_place_id

@@ -167,9 +167,12 @@ export type Place = {
   google_place_id: Scalars['String'];
   id: Scalars['ID'];
   residences: Array<Residence>;
+  reviewCount?: Maybe<Scalars['Int']>;
+  reviews?: Maybe<Array<Review>>;
   topNFlags?: Maybe<TopNFlagsResponse>;
   updatedAt: Scalars['DateTime'];
   usersTrackingThisPlace: Array<ImhoUser>;
+  wouldRecommendRatio?: Maybe<RecommendRatio>;
 };
 
 
@@ -212,6 +215,12 @@ export type QueryGetReviewArgs = {
   id: Scalars['String'];
 };
 
+export type RecommendRatio = {
+  __typename?: 'RecommendRatio';
+  recommend: Scalars['Float'];
+  total: Scalars['Float'];
+};
+
 export type RegisterInput = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -222,7 +231,7 @@ export type Residence = {
   averageRating?: Maybe<Scalars['Float']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['ID'];
-  place: Place;
+  myPlace: Place;
   reviews: Array<Review>;
   unit: Scalars['String'];
   updatedAt: Scalars['DateTime'];
@@ -230,13 +239,13 @@ export type Residence = {
 
 export type Review = {
   __typename?: 'Review';
-  author?: Maybe<ImhoUser>;
   createdAt: Scalars['DateTime'];
   feedback?: Maybe<Scalars['String']>;
   flags?: Maybe<Flags>;
   id: Scalars['ID'];
+  myAuthor?: Maybe<ImhoUser>;
+  myResidence: Residence;
   rating: Scalars['Float'];
-  residence?: Maybe<Residence>;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -297,7 +306,7 @@ export type GetPlaceQueryVariables = Exact<{
 }>;
 
 
-export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, averageRating?: number | null, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit: string, averageRating?: number | null, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null }> }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+export type GetPlaceQuery = { __typename?: 'Query', getPlace: { __typename?: 'PlaceResponse', result?: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string, formatted_address: string, wouldRecommendRatio?: { __typename?: 'RecommendRatio', recommend: number, total: number } | null, topNFlags?: { __typename?: 'TopNFlagsResponse', pros: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, cons: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }>, dbks: Array<{ __typename?: 'FlagWithCount', topic: string, cnt: number }> } | null, residences: Array<{ __typename?: 'Residence', id: string, createdAt: any, unit: string, averageRating?: number | null, reviews: Array<{ __typename?: 'Review', id: string, createdAt: any, rating: number, feedback?: string | null }> }> } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -336,7 +345,7 @@ export type AddReviewMutationVariables = Exact<{
 }>;
 
 
-export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null, residence?: { __typename?: 'Residence', id: string, createdAt: any, unit: string, place: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } } | null, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
+export type AddReviewMutation = { __typename?: 'Mutation', addReview: { __typename?: 'ReviewResponse', result?: { __typename?: 'Review', id: string, createdAt: any, feedback?: string | null, myResidence: { __typename?: 'Residence', id: string, createdAt: any, unit: string, myPlace: { __typename?: 'Place', id: string, createdAt: any, google_place_id: string } }, flags?: { __typename?: 'Flags', pros: Array<ProFlagTypes>, cons: Array<ConFlagTypes>, dbks: Array<DbkFlagTypes> } | null } | null, errors?: Array<{ __typename?: 'FieldError', field: string, error: string }> | null } };
 
 
 export const ChangePasswordDocument = gql`
@@ -426,7 +435,10 @@ export const GetPlaceDocument = gql`
       createdAt
       google_place_id
       formatted_address
-      averageRating
+      wouldRecommendRatio {
+        recommend
+        total
+      }
       topNFlags(n: 5) {
         pros {
           topic
@@ -700,11 +712,11 @@ export const AddReviewDocument = gql`
     result {
       id
       createdAt
-      residence {
+      myResidence {
         id
         createdAt
         unit
-        place {
+        myPlace {
           id
           createdAt
           google_place_id

@@ -5,7 +5,10 @@ query GetPlace($placeId: String!) {
             createdAt
             google_place_id
             formatted_address
-            averageRating
+            wouldRecommendRatio {
+                recommend
+                total
+            }
             topNFlags(n: 5) {
                 pros {
                     topic

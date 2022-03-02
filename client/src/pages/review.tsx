@@ -1274,8 +1274,8 @@ export default function ReviewPage() {
                                                             <Textarea
                                                                 {...field}
                                                                 mt={10}
-                                                                placeholder="Anything else to add?"
-                                                                description="Don't worry! These are anonymous."
+                                                                placeholder="Don't worry! These are anonymous."
+                                                                description="Does your review describe your experience living at this address? what else would you tell a person looking to rent here?"
                                                                 radius="md"
                                                                 size="md"
                                                                 autosize
