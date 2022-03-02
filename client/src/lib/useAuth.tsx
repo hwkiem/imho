@@ -11,6 +11,8 @@ import {
     ImhoUser,
     LoginInput,
     RegisterInput,
+    useChangePasswordMutation,
+    ChangePasswordMutationVariables,
     useLoginMutation,
     useLogoutMutation,
     useMeLazyQuery,
@@ -25,6 +27,11 @@ interface AuthContextType {
     login: (input: LoginInput, cb?: () => void) => void;
     register: (input: RegisterInput, cb?: () => void) => void;
     logout: (cb?: () => void) => void;
+    changePasswordHandler: (
+        input: ChangePasswordMutationVariables,
+        onFail?: () => void,
+        onFinish?: () => void
+    ) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -49,6 +56,7 @@ export function AuthProvider({
     const [apiLogin] = useLoginMutation();
     const [apiRegister] = useRegisterUserMutation();
     const [apiLogout] = useLogoutMutation();
+    const [changePassword] = useChangePasswordMutation();
 
     // If we change page, reset the error state.
     useEffect(() => {
@@ -106,6 +114,31 @@ export function AuthProvider({
             .finally(() => {
                 setLoading(false);
                 onFinish ? onFinish() : null;
+            });
+    };
+
+    const changePasswordHandler = (
+        { newPassword, token }: ChangePasswordMutationVariables,
+        onFail?: () => void
+    ) => {
+        setLoading(true);
+        changePassword({
+            variables: { newPassword: newPassword, token: token },
+        })
+            .then(({ data }) => {
+                if (data?.changePassword.result) {
+                    setUser(data.changePassword.result);
+                }
+                if (data?.changePassword.errors) {
+                    setErrors(data.changePassword.errors);
+                    onFail ? onFail() : null;
+                }
+            })
+            .catch((_err) => {
+                console.log(_err);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -173,6 +206,7 @@ export function AuthProvider({
             login,
             register,
             logout,
+            changePasswordHandler,
         }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [user, loading, errors]
