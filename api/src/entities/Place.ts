@@ -78,32 +78,6 @@ export class Place extends Base<Place> {
             for (const review of myReviews) reviews.push(review);
         }
 
-        // const rev: Review[] = async(residences: Residence[]):Promise<Review[]> residences.reduce((reviews, residence) => {
-
-        // })
-
-        // const reviews: Review[] = [];
-        // const reviews: Review[] = residences.flatMap(async (residence) => {
-        //     const loadedReviews = await residence.reviews(residence);
-        //     if (loadedReviews === null) return [];
-        //     const myReviews = await loadedReviews.loadItems();
-        //     return myReviews;
-        // });
-
-        // const reviewsFromResidences = async (
-        //     residences: Residence[]
-        // ): Promise<Review[]> => {
-        //     const promises = residences.flatMap(
-        //         async (residence: Residence) => {
-        //             const loadedReviews = await residence.reviews(residence);
-        //             if (loadedReviews === null) return [];
-        //             const myReviews = await loadedReviews.loadItems();
-        //             return myReviews;
-        //         }
-        //     );
-        //     return Promise.all(promises);
-        // };
-
         return reviews;
     }
 
