@@ -8,29 +8,47 @@ import {
     LoadingOverlay,
 } from '@mantine/core';
 import { Field, FieldProps, Form, Formik } from 'formik';
-import { LoginInput } from '../generated/graphql';
-import { SchemaOf, object, string } from 'yup';
-import useAuth from '../lib/useAuth';
+import {
+    ChangePasswordMutationVariables,
+    ForgotPasswordMutationVariables,
+    useChangePasswordMutation,
+    useForgotPasswordMutation,
+} from '../generated/graphql';
+import { SchemaOf, object, string, ref } from 'yup';
 import { AutoErrorInjection } from './SessionModal';
 import { useRouter } from 'next/router';
+import useAuth from '../lib/useAuth';
+import { useEffect } from 'react';
 
-export const LoginForm = () => {
+interface ChangePasswordFormProps {
+    token: string;
+}
+
+export const ChangePasswordForm = ({ token }: ChangePasswordFormProps) => {
     // initial state is undefined
-    const initial: LoginInput = {
-        email: '',
-        password: '',
+    const initial: ChangePasswordMutationVariables = {
+        newPassword: '',
+        token: token,
     };
 
     const router = useRouter();
 
     // validation schema for logging in
-    const loginSchema: SchemaOf<LoginInput> = object().shape({
-        email: string().email().required(),
-        password: string().min(8).required(),
-    });
+    const changePasswordSchema: SchemaOf<ChangePasswordMutationVariables> =
+        object().shape({
+            newPassword: string().min(8).required(),
+            passwordConfirm: string().oneOf(
+                [ref('newPassword'), null],
+                'Passwords must match'
+            ),
+            token: string().required(),
+        });
 
-    // using login auth context function
-    const { login, loading } = useAuth();
+    const { changePasswordHandler, loading, user } = useAuth();
+
+    useEffect(() => {
+        if (user) router.push('/');
+    }, [user]);
 
     return (
         <>
@@ -38,7 +56,7 @@ export const LoginForm = () => {
                 sx={{ fontSize: 20, fontWeight: 300, marginBottom: 10 }}
                 align="center"
             >
-                Login to{' '}
+                Let's update your{' '}
                 <Text
                     inherit
                     variant={'gradient'}
@@ -47,15 +65,19 @@ export const LoginForm = () => {
                 >
                     IMHO
                 </Text>{' '}
+                password.
             </Title>
             <Formik
                 initialValues={initial}
-                validationSchema={loginSchema}
+                validationSchema={changePasswordSchema}
                 onSubmit={async (values) => {
-                    login({
-                        email: values.email,
-                        password: values.password,
-                    });
+                    changePasswordHandler(
+                        {
+                            newPassword: values.newPassword,
+                            token: token,
+                        },
+                        () => router.push('/change-password/expired')
+                    );
                 }}
             >
                 {({ handleSubmit, isSubmitting }) => {
@@ -66,7 +88,7 @@ export const LoginForm = () => {
                                 <AutoErrorInjection />
                                 <Grid justify={'center'} gutter={'xl'}>
                                     <Grid.Col span={12}>
-                                        <Field name={'email'}>
+                                        <Field name={'newPassword'}>
                                             {({ field, meta }: FieldProps) => (
                                                 <TextInput
                                                     {...field}
@@ -74,19 +96,14 @@ export const LoginForm = () => {
                                                         meta.touched &&
                                                         meta.error
                                                     }
-                                                    label={'email'}
-                                                    type={'email'}
-                                                    placeholder={
-                                                        'chilipepperpete@imho.com'
-                                                    }
+                                                    label={'New Password'}
+                                                    type={'password'}
                                                     required
                                                     disabled={loading}
                                                 />
                                             )}
                                         </Field>
-                                    </Grid.Col>
-                                    <Grid.Col span={12}>
-                                        <Field name={'password'}>
+                                        <Field name={'passwordConfirm'}>
                                             {({ field, meta }: FieldProps) => (
                                                 <TextInput
                                                     {...field}
@@ -94,9 +111,10 @@ export const LoginForm = () => {
                                                         meta.touched &&
                                                         meta.error
                                                     }
-                                                    label={'password'}
+                                                    label={
+                                                        'Confirm New Password'
+                                                    }
                                                     type={'password'}
-                                                    placeholder={'iloveimho!'}
                                                     required
                                                     disabled={loading}
                                                 />
@@ -114,23 +132,9 @@ export const LoginForm = () => {
                                                     deg: 35,
                                                 }}
                                                 size={'md'}
+                                                mb={10}
                                             >
-                                                Login
-                                            </Button>
-                                        </Center>
-                                    </Grid.Col>
-                                    <Grid.Col span={12}>
-                                        <Center>
-                                            <Button
-                                                variant={'subtle'}
-                                                size={'xs'}
-                                                onClick={() =>
-                                                    router.push(
-                                                        '/forgot-password'
-                                                    )
-                                                }
-                                            >
-                                                Forgot Password
+                                                Submit
                                             </Button>
                                         </Center>
                                     </Grid.Col>
