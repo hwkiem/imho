@@ -42,6 +42,9 @@ export default function ChangePasswordPage() {
                 <ChangePasswordForm token={token} />
             </MotionContainer>
         );
+    else {
+        return <>Ooops...</>;
+    }
 }
 
 ChangePasswordPage.requireAuth = false;
