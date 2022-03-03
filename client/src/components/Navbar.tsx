@@ -35,7 +35,6 @@ export const Navbar = ({ openModal }: NavbarProps) => {
                         sx={{
                             fontSize: 30,
                             fontWeight: 300,
-                            letterSpacing: -2,
                             '@media (max-width: 755px)': {
                                 fontSize: 20,
                             },
@@ -46,7 +45,6 @@ export const Navbar = ({ openModal }: NavbarProps) => {
                             inherit
                             variant="gradient"
                             gradient={{ from: 'pink', to: 'cyan', deg: 45 }}
-                            component="span"
                         >
                             In My Housing Opinion
                         </Text>
