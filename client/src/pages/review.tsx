@@ -590,13 +590,16 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+                                                                                    '@media: (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#32a852',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#32a852',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
                                                                                     border: 0,
                                                                                     height: 100,
@@ -769,14 +772,19 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+
+                                                                                    '@media (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#85581b',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#85581b',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
+
                                                                                     border: 0,
                                                                                     height: 100,
                                                                                     paddingLeft: 20,
@@ -954,13 +962,16 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+                                                                                    '@media (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#940c1e',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#940c1e',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
                                                                                     border: 0,
                                                                                     height: 100,
