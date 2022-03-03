@@ -592,8 +592,6 @@ export default function ReviewPage() {
                                                                                                   .gray[2],
                                                                                     '@media: (hover: hover)':
                                                                                         {
-                                                                                            pointerEvents:
-                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
@@ -749,6 +747,11 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    '@media (max-width: 755px)':
+                                                                                        {
+                                                                                            pointerEvents:
+                                                                                                'none',
+                                                                                        },
                                                                                     color:
                                                                                         theme.colorScheme ==
                                                                                         'dark'
@@ -772,8 +775,6 @@ export default function ReviewPage() {
 
                                                                                     '@media (hover: hover)':
                                                                                         {
-                                                                                            pointerEvents:
-                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
@@ -936,6 +937,11 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    '@media (max-width: 755px)':
+                                                                                        {
+                                                                                            pointerEvents:
+                                                                                                'none',
+                                                                                        },
                                                                                     color:
                                                                                         theme.colorScheme ==
                                                                                         'dark'
@@ -956,10 +962,9 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
+
                                                                                     '@media (hover: hover)':
                                                                                         {
-                                                                                            pointerEvents:
-                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
