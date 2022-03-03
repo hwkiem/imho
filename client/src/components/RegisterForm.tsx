@@ -44,14 +44,13 @@ export const RegisterForm = () => {
                     marginTop: 20,
                 }}
             >
-                or{' '}
                 <Text
                     inherit
                     variant={'gradient'}
                     gradient={{ from: 'lime', to: 'blue', deg: -65 }}
                     component={'span'}
                 >
-                    register
+                    Register
                 </Text>{' '}
                 to save reviews, get notified about potential apartments, and
                 build your IMHO profile.

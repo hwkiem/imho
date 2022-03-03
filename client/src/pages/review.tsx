@@ -17,6 +17,7 @@ import {
     TextInput,
     Title,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { Field, FieldProps, Form, Formik } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
@@ -97,27 +98,41 @@ export default function ReviewPage() {
 
     const [subErrDialog, setSubErrDialog] = useState<string | null>(null);
 
+    const smallScreen = useMediaQuery('(max-width: 755px)');
+
     return (
         <Container>
-            <Stepper
-                active={activeStep}
-                onStepClick={onStepClick}
-                radius="md"
-                color="pink"
-            >
-                <Stepper.Step label="The whereabouts" />
-                <Stepper.Step
-                    label="The logistics"
-                    allowStepSelect={curStep > 1}
-                />
-                <Stepper.Step
-                    label="the good, the bad, the ugly"
-                    allowStepSelect={curStep > 2}
-                />
-                <Stepper.Step label="comments" allowStepSelect={curStep > 2} />
-            </Stepper>
+            {!smallScreen && (
+                <Stepper
+                    active={activeStep}
+                    onStepClick={onStepClick}
+                    radius="md"
+                    color="pink"
+                >
+                    <Stepper.Step label="The whereabouts" />
+                    <Stepper.Step
+                        label="The logistics"
+                        allowStepSelect={curStep > 1}
+                    />
+                    <Stepper.Step
+                        label="the good, the bad, the ugly"
+                        allowStepSelect={curStep > 2}
+                    />
+                    <Stepper.Step
+                        label="comments"
+                        allowStepSelect={curStep > 2}
+                    />
+                </Stepper>
+            )}
             <Title
-                sx={{ fontSize: 40, fontWeight: 900, letterSpacing: -2 }}
+                sx={{
+                    fontSize: 40,
+                    fontWeight: 900,
+                    letterSpacing: -2,
+                    '@media (max-width: 755px)': {
+                        fontSize: 30,
+                    },
+                }}
                 align="center"
                 mt={20}
             >
@@ -406,6 +421,13 @@ export default function ReviewPage() {
                                                     <Slider
                                                         label={null}
                                                         mt={40}
+                                                        sx={{
+                                                            '@media (max-width: 755px)':
+                                                                {
+                                                                    paddingLeft: 5,
+                                                                    paddingRight: 5,
+                                                                },
+                                                        }}
                                                         color="pink"
                                                         size="xl"
                                                         radius="xs"
@@ -446,6 +468,7 @@ export default function ReviewPage() {
                                                     <Center>
                                                         <Button
                                                             mt={60}
+                                                            mb={5}
                                                             size="lg"
                                                             variant="gradient"
                                                             gradient={{
@@ -511,11 +534,6 @@ export default function ReviewPage() {
                                                             },
                                                             {
                                                                 maxWidth: 755,
-                                                                cols: 2,
-                                                                spacing: 'sm',
-                                                            },
-                                                            {
-                                                                maxWidth: 600,
                                                                 cols: 1,
                                                                 spacing: 'sm',
                                                             },
@@ -623,6 +641,7 @@ export default function ReviewPage() {
                                                     <Center>
                                                         <Button
                                                             mt={60}
+                                                            mb={5}
                                                             size="lg"
                                                             variant="gradient"
                                                             gradient={{
@@ -801,6 +820,7 @@ export default function ReviewPage() {
                                                     <Center>
                                                         <Button
                                                             mt={60}
+                                                            mb={5}
                                                             size="lg"
                                                             variant="gradient"
                                                             gradient={{
@@ -985,6 +1005,7 @@ export default function ReviewPage() {
                                                     <Center>
                                                         <Button
                                                             mt={60}
+                                                            mb={5}
                                                             size="lg"
                                                             variant="gradient"
                                                             gradient={{
@@ -1007,16 +1028,31 @@ export default function ReviewPage() {
                                                 <>
                                                     <SimpleGrid
                                                         cols={3}
-                                                        spacing={'lg'}
+                                                        breakpoints={[
+                                                            {
+                                                                maxWidth: 980,
+                                                                cols: 3,
+                                                                spacing: 'md',
+                                                            },
+                                                            {
+                                                                maxWidth: 755,
+                                                                cols: 1,
+                                                                spacing: 'sm',
+                                                            },
+                                                        ]}
                                                     >
                                                         <Box>
                                                             <Title
                                                                 sx={{
                                                                     fontSize: 26,
                                                                     fontWeight: 300,
+                                                                    marginTop: 40,
+                                                                    '@media (max-width: 755px)':
+                                                                        {
+                                                                            marginTop: 10,
+                                                                        },
                                                                 }}
                                                                 align="center"
-                                                                mt={50}
                                                             >
                                                                 Pros
                                                             </Title>
@@ -1036,26 +1072,6 @@ export default function ReviewPage() {
                                                                 <SimpleGrid
                                                                     cols={1}
                                                                     spacing="sm"
-                                                                    breakpoints={[
-                                                                        {
-                                                                            maxWidth: 980,
-                                                                            cols: 3,
-                                                                            spacing:
-                                                                                'md',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 755,
-                                                                            cols: 2,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 600,
-                                                                            cols: 1,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                    ]}
                                                                 >
                                                                     {values.reviewInput.flagInput.pros.map(
                                                                         (f) => {
@@ -1093,9 +1109,13 @@ export default function ReviewPage() {
                                                                 sx={{
                                                                     fontSize: 26,
                                                                     fontWeight: 300,
+                                                                    marginTop: 40,
+                                                                    '@media (max-width: 755px)':
+                                                                        {
+                                                                            marginTop: 10,
+                                                                        },
                                                                 }}
                                                                 align="center"
-                                                                mt={50}
                                                             >
                                                                 Cons
                                                             </Title>
@@ -1104,42 +1124,17 @@ export default function ReviewPage() {
                                                                 .length == 0 ? (
                                                                 <Center>
                                                                     <Text>
-                                                                        If you
-                                                                        login
-                                                                        you'll
-                                                                        be able
-                                                                        to edit
-                                                                        this
-                                                                        review
-                                                                        if
-                                                                        anything
-                                                                        changes!
+                                                                        We're
+                                                                        thrilled
+                                                                        you had
+                                                                        a great
+                                                                        experience!
                                                                     </Text>
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
                                                                     cols={1}
                                                                     spacing="sm"
-                                                                    breakpoints={[
-                                                                        {
-                                                                            maxWidth: 980,
-                                                                            cols: 3,
-                                                                            spacing:
-                                                                                'md',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 755,
-                                                                            cols: 2,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 600,
-                                                                            cols: 1,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                    ]}
                                                                 >
                                                                     {values.reviewInput.flagInput.cons.map(
                                                                         (f) => {
@@ -1177,9 +1172,13 @@ export default function ReviewPage() {
                                                                 sx={{
                                                                     fontSize: 26,
                                                                     fontWeight: 300,
+                                                                    marginTop: 40,
+                                                                    '@media (max-width: 755px)':
+                                                                        {
+                                                                            marginTop: 10,
+                                                                        },
                                                                 }}
                                                                 align="center"
-                                                                mt={50}
                                                             >
                                                                 Dealbreakers
                                                             </Title>
@@ -1189,38 +1188,14 @@ export default function ReviewPage() {
                                                                 .length == 0 ? (
                                                                 <Center>
                                                                     <Text>
-                                                                        None!
-                                                                        We're
-                                                                        glad you
-                                                                        had such
-                                                                        a good
-                                                                        experience.
+                                                                        Lucky
+                                                                        you.
                                                                     </Text>
                                                                 </Center>
                                                             ) : (
                                                                 <SimpleGrid
                                                                     cols={1}
                                                                     spacing="sm"
-                                                                    breakpoints={[
-                                                                        {
-                                                                            maxWidth: 980,
-                                                                            cols: 3,
-                                                                            spacing:
-                                                                                'md',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 755,
-                                                                            cols: 2,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                        {
-                                                                            maxWidth: 600,
-                                                                            cols: 1,
-                                                                            spacing:
-                                                                                'sm',
-                                                                        },
-                                                                    ]}
                                                                 >
                                                                     {values.reviewInput.flagInput.dbks.map(
                                                                         (f) => {
@@ -1257,9 +1232,13 @@ export default function ReviewPage() {
                                                         sx={{
                                                             fontSize: 26,
                                                             fontWeight: 300,
+                                                            marginTop: 40,
+                                                            '@media (max-width: 755px)':
+                                                                {
+                                                                    marginTop: 10,
+                                                                },
                                                         }}
                                                         align="center"
-                                                        mt={20}
                                                     >
                                                         Comments
                                                     </Title>
@@ -1274,12 +1253,16 @@ export default function ReviewPage() {
                                                             <Textarea
                                                                 {...field}
                                                                 mt={10}
-                                                                placeholder="Anything else to add?"
-                                                                description="Don't worry! These are anonymous."
+                                                                placeholder="Don't worry! These are anonymous."
+                                                                description="Does your review describe your experience living at this address? what else would you tell a person looking to rent here?"
                                                                 radius="md"
                                                                 size="md"
                                                                 autosize
-                                                                minRows={6}
+                                                                minRows={
+                                                                    smallScreen
+                                                                        ? 3
+                                                                        : 6
+                                                                }
                                                                 maxRows={10}
                                                             />
                                                         )}

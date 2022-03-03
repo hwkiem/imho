@@ -30,9 +30,17 @@ export default function SearchPage() {
             key={'review'}
         >
             <Title
-                sx={{ fontSize: 60, fontWeight: 900, letterSpacing: -2 }}
+                sx={{
+                    fontSize: 60,
+                    fontWeight: 900,
+                    letterSpacing: -2,
+                    marginTop: 50,
+                    '@media (max-width: 755px)': {
+                        fontSize: 30,
+                        marginTop: 60,
+                    },
+                }}
                 align="center"
-                mt={50}
             >
                 You've got questions,<br></br>
                 <Text
@@ -48,7 +56,14 @@ export default function SearchPage() {
             <Text
                 color="dimmed"
                 align="center"
-                sx={{ maxWidth: 580, fontSize: 30 }}
+                sx={{
+                    maxWidth: 580,
+                    fontSize: 30,
+                    '@media (max-width: 755px)': {
+                        fontSize: 16,
+                        marginTop: 10,
+                    },
+                }}
                 mx="auto"
                 mt="sm"
             >

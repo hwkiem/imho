@@ -5,6 +5,8 @@ import {
     Button,
     Center,
     Grid,
+    Popover,
+    Progress,
     SimpleGrid,
     Text,
     TextInput,
@@ -13,7 +15,7 @@ import {
 import { Variants } from 'framer-motion';
 import {} from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import {
     FlagWithCount,
@@ -23,6 +25,7 @@ import {
 import useAuth from '../../lib/useAuth';
 import { MotionContainer } from '../../utils/motion';
 import usePlacesService from 'react-google-autocomplete/lib/usePlacesAutocompleteService';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function PlacePage() {
     const variants: Variants = {
@@ -61,6 +64,17 @@ export default function PlacePage() {
     });
 
     const [address, setAddress] = useState('');
+
+    const [successfullyTracked, setSuccessfullyTracked] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    const smallScreen = useMediaQuery('(max-width: 755px)');
+
+    useEffect(() => {
+        if (progress > 200) {
+            router.push('/search');
+        }
+    }, [progress, router]);
 
     placesService?.getDetails({ placeId: placeId }, (place) =>
         place ? setAddress(place.formatted_address ?? '') : null
@@ -127,41 +141,26 @@ export default function PlacePage() {
             </Center>
             <Center>
                 <Title
-                    sx={{
-                        fontSize: 30,
-                        fontWeight: 500,
-                        letterSpacing: -2,
-                    }}
-                    align="left"
-                    mt={50}
+                    sx={{ fontSize: 40, fontWeight: 200 }}
+                    align="center"
+                    mt={smallScreen ? 10 : 100}
                 >
-                    Average Rating:
+                    <Text
+                        inherit
+                        component={'span'}
+                        variant="gradient"
+                        gradient={{ from: 'green', to: 'blue', deg: 45 }}
+                        sx={{ letterSpacing: -2 }}
+                    >
+                        {data.getPlace.result.wouldRecommendRatio?.recommend} /{' '}
+                        {data.getPlace.result.wouldRecommendRatio?.total}
+                    </Text>{' '}
+                    reviewers would recommend.
                 </Title>
             </Center>
-            <Center>
-                <Text
-                    variant="gradient"
-                    gradient={{ from: 'orange', to: 'violet', deg: 45 }}
-                    sx={{ fontSize: 40 }}
-                >
-                    {data.getPlace.result.averageRating?.toFixed(1)}%
-                </Text>
-            </Center>
-            <Title
-                sx={{
-                    fontSize: 30,
-                    fontWeight: 500,
-                    letterSpacing: -2,
-                }}
-                align="left"
-                mt={50}
-            >
-                Common Flags:
-            </Title>
             <SimpleGrid
-                mt={30}
-                cols={4}
-                spacing="lg"
+                cols={3}
+                spacing={'lg'}
                 breakpoints={[
                     {
                         maxWidth: 980,
@@ -170,28 +169,159 @@ export default function PlacePage() {
                     },
                     {
                         maxWidth: 755,
-                        cols: 2,
-                        spacing: 'sm',
-                    },
-                    {
-                        maxWidth: 600,
                         cols: 1,
                         spacing: 'sm',
                     },
                 ]}
             >
-                {topFlagsSorted.map((fg) => (
-                    <Badge
-                        key={fg.topic}
-                        color={fg.color}
-                        variant={'filled'}
-                        size={'xl'}
-                        radius={'sm'}
-                        leftSection={<Box mr={10}>{fg.cnt}</Box>}
+                <Box>
+                    <Title
+                        sx={{
+                            fontSize: 26,
+                            fontWeight: 300,
+                        }}
+                        align="center"
+                        mt={smallScreen ? 10 : 50}
                     >
-                        {fg.topic}
-                    </Badge>
-                ))}
+                        Pros
+                    </Title>
+                    {data.getPlace.result.topNFlags?.pros.length == 0 ? (
+                        <Center>
+                            <Text>Anyone have anything nice to say?</Text>
+                        </Center>
+                    ) : (
+                        <SimpleGrid
+                            cols={1}
+                            spacing="sm"
+                            breakpoints={[
+                                {
+                                    maxWidth: 980,
+                                    cols: 3,
+                                    spacing: 'md',
+                                },
+                                {
+                                    maxWidth: 755,
+                                    cols: 1,
+                                    spacing: 'sm',
+                                },
+                            ]}
+                        >
+                            {data.getPlace.result.topNFlags?.pros.map((f) => {
+                                return (
+                                    <Badge
+                                        key={f.topic}
+                                        color={'green'}
+                                        variant={'filled'}
+                                        size={'xl'}
+                                        radius={'sm'}
+                                        leftSection={<Box mr={10}>{f.cnt}</Box>}
+                                    >
+                                        {f.topic}
+                                    </Badge>
+                                );
+                            })}
+                        </SimpleGrid>
+                    )}
+                </Box>
+                <Box>
+                    <Title
+                        sx={{
+                            fontSize: 26,
+                            fontWeight: 300,
+                        }}
+                        align="center"
+                        mt={smallScreen ? 10 : 50}
+                    >
+                        Cons
+                    </Title>
+                    {data.getPlace.result.topNFlags?.cons.length == 0 ? (
+                        <Center>
+                            <Text>No cons to be seen!</Text>
+                        </Center>
+                    ) : (
+                        <SimpleGrid
+                            cols={1}
+                            spacing="sm"
+                            breakpoints={[
+                                {
+                                    maxWidth: 980,
+                                    cols: 3,
+                                    spacing: 'md',
+                                },
+                                {
+                                    maxWidth: 755,
+                                    cols: 1,
+                                    spacing: 'sm',
+                                },
+                            ]}
+                        >
+                            {data.getPlace.result.topNFlags?.cons.map((f) => {
+                                return (
+                                    <Badge
+                                        key={f.topic}
+                                        color={'orange'}
+                                        variant={'filled'}
+                                        size={'xl'}
+                                        radius={'sm'}
+                                        leftSection={<Box mr={10}>{f.cnt}</Box>}
+                                    >
+                                        {f.topic}
+                                    </Badge>
+                                );
+                            })}
+                        </SimpleGrid>
+                    )}
+                </Box>
+                <Box>
+                    <Title
+                        sx={{
+                            fontSize: 26,
+                            fontWeight: 300,
+                        }}
+                        align="center"
+                        mt={smallScreen ? 10 : 50}
+                    >
+                        Dealbreakers
+                    </Title>
+
+                    {data.getPlace.result.topNFlags?.dbks.length == 0 ? (
+                        <Center>
+                            <Text>None! That's a great sign.</Text>
+                        </Center>
+                    ) : (
+                        <SimpleGrid
+                            cols={1}
+                            spacing="sm"
+                            breakpoints={[
+                                {
+                                    maxWidth: 980,
+                                    cols: 3,
+                                    spacing: 'md',
+                                },
+                                {
+                                    maxWidth: 755,
+                                    cols: 1,
+                                    spacing: 'sm',
+                                },
+                            ]}
+                        >
+                            {data.getPlace.result.topNFlags?.dbks.map((f) => {
+                                return (
+                                    <Badge
+                                        key={f.topic}
+                                        color={'red'}
+                                        variant={'filled'}
+                                        size={'xl'}
+                                        radius={'sm'}
+                                        leftSection={<Box mr={10}>{f.cnt}</Box>}
+                                    >
+                                        {f.topic}
+                                    </Badge>
+                                );
+                            })}
+                        </SimpleGrid>
+                    )}
+                </Box>
             </SimpleGrid>
             <Title
                 sx={{
@@ -240,20 +370,70 @@ export default function PlacePage() {
             </Title>
             {user && (
                 <Center mt={20}>
-                    <Button
-                        onClick={() => {
-                            trackPlace({
-                                variables: {
-                                    placeInput: {
-                                        google_place_id: placeId,
-                                        formatted_address: address,
-                                    },
-                                },
-                            });
-                        }}
+                    <Popover
+                        opened={successfullyTracked}
+                        onClose={() => router.push('/search')}
+                        target={
+                            <Button
+                                onClick={() => {
+                                    trackPlace({
+                                        variables: {
+                                            placeInput: {
+                                                google_place_id: placeId,
+                                                formatted_address: address,
+                                            },
+                                        },
+                                    })
+                                        .then(({ data }) => {
+                                            if (data?.trackPlace.result) {
+                                                setSuccessfullyTracked(true);
+                                                setInterval(
+                                                    () =>
+                                                        setProgress(
+                                                            (pr) => pr + 1
+                                                        ),
+                                                    10
+                                                );
+                                            } else if (
+                                                data?.trackPlace.errors
+                                            ) {
+                                                console.log(
+                                                    data.trackPlace.errors
+                                                );
+                                                setErrorMessage(
+                                                    data.trackPlace.errors[0]
+                                                        .error
+                                                );
+                                            } else {
+                                                console.log(
+                                                    'failed for some other reason...'
+                                                );
+                                                router.push('/error');
+                                            }
+                                        })
+                                        .catch((err) => {
+                                            console.log('caught some error');
+                                            console.log(err);
+                                            router.push('/error');
+                                        });
+                                }}
+                            >
+                                Yes Please!
+                            </Button>
+                        }
+                        width={260}
+                        position="bottom"
+                        withArrow
                     >
-                        Yes Please!
-                    </Button>
+                        <Text size="md">
+                            You're now tracking this address. We'll email you if
+                            something comes up!
+                        </Text>
+                        <Progress value={progress} size={'md'} />
+                        <Text size={'md'} align={'center'}>
+                            Redirecting you to the home screen.
+                        </Text>
+                    </Popover>
                 </Center>
             )}
             {!user && (
@@ -272,51 +452,76 @@ export default function PlacePage() {
                         />
                     </Center>
                     <Center>
-                        <Button
-                            mt={20}
-                            variant={'subtle'}
-                            size={'xl'}
-                            onClick={async () => {
-                                if (email) {
-                                    trackPlace({
-                                        variables: {
-                                            email: email,
-                                            placeInput: {
-                                                google_place_id: placeId,
-                                                formatted_address: address,
+                        <Popover
+                            opened={successfullyTracked}
+                            onClose={() => router.push('/search')}
+                            target={
+                                <Button
+                                    mt={10}
+                                    onClick={() => {
+                                        trackPlace({
+                                            variables: {
+                                                placeInput: {
+                                                    google_place_id: placeId,
+                                                    formatted_address: address,
+                                                },
+                                                email: email,
                                             },
-                                        },
-                                    })
-                                        .then((res) => {
-                                            if (res.data?.trackPlace.result) {
-                                                router.push('/');
-                                            } else if (
-                                                res.data?.trackPlace.errors
-                                            ) {
-                                                console.log(
-                                                    res.data.trackPlace.errors
-                                                );
-                                                setErrorMessage(
-                                                    res.data.trackPlace
-                                                        .errors[0].error
-                                                );
-                                            } else {
-                                                console.log(
-                                                    'failed for some other reason...'
-                                                );
-                                                router.push('/error');
-                                            }
                                         })
-                                        .catch((err) => {
-                                            console.log('caught some error');
-                                            console.log(err);
-                                            router.push('/error');
-                                        });
-                                }
-                            }}
+                                            .then(({ data }) => {
+                                                if (data?.trackPlace.result) {
+                                                    setSuccessfullyTracked(
+                                                        true
+                                                    );
+                                                    setInterval(
+                                                        () =>
+                                                            setProgress(
+                                                                (pr) => pr + 1
+                                                            ),
+                                                        10
+                                                    );
+                                                } else if (
+                                                    data?.trackPlace.errors
+                                                ) {
+                                                    console.log(
+                                                        data.trackPlace.errors
+                                                    );
+                                                    setErrorMessage(
+                                                        data.trackPlace
+                                                            .errors[0].error
+                                                    );
+                                                } else {
+                                                    console.log(
+                                                        'failed for some other reason...'
+                                                    );
+                                                    router.push('/error');
+                                                }
+                                            })
+                                            .catch((err) => {
+                                                console.log(
+                                                    'caught some error'
+                                                );
+                                                console.log(err);
+                                                router.push('/error');
+                                            });
+                                    }}
+                                >
+                                    Yes Please!
+                                </Button>
+                            }
+                            width={260}
+                            position="bottom"
+                            withArrow
                         >
-                            Yes Please!
-                        </Button>
+                            <Text size="md" align="center" mb={2}>
+                                You're now tracking this address. We'll email
+                                you if something comes up!
+                            </Text>
+                            <Progress value={progress} size={'md'} />
+                            <Text size={'md'} align={'center'} mt={2}>
+                                Redirecting you to the search screen.
+                            </Text>
+                        </Popover>
                     </Center>
                 </>
             )}
