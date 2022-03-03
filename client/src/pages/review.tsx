@@ -592,6 +592,8 @@ export default function ReviewPage() {
                                                                                                   .gray[2],
                                                                                     '@media: (hover: hover)':
                                                                                         {
+                                                                                            pointerEvents:
+                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
@@ -711,11 +713,6 @@ export default function ReviewPage() {
                                                             },
                                                             {
                                                                 maxWidth: 755,
-                                                                cols: 2,
-                                                                spacing: 'sm',
-                                                            },
-                                                            {
-                                                                maxWidth: 600,
                                                                 cols: 1,
                                                                 spacing: 'sm',
                                                             },
@@ -775,6 +772,8 @@ export default function ReviewPage() {
 
                                                                                     '@media (hover: hover)':
                                                                                         {
+                                                                                            pointerEvents:
+                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
@@ -912,11 +911,6 @@ export default function ReviewPage() {
                                                                 cols: 2,
                                                                 spacing: 'sm',
                                                             },
-                                                            {
-                                                                maxWidth: 600,
-                                                                cols: 1,
-                                                                spacing: 'sm',
-                                                            },
                                                         ]}
                                                     >
                                                         {Object.values(
@@ -964,6 +958,8 @@ export default function ReviewPage() {
                                                                                                   .gray[2],
                                                                                     '@media (hover: hover)':
                                                                                         {
+                                                                                            pointerEvents:
+                                                                                                'none',
                                                                                             '&:hover':
                                                                                                 {
                                                                                                     backgroundColor:
