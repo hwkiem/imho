@@ -4,6 +4,7 @@ import { FaRegCommentDots, FaSearchengin } from 'react-icons/fa';
 import { RiLoginBoxLine } from 'react-icons/ri';
 import { Variants } from 'framer-motion';
 import { MotionContainer } from '../utils/motion';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function HomePage() {
     const variants: Variants = {
@@ -16,6 +17,8 @@ export default function HomePage() {
         exit: { opacity: 0, x: 200, y: 0 },
     };
 
+    const smallScreen = useMediaQuery('(max-width: 755px)');
+
     return (
         <MotionContainer
             initial="hidden"
@@ -26,7 +29,14 @@ export default function HomePage() {
             key={'review'}
         >
             <Title
-                sx={{ fontSize: 100, fontWeight: 900, letterSpacing: -2 }}
+                sx={{
+                    fontSize: 100,
+                    fontWeight: 900,
+                    letterSpacing: -2,
+                    '@media (max-width: 755px)': {
+                        fontSize: 40,
+                    },
+                }}
                 align="center"
                 mt={100}
             >
@@ -51,7 +61,7 @@ export default function HomePage() {
             </Text>
             <Box>
                 <Grid mt={40} justify="center">
-                    <Grid.Col span={3}>
+                    <Grid.Col span={smallScreen ? 12 : 3}>
                         <Center>
                             <Link href="/review?step=1" passHref>
                                 <Button
@@ -68,7 +78,7 @@ export default function HomePage() {
                             </Link>
                         </Center>
                     </Grid.Col>
-                    <Grid.Col span={3}>
+                    <Grid.Col span={smallScreen ? 12 : 3}>
                         <Center>
                             <Link href="/search" passHref>
                                 <Button

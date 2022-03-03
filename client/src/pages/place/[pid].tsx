@@ -25,6 +25,7 @@ import {
 import useAuth from '../../lib/useAuth';
 import { MotionContainer } from '../../utils/motion';
 import usePlacesService from 'react-google-autocomplete/lib/usePlacesAutocompleteService';
+import { useMediaQuery } from '@mantine/hooks';
 
 export default function PlacePage() {
     const variants: Variants = {
@@ -66,6 +67,8 @@ export default function PlacePage() {
 
     const [successfullyTracked, setSuccessfullyTracked] = useState(false);
     const [progress, setProgress] = useState(0);
+
+    const smallScreen = useMediaQuery('(max-width: 755px)');
 
     useEffect(() => {
         if (progress > 200) {
@@ -140,7 +143,7 @@ export default function PlacePage() {
                 <Title
                     sx={{ fontSize: 40, fontWeight: 200 }}
                     align="center"
-                    mt={100}
+                    mt={smallScreen ? 10 : 100}
                 >
                     <Text
                         inherit
@@ -155,7 +158,22 @@ export default function PlacePage() {
                     reviewers would recommend.
                 </Title>
             </Center>
-            <SimpleGrid cols={3} spacing={'lg'}>
+            <SimpleGrid
+                cols={3}
+                spacing={'lg'}
+                breakpoints={[
+                    {
+                        maxWidth: 980,
+                        cols: 3,
+                        spacing: 'md',
+                    },
+                    {
+                        maxWidth: 755,
+                        cols: 1,
+                        spacing: 'sm',
+                    },
+                ]}
+            >
                 <Box>
                     <Title
                         sx={{
@@ -163,7 +181,7 @@ export default function PlacePage() {
                             fontWeight: 300,
                         }}
                         align="center"
-                        mt={50}
+                        mt={smallScreen ? 10 : 50}
                     >
                         Pros
                     </Title>
@@ -183,11 +201,6 @@ export default function PlacePage() {
                                 },
                                 {
                                     maxWidth: 755,
-                                    cols: 2,
-                                    spacing: 'sm',
-                                },
-                                {
-                                    maxWidth: 600,
                                     cols: 1,
                                     spacing: 'sm',
                                 },
@@ -217,7 +230,7 @@ export default function PlacePage() {
                             fontWeight: 300,
                         }}
                         align="center"
-                        mt={50}
+                        mt={smallScreen ? 10 : 50}
                     >
                         Cons
                     </Title>
@@ -237,11 +250,6 @@ export default function PlacePage() {
                                 },
                                 {
                                     maxWidth: 755,
-                                    cols: 2,
-                                    spacing: 'sm',
-                                },
-                                {
-                                    maxWidth: 600,
                                     cols: 1,
                                     spacing: 'sm',
                                 },
@@ -271,7 +279,7 @@ export default function PlacePage() {
                             fontWeight: 300,
                         }}
                         align="center"
-                        mt={50}
+                        mt={smallScreen ? 10 : 50}
                     >
                         Dealbreakers
                     </Title>
@@ -292,11 +300,6 @@ export default function PlacePage() {
                                 },
                                 {
                                     maxWidth: 755,
-                                    cols: 2,
-                                    spacing: 'sm',
-                                },
-                                {
-                                    maxWidth: 600,
                                     cols: 1,
                                     spacing: 'sm',
                                 },
