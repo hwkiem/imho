@@ -7,6 +7,8 @@ export class Flags {
     @Field(() => [ProFlagType])
     pros: ProFlagType[];
 
+    
+
     @Field(() => [ConFlagType])
     cons: ConFlagType[];
 

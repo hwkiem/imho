@@ -170,11 +170,7 @@ export class ReviewResolver {
         };
 
         try {
-            const review = await em.findOneOrFail(
-                Review,
-                { id: reviewId },
-                { populate: ['author'] }
-            );
+            const review = await em.findOneOrFail(Review, { id: reviewId });
             if (review.author) {
                 if (req.session.userId === null) {
                     return {
