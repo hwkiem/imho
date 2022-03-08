@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import cors from 'cors';
-import { buildSchema, registerEnumType } from 'type-graphql';
+import { buildSchema } from 'type-graphql';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
@@ -14,45 +14,21 @@ import {
     RequestContext,
 } from '@mikro-orm/core';
 import { ReviewResolver } from './resolvers/review.resolver';
-import {
-    ConFlagType,
-    DbkFlagType,
-    ProFlagType,
-} from './utils/enums/FlagType.enum';
+
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';
 import { UserResolver } from './resolvers/user.resolver';
 import Container from 'typedi';
-import { UserRoles } from './utils/enums/UserRoles';
+import registerTypegraphqlEnums from './services/registerTypegraphqlEnums';
 
 const main = async () => {
     const app = express();
 
-    // TODO: create service for this
-    registerEnumType(ProFlagType, {
-        name: 'ProFlagTypes',
-        description: 'All the positive flag topics',
-    });
-
-    registerEnumType(DbkFlagType, {
-        name: 'DbkFlagTypes',
-        description: 'All the dealbreakers',
-    });
-
-    registerEnumType(ConFlagType, {
-        name: 'ConFlagTypes',
-        description: 'All the negative flag topics',
-    });
-
-    registerEnumType(UserRoles, {
-        name: 'UserRoles',
-        description: 'Users are admin or normal privilege',
-    });
+    registerTypegraphqlEnums();
 
     const orm: MikroORM<IDatabaseDriver<Connection>> = await (async () => {
         try {
-            // const orm = await MikroORM.init<PostgreSqlDriver>({
             const orm = await MikroORM.init({
                 ...ormConfig,
                 clientUrl: process.env.DATABASE_URL, // overwrite cli setting
@@ -77,7 +53,6 @@ const main = async () => {
 
     app.set('trust proxy', 1);
 
-    // fixed url whitelist
     const whitelist: (string | RegExp)[] = process.env.CORS_ORIGIN_WHITELIST
         ? process.env.CORS_ORIGIN_WHITELIST.split(' ')
         : ([] as string[]);
@@ -119,7 +94,7 @@ const main = async () => {
         RequestContext.create(orm.em, next);
     });
 
-    // Configure AppolloServer
+    // Configure ApolloServer
     const apolloServer = new ApolloServer({
         plugins:
             process.env.NODE_ENV === 'dev'
@@ -146,7 +121,7 @@ const main = async () => {
             `server started on http://localhost:${process.env.PORT}/graphql`
         );
     });
-}; //
+};
 
 main().catch((err) => {
     console.error(err);
