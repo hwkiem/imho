@@ -26,14 +26,15 @@ export class Review extends Base<Review> {
     }
 
     @ManyToOne(() => ImhoUser, { nullable: true })
-    public author: ImhoUser | null;
+    public author: ImhoUser | undefined;
 
     /**
      * User who wrote this review
      */
     @Field(() => ImhoUser, { nullable: true })
     async myAuthor(@Root() review: Review): Promise<ImhoUser | null> {
-        if (review.author === null) return null;
+        // can be undefined when creating object but will be null when fetching ...
+        if (review.author === undefined || review.author === null) return null;
         if (!review.author.isInitialized()) {
             await review.author.init();
         }

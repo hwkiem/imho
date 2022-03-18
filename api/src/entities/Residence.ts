@@ -8,12 +8,14 @@ import {
     Unique,
 } from '@mikro-orm/core';
 import { Review } from './Review';
-import { Ctx, Field, Float, ObjectType, Root } from 'type-graphql';
+import { Arg, Ctx, Field, Float, Int, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { ResidenceValidator } from '../validators/ResidenceValidator';
 import { Place } from './Place';
 import { MyContext } from '../utils/context';
 import { EntityManager } from '@mikro-orm/postgresql';
+import { ProFlags, TopNFlagsResponse } from '../utils/types/Flag';
+import { AllConFlags, AllProFlags } from '../utils/enums/FlagType.enum';
 
 export const SINGLE_FAMILY = 'single family';
 
@@ -73,6 +75,109 @@ export class Residence extends Base<Residence> {
 
         if (!res[0].avg) return null;
         return +res[0].avg;
+    }
+
+    @Field(() => TopNFlagsResponse, { nullable: true })
+    async topNFlags(
+        @Root() residence: Residence,
+        @Arg('n', () => Int, { nullable: true }) n = 5
+    ): Promise<TopNFlagsResponse | undefined> {
+        const reviewsRef = await this.reviews(residence);
+        if (reviewsRef === null) return;
+        const reviews = await reviewsRef.loadItems();
+        const counter = {
+            pros: {} as { [key in AllProFlags]: number },
+            cons: {} as { [key in AllConFlags]: number },
+        };
+
+        reviews.forEach((review: Review) => {
+            const flags = review.flags(review);
+            if (flags === undefined) return;
+            // all pros
+            if (flags.pros.misc) {
+                flags.pros.misc.forEach((f) => {
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
+                });
+            }
+            if (flags.pros.bathroom) {
+                flags.pros.bathroom.forEach((f) => {
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
+                });
+            }
+            if (flags.pros.kitchen) {
+                flags.pros.kitchen.forEach((f) => {
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
+                });
+            }
+            if (flags.pros.location) {
+                flags.pros.location.forEach((f) => {
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
+                });
+            }
+            if (flags.pros.landlord) {
+                flags.pros.landlord.forEach((f) => {
+                    counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;
+                });
+            }
+            // all cons
+            if (flags.cons.misc) {
+                flags.cons.misc.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.bathroom) {
+                flags.cons.bathroom.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.maintenance) {
+                flags.cons.maintenance.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.utilities) {
+                flags.cons.utilities.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.smells) {
+                flags.cons.smells.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.location) {
+                flags.cons.location.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+            if (flags.cons.landlord) {
+                flags.cons.landlord.forEach((f) => {
+                    counter.cons[f] = counter.cons[f] ? ++counter.cons[f] : 1;
+                });
+            }
+        });
+        // COUNTER IS FULL
+        const result: TopNFlagsResponse = { pros: [], cons: [] };
+
+        const filtered = Object.entries(counter.pros)
+            .concat(Object.entries(counter.cons))
+            .sort(([, aval], [, bval]) => bval - aval)
+            .slice(0, n);
+
+        for (const fc of filtered) {
+            const [key, val] = fc;
+            if (
+                Object.values(ProFlags)
+                    .map((pro: string) => pro)
+                    .includes(key)
+            ) {
+                result.pros.push({ topic: key, cnt: val });
+            } else {
+                result.cons.push({ topic: key, cnt: val });
+            }
+        }
+
+        return result;
     }
 
     constructor(body: ResidenceValidator) {

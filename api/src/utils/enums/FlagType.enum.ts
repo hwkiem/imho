@@ -1,29 +1,73 @@
-/**
- * This file contains the definitions for all flag types.
- *
- * The goal is to have these enums propagate all the way to
- * the client
- */
+/* Pros */
 
-// Pro subflags
+/**
+ * pros which don't belong to a category
+ */
+export enum MiscPros {
+    NATURAL_LIGHT = 'Plenty of Natural Light',
+    RELIABLE_LIGHTS = 'Reliable light fixtures',
+    BRIGHT = 'No need for lamps',
+    AMENITIES = 'Amazing Amenities',
+    POOL = 'the Pool',
+    GYM = 'the Gym',
+    MAILROOM = 'the Mailroom',
+    OUTDOOR = 'the Outdoor Space',
+    MAINTENANCE_FREQ = 'Very Few Maintenance Issues',
+    MAINTENANCE_QUAL = 'Maintenance Issues handled well',
+    PETS = 'Great for my Pets',
+    KIDS = 'Great for my Kids',
+}
+
+// Pro Subflags
 export enum BathroomSubflagsPro {
+    BATHROOM = 'the Bathroom',
     WATER_PRESSURE = 'Great water pressure',
     HOT_WATER = 'Shower stays hot for days',
 }
 
 export enum KitchenSubflagsPro {
+    KITCHEN = 'the Kitchen',
     DISHWASHER = 'Great dishwasher',
     DISPOSAL = 'Great garbage disposal',
     KITCHEN_APPLIANCES = 'Reliable kitchen appliances',
 }
 
-export enum NeighborsSubflagsPro {
+export enum LocationSubflagsPro {
+    LOCATION = 'the Location',
     FRIENDLY = 'Friendly',
-    QUIET_BLDG = 'Quiet building',
+    BLDG_NOISE = 'Quiet building',
+    TOWN_NOISE = 'Quiet neighborhood',
+    NEAR_FUN = 'Near restaraunts, bars',
+    TRAVERSABLE = 'Walkable, bikable',
+    NEAR_FOOD = 'Near a grocery store',
+    NEAR_TRANSIT = 'Near public transit',
 }
 
-// Con subflags
+export enum LandlordSubflagsPro {
+    LANDLORD = 'my Landlord, Management company',
+    COMMUNICATION = 'Landlord communicates well',
+    PRIVACY = 'Landlord respects my privacy',
+    SUBLETS = 'Landlord allows sublets',
+    VALUE = 'This place is a great value for the money',
+}
+
+/* CONS */
+
+/**
+ * cons which map to no categories
+ */
+export enum MiscCons {
+    KITCHEN_APPLIANCES = 'Kitchen Appliances in bad shape',
+    NATURAL_LIGHT = 'Not much natural light',
+    RELIABLE_LIGHTS = 'Unreliable light fixtures',
+    BRIGHT = "You'll need lamps for lights",
+    AMENITIES = 'Amenities not as advertised',
+}
+
+// Con Subflags
+
 export enum BathroomSubflagsCon {
+    BATHROOM = 'the Bathroom',
     WATER_PRESSURE = 'The shower water pressure was weak',
     HOT_WATER = "Hot water doesn't last",
     CLOG = 'Toilet frequently clogged',
@@ -32,11 +76,21 @@ export enum BathroomSubflagsCon {
 }
 
 export enum MaintenanceSubflagsCon {
+    MAINTENANCE = 'Maintenance issues',
     ELECTICAL = 'Electrical issues',
     PLUMBING = 'Plumbing issues',
     APPLIANCES = 'Appliance issues',
     PESTS = 'Pest issues',
     STRUCTURAL = 'Structural issues',
+    MAINTENANCE_FREQ = 'Frequent maintenance issues',
+    MAINTENANCE_QUAL = 'Maintenance Issues handled poorly',
+}
+
+export enum UtilitiesSubflagsCon {
+    UTILITIES = 'the Utilities',
+    HEATING_QUAL = "Heat isn't good",
+    AIRCON_QUAL = "AC isn't good",
+    UTIL_COST = 'Expensive utilities',
 }
 
 export enum SmellSubflagsCon {
@@ -45,18 +99,10 @@ export enum SmellSubflagsCon {
     SMOKE = 'Smoke smells',
 }
 
-export enum NeighborsSubflagsCon {
-    NOT_FRIENDLY = 'Not friendly',
-    QUIET_BLDG = 'Noisy building',
-}
-
-export enum UtilitiesSubflagsCon {
-    HEATING_QUAL = "Heat isn't good",
-    AIRCON_QUAL = "AC isn't good",
-    UTIL_COST = 'Expensive utilities',
-}
-
 export enum LocationSubflagsCon {
+    LOCATION = 'the Location',
+    NOT_FRIENDLY = 'Not friendly',
+    BLDG_NOISE = 'Noisy building',
     NEAR_FUN = 'Not near fun things to do',
     PARKING = 'Difficult parking',
     GROCERY = 'Difficult parking',
@@ -64,6 +110,7 @@ export enum LocationSubflagsCon {
 }
 
 export enum LandlordSubflagsCon {
+    LANDLORD = 'my Landlord, Management company',
     UNRESPONSIVE = 'unresponsive',
     REQUESTS = 'Did not address my requests',
     PRIVACY = 'Did not respect my privacy',
@@ -73,90 +120,18 @@ export enum LandlordSubflagsCon {
     RAISE_RENT = 'Raised my rent a lot',
 }
 
-// Standalone flags, some have optional dependencies
-export enum ProFlagType {
-    /* Residence */
-    BATHROOM = 'the Bathroom',
-    KITCHEN = 'the Kitchen',
-    // Lights
-    NATURAL_LIGHT = 'Plenty of Natural Light',
-    RELIABLE_LIGHTS = 'Reliable light fixtures',
-    BRIGHT = 'No need for lamps',
-    // Maintenance
-    MAINTENANCE_FREQ = 'Very Few Maintenance Issues',
-    MAINTENANCE_QUAL = 'Maintenance Issues handled poorly',
-
-    AMENITIES = 'Amazing Amenities',
-    POOL = 'the Pool',
-    GYM = 'the Gym',
-    MAILROOM = 'the Mailroom',
-    OUTDOOR = 'the Outdoor Space',
-
-    /*  Place */
-    NEIGHBORS = 'my Neighbors',
-
-    QUIET_TOWN = 'Quiet neighborhood',
-    LOCATION = 'the Location',
-    NEAR_FUN = 'Near restaraunts, bars',
-    TRAVERSABLE = 'Walkable, bikable',
-    NEAR_FOOD = 'Near a grocery store',
-    NEAR_TRANSIT = 'Near public transit',
-
-    /* Landlord */
-    LANDLORD = 'my Landlord, Management company',
-    COMMUNICATION = 'Landlord communicates well',
-    PRIVACY = 'Landlord respects my privacy',
-    SUBLETS = 'Landlord allows sublets',
-    VALUE = 'This place is a great value for the money',
-
-    // Other
-    PETS = 'Great for my Pets',
-    KIDS = 'Great for my Kids',
-}
-
-export enum ConFlagType {
-    /* Residence */
-    BATHROOM = 'the Bathroom',
-    KITCHEN_APPLIANCES = 'Kitchen Appliances in bad shape',
-
-    // Lights
-    NATURAL_LIGHT = 'Not much natural light',
-    RELIABLE_LIGHTS = 'Unreliable light fixtures',
-    BRIGHT = "You'll need lamps for lights",
-
-    // Maintenance
-    MAINTENANCE_FREQ = 'Frequent maintenance issues',
-    MAINTENANCE_QUAL = 'Maintenance Issues handled poorly',
-
-    // Utilities
-    UTILITIES = 'utilities',
-
-    AMENITIES = 'Amenities not as advertised',
-    INTERNET = 'Bad internet',
-    CELL_RECEPTION = 'Bad cell reception',
-    SMELLS = 'Bad smells',
-
-    NEIGHBORS = 'my Neighbors',
-    TRAFFIC_NOISE = 'Noisy Traffic',
-    TOWN_NOISE = 'Noisy restaurants, bars',
-
-    LOCATION = 'the Location',
-
-    UNSAFE = 'Did not feel safe',
-
-    LANDLORD = 'my Landlord, Management company',
-
-    // Other
-    PETS = 'Bad for my Pets',
-    KIDS = 'Bad for my Kids',
-}
-
-// a thing of the past?
-export enum DbkFlagType {
-    LEASE = 'lease issues',
-    BURGLARY = 'burglary',
-    DEPOSIT = 'security deposit',
-    CONSTRUCTION = 'construction harrasment',
-    PRIVACY = 'privacy',
-    UNRESPONSIVE = 'unresponsive',
-}
+/* Create types combining all positive and negative flags */
+export type AllProFlags =
+    | MiscPros
+    | BathroomSubflagsPro
+    | KitchenSubflagsPro
+    | LocationSubflagsPro
+    | LandlordSubflagsPro;
+export type AllConFlags =
+    | MiscCons
+    | BathroomSubflagsCon
+    | MaintenanceSubflagsCon
+    | UtilitiesSubflagsCon
+    | SmellSubflagsCon
+    | LocationSubflagsCon
+    | LandlordSubflagsCon;
