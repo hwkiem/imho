@@ -92,34 +92,19 @@ export class Place extends Base<Place> {
         const residences = await residencesRef.loadItems();
 
         // get TopFlags of all residences
-        console.log('before');
         const topFlags: TopNFlagsResponse[] = [];
         await (async () => {
             for (const residence of residences) {
                 const top = await residence.topNFlags(residence); // no n, fetching all flags and count
                 if (top === undefined) return;
-
                 topFlags.push(top);
-                console.log('topFlags became ', topFlags);
             }
         })();
 
-        console.log('who care ab', n);
-
-        // const f = () => {
-        //     residences.forEach(async (residence) => {
-        //         const top = await residence.topNFlags(residence, n); // no n, fetching all flags and count
-        //         if (top === undefined) return;
-
-        //         topFlags.push(top);
-        //         console.log('topFlags became ', topFlags);
-        //     });
-        // };
-
-        console.log('after topFlags is ', topFlags);
         // tally TopFlags of all residences into a single response
-        return topFlags.reduce(
+        const combined = topFlags.reduce(
             (prev, cur) => {
+                // tally pros
                 cur.pros.forEach((proWithCount) => {
                     // if already has a FlagWithCount
                     if (prev.pros.some((e) => e.topic === proWithCount.topic)) {
@@ -134,7 +119,7 @@ export class Place extends Base<Place> {
                         });
                     }
                 });
-
+                // tally cons
                 cur.cons.forEach((conWithCount) => {
                     // if already has a FlagWithCount
                     if (prev.cons.some((e) => e.topic === conWithCount.topic)) {
@@ -149,11 +134,29 @@ export class Place extends Base<Place> {
                         });
                     }
                 });
-                console.log('in reduce returning ', prev);
                 return prev;
             },
             { pros: [], cons: [] }
         );
+        if (n) {
+            const f: TopNFlagsResponse = { pros: [], cons: [] };
+            const filtered = Object.values(combined.pros)
+                .concat(Object.values(combined.cons))
+                .sort(({ cnt: a }, { cnt: b }) => b - a)
+                .slice(0, n);
+
+            for (const fc of filtered) {
+                const { topic: topic, cnt: count } = fc;
+                if (combined.pros.some((e) => e.topic === topic)) {
+                    f.pros.push({ topic: topic, cnt: count });
+                } else {
+                    f.cons.push({ topic: topic, cnt: count });
+                }
+            }
+            return f;
+        } else {
+            return combined;
+        }
     }
 
     /* Properties */
