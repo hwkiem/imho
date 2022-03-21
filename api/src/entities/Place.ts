@@ -6,7 +6,7 @@ import {
     Unique,
     ManyToMany,
 } from '@mikro-orm/core';
-import { Ctx, Field, Float, Int, ObjectType, Root } from 'type-graphql';
+import { Arg, Ctx, Field, Float, Int, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { PlaceValidator } from '../validators/PlaceValidator';
@@ -14,6 +14,7 @@ import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { ImhoUser } from './ImhoUser';
 import { Review } from './Review';
+import { TopNFlagsResponse } from '../utils/types/Flag';
 
 @ObjectType()
 class RecommendRatio {
@@ -79,6 +80,80 @@ export class Place extends Base<Place> {
         }
 
         return reviews;
+    }
+
+    @Field(() => TopNFlagsResponse, { nullable: true })
+    async topNFlags(
+        @Root() place: Place,
+        @Arg('n', () => Int, { nullable: true }) n?: number | undefined
+    ): Promise<TopNFlagsResponse | null> {
+        const residencesRef = await place.residences(place);
+        if (residencesRef === null) return null;
+        const residences = await residencesRef.loadItems();
+
+        // get TopFlags of all residences
+        console.log('before');
+        const topFlags: TopNFlagsResponse[] = [];
+        await (async () => {
+            for (const residence of residences) {
+                const top = await residence.topNFlags(residence); // no n, fetching all flags and count
+                if (top === undefined) return;
+
+                topFlags.push(top);
+                console.log('topFlags became ', topFlags);
+            }
+        })();
+
+        console.log('who care ab', n);
+
+        // const f = () => {
+        //     residences.forEach(async (residence) => {
+        //         const top = await residence.topNFlags(residence, n); // no n, fetching all flags and count
+        //         if (top === undefined) return;
+
+        //         topFlags.push(top);
+        //         console.log('topFlags became ', topFlags);
+        //     });
+        // };
+
+        console.log('after topFlags is ', topFlags);
+        // tally TopFlags of all residences into a single response
+        return topFlags.reduce(
+            (prev, cur) => {
+                cur.pros.forEach((proWithCount) => {
+                    // if already has a FlagWithCount
+                    if (prev.pros.some((e) => e.topic === proWithCount.topic)) {
+                        // iterate the FlagWithCount for this topic
+                        prev.pros.filter(
+                            (pro) => pro.topic === proWithCount.topic
+                        )[0].cnt += 1;
+                    } else {
+                        prev.pros.push({
+                            topic: proWithCount.topic,
+                            cnt: proWithCount.cnt,
+                        });
+                    }
+                });
+
+                cur.cons.forEach((conWithCount) => {
+                    // if already has a FlagWithCount
+                    if (prev.cons.some((e) => e.topic === conWithCount.topic)) {
+                        // iterate the FlagWithCount for this topic
+                        prev.cons.filter(
+                            (con) => con.topic === conWithCount.topic
+                        )[0].cnt += 1;
+                    } else {
+                        prev.cons.push({
+                            topic: conWithCount.topic,
+                            cnt: conWithCount.cnt,
+                        });
+                    }
+                });
+                console.log('in reduce returning ', prev);
+                return prev;
+            },
+            { pros: [], cons: [] }
+        );
     }
 
     /* Properties */

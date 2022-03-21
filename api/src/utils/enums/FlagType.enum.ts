@@ -67,7 +67,7 @@ export enum MiscCons {
 // Con Subflags
 
 export enum BathroomSubflagsCon {
-    BATHROOM = 'the Bathroom',
+    BATHROOM = 'the Bathroom_',
     WATER_PRESSURE = 'The shower water pressure was weak',
     HOT_WATER = "Hot water doesn't last",
     CLOG = 'Toilet frequently clogged',
@@ -100,7 +100,7 @@ export enum SmellSubflagsCon {
 }
 
 export enum LocationSubflagsCon {
-    LOCATION = 'the Location',
+    LOCATION = 'the Location_',
     NOT_FRIENDLY = 'Not friendly',
     BLDG_NOISE = 'Noisy building',
     NEAR_FUN = 'Not near fun things to do',
@@ -110,7 +110,7 @@ export enum LocationSubflagsCon {
 }
 
 export enum LandlordSubflagsCon {
-    LANDLORD = 'my Landlord, Management company',
+    LANDLORD = 'my Landlord, Management company_',
     UNRESPONSIVE = 'unresponsive',
     REQUESTS = 'Did not address my requests',
     PRIVACY = 'Did not respect my privacy',

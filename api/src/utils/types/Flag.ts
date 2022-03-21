@@ -92,11 +92,16 @@ export class Flags {
     cons: ConFlags;
 }
 
+// @ObjectType()
+// class ProOrCon
+// topic: { [key in AllProFlags]: number } | { [key in AllConFlags]: number };
 @ObjectType()
-class FlagWithCount {
+export class FlagWithCount {
+    // @Field()
+    // topic: AllProFlags | AllConFlags;
+
     @Field()
     topic: string;
-    // topic: keyof ProFlags | keyof ConFlags;
     @Field()
     cnt: number;
 }
@@ -108,3 +113,8 @@ export class TopNFlagsResponse {
     @Field(() => [FlagWithCount])
     cons: FlagWithCount[];
 }
+
+// const counter = {
+//     pros: {} as { [key in AllProFlags]: number },
+//     cons: {} as { [key in AllConFlags]: number },
+// };

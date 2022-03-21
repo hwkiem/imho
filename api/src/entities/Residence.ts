@@ -14,7 +14,7 @@ import { ResidenceValidator } from '../validators/ResidenceValidator';
 import { Place } from './Place';
 import { MyContext } from '../utils/context';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { ProFlags, TopNFlagsResponse } from '../utils/types/Flag';
+import { TopNFlagsResponse } from '../utils/types/Flag';
 import { AllConFlags, AllProFlags } from '../utils/enums/FlagType.enum';
 
 export const SINGLE_FAMILY = 'single family';
@@ -80,7 +80,7 @@ export class Residence extends Base<Residence> {
     @Field(() => TopNFlagsResponse, { nullable: true })
     async topNFlags(
         @Root() residence: Residence,
-        @Arg('n', () => Int, { nullable: true }) n = 5
+        @Arg('n', () => Int, { nullable: true }) n?: number | undefined
     ): Promise<TopNFlagsResponse | undefined> {
         const reviewsRef = await this.reviews(residence);
         if (reviewsRef === null) return;
@@ -157,18 +157,24 @@ export class Residence extends Base<Residence> {
             }
         });
         // COUNTER IS FULL
+
         const result: TopNFlagsResponse = { pros: [], cons: [] };
 
-        const filtered = Object.entries(counter.pros)
+        let filtered = Object.entries(counter.pros)
             .concat(Object.entries(counter.cons))
-            .sort(([, aval], [, bval]) => bval - aval)
-            .slice(0, n);
+            .sort(([, aval], [, bval]) => bval - aval);
+
+        // if no n, provide count for all, could introduce some default ...
+        // any topic with the same count as one that makes the top N also makes it?
+        if (n) {
+            filtered = filtered.slice(0, n);
+        }
 
         for (const fc of filtered) {
             const [key, val] = fc;
             if (
-                Object.values(ProFlags)
-                    .map((pro: string) => pro)
+                Object.keys(counter.pros)
+                    .map((pro) => pro)
                     .includes(key)
             ) {
                 result.pros.push({ topic: key, cnt: val });
