@@ -82,6 +82,7 @@ export class Place extends Base<Place> {
         return reviews;
     }
 
+    // combined FlagWithCount tally across this Place's residences
     @Field(() => TopNFlagsResponse, { nullable: true })
     async topNFlags(
         @Root() place: Place,
@@ -93,13 +94,11 @@ export class Place extends Base<Place> {
 
         // get TopFlags of all residences
         const topFlags: TopNFlagsResponse[] = [];
-        await (async () => {
-            for (const residence of residences) {
-                const top = await residence.topNFlags(residence); // no n, fetching all flags and count
-                if (top === undefined) return;
-                topFlags.push(top);
-            }
-        })();
+        for (const residence of residences) {
+            const top = await residence.topNFlags(residence); // no n, fetching all flags and count
+            if (top === undefined) continue;
+            topFlags.push(top);
+        }
 
         // tally TopFlags of all residences into a single response
         const combined = topFlags.reduce(
@@ -111,8 +110,9 @@ export class Place extends Base<Place> {
                         // iterate the FlagWithCount for this topic
                         prev.pros.filter(
                             (pro) => pro.topic === proWithCount.topic
-                        )[0].cnt += 1;
+                        )[0].cnt += proWithCount.cnt;
                     } else {
+                        // start a new FlagWithCount for this topic
                         prev.pros.push({
                             topic: proWithCount.topic,
                             cnt: proWithCount.cnt,
@@ -121,12 +121,10 @@ export class Place extends Base<Place> {
                 });
                 // tally cons
                 cur.cons.forEach((conWithCount) => {
-                    // if already has a FlagWithCount
                     if (prev.cons.some((e) => e.topic === conWithCount.topic)) {
-                        // iterate the FlagWithCount for this topic
                         prev.cons.filter(
                             (con) => con.topic === conWithCount.topic
-                        )[0].cnt += 1;
+                        )[0].cnt += conWithCount.cnt;
                     } else {
                         prev.cons.push({
                             topic: conWithCount.topic,
@@ -139,6 +137,7 @@ export class Place extends Base<Place> {
             { pros: [], cons: [] }
         );
         if (n) {
+            // fill another object once, instead of filtering combined
             const f: TopNFlagsResponse = { pros: [], cons: [] };
             const filtered = Object.values(combined.pros)
                 .concat(Object.values(combined.cons))
