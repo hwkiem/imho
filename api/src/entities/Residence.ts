@@ -90,10 +90,15 @@ export class Residence extends Base<Residence> {
             cons: {} as { [key in AllConFlags]: number },
         };
 
+        // count flags from each review
         reviews.forEach((review: Review) => {
             const flags = review.flags(review);
             if (flags === undefined) return;
             // all pros
+            // const x = Object.keys(flags.pros) as keyof ProFlags;
+            for (const k in flags.pros) {
+                console.log(k);
+            }
             if (flags.pros.misc) {
                 flags.pros.misc.forEach((f) => {
                     counter.pros[f] = counter.pros[f] ? ++counter.pros[f] : 1;

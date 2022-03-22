@@ -14,7 +14,6 @@ import {
     RequestContext,
 } from '@mikro-orm/core';
 import { ReviewResolver } from './resolvers/review.resolver';
-
 import { PlaceResolver } from './resolvers/place.resolver';
 import { MyContext } from './utils/context';
 import ormConfig from './mikro-orm.config';

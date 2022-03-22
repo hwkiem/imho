@@ -13,73 +13,50 @@ import {
     LandlordSubflagsCon,
     MiscCons,
 } from '../enums/FlagType.enum';
+import { FieldError } from './FieldError';
 
 @ObjectType()
 @InputType('ProFlagsInput')
 export class ProFlags {
     @Field(() => [BathroomSubflagsPro], { nullable: true })
-    bathroom: BathroomSubflagsPro[] | undefined;
+    bathroom?: BathroomSubflagsPro[] | undefined;
 
     @Field(() => [KitchenSubflagsPro], { nullable: true })
-    kitchen: KitchenSubflagsPro[] | undefined;
+    kitchen?: KitchenSubflagsPro[] | undefined;
 
     @Field(() => [LocationSubflagsPro], { nullable: true })
-    location: LocationSubflagsPro[] | undefined;
+    location?: LocationSubflagsPro[] | undefined;
 
     @Field(() => [LandlordSubflagsPro], { nullable: true })
-    landlord: LandlordSubflagsPro[] | undefined;
+    landlord?: LandlordSubflagsPro[] | undefined;
 
     @Field(() => [MiscPros], { nullable: true })
-    misc: MiscPros[] | undefined;
-
-    constructor() {
-        // ensure unique arrays
-        // TODO: be typescript clever and iterate over object members
-        this.bathroom = this.bathroom ? [...new Set(this.bathroom)] : undefined;
-        this.kitchen = this.kitchen ? [...new Set(this.kitchen)] : undefined;
-        this.location = this.location ? [...new Set(this.location)] : undefined;
-        this.landlord = this.landlord ? [...new Set(this.landlord)] : undefined;
-        this.misc = this.misc ? [...new Set(this.misc)] : undefined;
-    }
+    misc?: MiscPros[] | undefined;
 }
 
 @ObjectType()
 @InputType('ConFlagsInput')
 export class ConFlags {
     @Field(() => [BathroomSubflagsCon], { nullable: true })
-    bathroom: BathroomSubflagsCon[] | undefined;
+    bathroom?: BathroomSubflagsCon[] | undefined;
 
     @Field(() => [MaintenanceSubflagsCon], { nullable: true })
-    maintenance: MaintenanceSubflagsCon[] | undefined;
+    maintenance?: MaintenanceSubflagsCon[] | undefined;
 
     @Field(() => [UtilitiesSubflagsCon], { nullable: true })
-    utilities: UtilitiesSubflagsCon[] | undefined;
+    utilities?: UtilitiesSubflagsCon[] | undefined;
 
     @Field(() => [SmellSubflagsCon], { nullable: true })
-    smells: SmellSubflagsCon[] | undefined;
+    smells?: SmellSubflagsCon[] | undefined;
 
     @Field(() => [LocationSubflagsCon], { nullable: true })
-    location: LocationSubflagsCon[] | undefined;
+    location?: LocationSubflagsCon[] | undefined;
 
     @Field(() => [LandlordSubflagsCon], { nullable: true })
-    landlord: LandlordSubflagsCon[] | undefined;
+    landlord?: LandlordSubflagsCon[] | undefined;
 
     @Field(() => [MiscCons], { nullable: true })
-    misc: MiscCons[] | undefined;
-
-    constructor() {
-        this.bathroom = this.bathroom ? [...new Set(this.bathroom)] : undefined;
-        this.maintenance = this.maintenance
-            ? [...new Set(this.maintenance)]
-            : undefined;
-        this.utilities = this.utilities
-            ? [...new Set(this.utilities)]
-            : undefined;
-        this.smells = this.smells ? [...new Set(this.smells)] : undefined;
-        this.location = this.location ? [...new Set(this.location)] : undefined;
-        this.landlord = this.landlord ? [...new Set(this.landlord)] : undefined;
-        this.misc = this.misc ? [...new Set(this.misc)] : undefined;
-    }
+    misc?: MiscCons[] | undefined;
 }
 
 @ObjectType()
@@ -92,14 +69,8 @@ export class Flags {
     cons: ConFlags;
 }
 
-// @ObjectType()
-// class ProOrCon
-// topic: { [key in AllProFlags]: number } | { [key in AllConFlags]: number };
 @ObjectType()
 export class FlagWithCount {
-    // @Field()
-    // topic: AllProFlags | AllConFlags;
-
     @Field()
     topic: string;
     @Field()
@@ -112,9 +83,7 @@ export class TopNFlagsResponse {
     pros: FlagWithCount[];
     @Field(() => [FlagWithCount])
     cons: FlagWithCount[];
-}
 
-// const counter = {
-//     pros: {} as { [key in AllProFlags]: number },
-//     cons: {} as { [key in AllConFlags]: number },
-// };
+    @Field(() => FieldError, { nullable: true })
+    error?: FieldError | undefined;
+}
