@@ -590,13 +590,16 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+                                                                                    '@media: (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#32a852',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#32a852',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
                                                                                     border: 0,
                                                                                     height: 100,
@@ -708,11 +711,6 @@ export default function ReviewPage() {
                                                             },
                                                             {
                                                                 maxWidth: 755,
-                                                                cols: 2,
-                                                                spacing: 'sm',
-                                                            },
-                                                            {
-                                                                maxWidth: 600,
                                                                 cols: 1,
                                                                 spacing: 'sm',
                                                             },
@@ -749,6 +747,11 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    '@media (max-width: 755px)':
+                                                                                        {
+                                                                                            pointerEvents:
+                                                                                                'none',
+                                                                                        },
                                                                                     color:
                                                                                         theme.colorScheme ==
                                                                                         'dark'
@@ -769,14 +772,19 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+
+                                                                                    '@media (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#85581b',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#85581b',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
+
                                                                                     border: 0,
                                                                                     height: 100,
                                                                                     paddingLeft: 20,
@@ -904,11 +912,6 @@ export default function ReviewPage() {
                                                                 cols: 2,
                                                                 spacing: 'sm',
                                                             },
-                                                            {
-                                                                maxWidth: 600,
-                                                                cols: 1,
-                                                                spacing: 'sm',
-                                                            },
                                                         ]}
                                                     >
                                                         {Object.values(
@@ -934,6 +937,11 @@ export default function ReviewPage() {
                                                                                 theme
                                                                             ) => ({
                                                                                 root: {
+                                                                                    '@media (max-width: 755px)':
+                                                                                        {
+                                                                                            pointerEvents:
+                                                                                                'none',
+                                                                                        },
                                                                                     color:
                                                                                         theme.colorScheme ==
                                                                                         'dark'
@@ -954,13 +962,17 @@ export default function ReviewPage() {
                                                                                             : theme
                                                                                                   .colors
                                                                                                   .gray[2],
-                                                                                    '&:hover':
+
+                                                                                    '@media (hover: hover)':
                                                                                         {
-                                                                                            backgroundColor:
-                                                                                                theme.fn.darken(
-                                                                                                    '#940c1e',
-                                                                                                    0.2
-                                                                                                ),
+                                                                                            '&:hover':
+                                                                                                {
+                                                                                                    backgroundColor:
+                                                                                                        theme.fn.darken(
+                                                                                                            '#940c1e',
+                                                                                                            0.2
+                                                                                                        ),
+                                                                                                },
                                                                                         },
                                                                                     border: 0,
                                                                                     height: 100,
