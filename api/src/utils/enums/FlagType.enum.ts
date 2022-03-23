@@ -120,7 +120,6 @@ export enum LandlordSubflagsCon {
     RAISE_RENT = 'Raised my rent a lot',
 }
 
-
 /* Create types combining all positive and negative flags */
 export type AllProFlags =
     | MiscPros
@@ -136,5 +135,3 @@ export type AllConFlags =
     | SmellSubflagsCon
     | LocationSubflagsCon
     | LandlordSubflagsCon;
-
-
