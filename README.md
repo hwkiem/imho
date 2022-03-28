@@ -52,3 +52,5 @@ If you want to connect directly to postgres or redis, they are available on `loc
 
 
 **Note**: The api/ and client/ directories are mounted into the docker containers when they run under docker-compose. This can lead to some funky behaviors with regards to folders generated inside of the running containers (namely `dist`, `node_modules` and `.next`). To avoid these leaking out, they are contained in anonymous volumes, but that does mean that empty folders might show up on the host. If that's the case, they can safely be deleted.
+
+We need to add more...
