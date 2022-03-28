@@ -6,7 +6,7 @@ import {
     Unique,
     ManyToMany,
 } from '@mikro-orm/core';
-import { Ctx, Field, Float, Int, ObjectType, Root } from 'type-graphql';
+import { Arg, Ctx, Field, Float, Int, ObjectType, Root } from 'type-graphql';
 import { Base } from './Base';
 import { Residence } from './Residence';
 import { PlaceValidator } from '../validators/PlaceValidator';
@@ -14,6 +14,7 @@ import { MyContext } from '../utils/context';
 import { EntityManager, PostgreSqlConnection } from '@mikro-orm/postgresql';
 import { ImhoUser } from './ImhoUser';
 import { Review } from './Review';
+import { TopNFlagsResponse } from '../utils/types/Flag';
 
 @ObjectType()
 class RecommendRatio {
@@ -79,6 +80,82 @@ export class Place extends Base<Place> {
         }
 
         return reviews;
+    }
+
+    // combined FlagWithCount tally across this Place's residences
+    @Field(() => TopNFlagsResponse, { nullable: true })
+    async topNFlags(
+        @Root() place: Place,
+        @Arg('n', () => Int, { nullable: true }) n?: number | undefined
+    ): Promise<TopNFlagsResponse | null> {
+        const residencesRef = await place.residences(place);
+        if (residencesRef === null) return null;
+        const residences = await residencesRef.loadItems();
+
+        // get TopFlags of all residences
+        const topFlags: TopNFlagsResponse[] = [];
+        for (const residence of residences) {
+            const top = await residence.topNFlags(residence); // no n, fetching all flags and count
+            if (top === undefined) continue;
+            topFlags.push(top);
+        }
+
+        // tally TopFlags of all residences into a single response
+        const combined = topFlags.reduce(
+            (prev, cur) => {
+                // tally pros
+                cur.pros.forEach((proWithCount) => {
+                    // if already has a FlagWithCount
+                    if (prev.pros.some((e) => e.topic === proWithCount.topic)) {
+                        // iterate the FlagWithCount for this topic
+                        prev.pros.filter(
+                            (pro) => pro.topic === proWithCount.topic
+                        )[0].cnt += proWithCount.cnt;
+                    } else {
+                        // start a new FlagWithCount for this topic
+                        prev.pros.push({
+                            topic: proWithCount.topic,
+                            cnt: proWithCount.cnt,
+                        });
+                    }
+                });
+                // tally cons
+                cur.cons.forEach((conWithCount) => {
+                    if (prev.cons.some((e) => e.topic === conWithCount.topic)) {
+                        prev.cons.filter(
+                            (con) => con.topic === conWithCount.topic
+                        )[0].cnt += conWithCount.cnt;
+                    } else {
+                        prev.cons.push({
+                            topic: conWithCount.topic,
+                            cnt: conWithCount.cnt,
+                        });
+                    }
+                });
+                return prev;
+            },
+            { pros: [], cons: [] }
+        );
+        if (n) {
+            // fill another object once, instead of filtering combined
+            const f: TopNFlagsResponse = { pros: [], cons: [] };
+            const filtered = Object.values(combined.pros)
+                .concat(Object.values(combined.cons))
+                .sort(({ cnt: a }, { cnt: b }) => b - a)
+                .slice(0, n);
+
+            for (const fc of filtered) {
+                const { topic: topic, cnt: count } = fc;
+                if (combined.pros.some((e) => e.topic === topic)) {
+                    f.pros.push({ topic: topic, cnt: count });
+                } else {
+                    f.cons.push({ topic: topic, cnt: count });
+                }
+            }
+            return f;
+        } else {
+            return combined;
+        }
     }
 
     /* Properties */

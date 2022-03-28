@@ -33,8 +33,8 @@ export class Review extends Base<Review> {
      */
     @Field(() => ImhoUser, { nullable: true })
     async myAuthor(@Root() review: Review): Promise<ImhoUser | null> {
-        // since its nullable and not a Collection, catch yourself
-        if (review.author === undefined) return null;
+        // can be undefined when creating object but will be null when fetching ...
+        if (review.author === undefined || review.author === null) return null;
         if (!review.author.isInitialized()) {
             await review.author.init();
         }

@@ -28,7 +28,6 @@ export class ReviewResolver {
             });
             return { result: review };
         } catch (e) {
-            // console.error(e);
             return {
                 errors: [
                     {
@@ -45,13 +44,6 @@ export class ReviewResolver {
         @Arg('input') input: WriteReviewInput,
         @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
-        // make sure review.flags are unique from client
-        input.reviewInput.flagInput = {
-            pros: [...new Set(input.reviewInput.flagInput.pros)],
-            cons: [...new Set(input.reviewInput.flagInput.cons)],
-            dbks: [...new Set(input.reviewInput.flagInput.dbks)],
-        };
-
         // ensure place, residence
         const placeResponse = await createPlaceIfNotExists(
             em,
@@ -162,19 +154,8 @@ export class ReviewResolver {
         @Arg('reviewId') reviewId: string,
         @Ctx() { em, req }: MyContext
     ): Promise<ReviewResponse> {
-        // make sure review.flags are unique from client
-        input.flagInput = {
-            pros: [...new Set(input.flagInput.pros)],
-            cons: [...new Set(input.flagInput.cons)],
-            dbks: [...new Set(input.flagInput.dbks)],
-        };
-
         try {
-            const review = await em.findOneOrFail(
-                Review,
-                { id: reviewId },
-                { populate: ['author'] }
-            );
+            const review = await em.findOneOrFail(Review, { id: reviewId });
             if (review.author) {
                 if (req.session.userId === null) {
                     return {
@@ -201,7 +182,7 @@ export class ReviewResolver {
                     ],
                 };
             }
-
+            // constructor check will not ensure unique arrays here ...
             // review has no author, for now allow edits
             review.assign(input);
             review.flag_string = JSON.stringify(input.flagInput);
