@@ -87,5 +87,3 @@ export class TopNFlagsResponse {
     @Field(() => FieldError, { nullable: true })
     error?: FieldError | undefined;
 }
-
-// function to convert a Flags object into a bitmap string
