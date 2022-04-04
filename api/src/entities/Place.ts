@@ -18,7 +18,6 @@ import { TopNFlagsResponse } from '../utils/types/Flag';
 
 @ObjectType()
 class RecommendRatio {
-    // round to 3.7/5
     @Field(() => Float)
     recommend: number;
     @Field()
@@ -80,6 +79,65 @@ export class Place extends Base<Place> {
         }
 
         return reviews;
+    }
+
+    /* Properties */
+    @Field()
+    @Property()
+    @Unique()
+    public google_place_id: string;
+
+    @Field()
+    @Property()
+    public formatted_address: string;
+
+    /* Averages and stats across reviews */
+    @Field(() => Float, { nullable: true })
+    async averageRating(
+        @Root() place: Place,
+        @Ctx() { em }: MyContext
+    ): Promise<number | null> {
+        const knex = (
+            (em as EntityManager).getConnection() as PostgreSqlConnection
+        ).getKnex();
+
+        const res = await knex
+            .avg('rating')
+            .from('review')
+            .where(
+                'review.residence_id',
+                'in',
+                knex
+                    .select('id')
+                    .from('residence')
+                    .where('place_id', '=', place.id)
+            );
+
+        if (!res[0].avg) return null;
+        return +res[0].avg;
+    }
+
+    @Field(() => RecommendRatio, { nullable: true })
+    async wouldRecommendRatio(): Promise<RecommendRatio | null> {
+        const reviews = await this.reviews();
+        if (reviews === null) return null;
+        const recommend = reviews.filter((r) => r.rating >= 75).length,
+            total = reviews.length,
+            CONVENTIONAL_DENOM = 5;
+
+        return total < CONVENTIONAL_DENOM
+            ? { recommend: recommend, total: total }
+            : {
+                  recommend: (CONVENTIONAL_DENOM * recommend) / total,
+                  total: CONVENTIONAL_DENOM,
+              };
+    }
+
+    @Field(() => Int, { nullable: true })
+    async reviewCount(): Promise<number | null> {
+        const reviews = await this.reviews();
+        if (reviews === null) return null;
+        return reviews === null ? null : reviews.length;
     }
 
     // combined FlagWithCount tally across this Place's residences
@@ -156,65 +214,6 @@ export class Place extends Base<Place> {
         } else {
             return combined;
         }
-    }
-
-    /* Properties */
-    @Field()
-    @Property()
-    @Unique()
-    public google_place_id: string;
-
-    @Field()
-    @Property()
-    public formatted_address: string;
-
-    /* Averages and stats across reviews */
-    @Field(() => Float, { nullable: true })
-    async averageRating(
-        @Root() place: Place,
-        @Ctx() { em }: MyContext
-    ): Promise<number | null> {
-        const knex = (
-            (em as EntityManager).getConnection() as PostgreSqlConnection
-        ).getKnex();
-
-        const res = await knex
-            .avg('rating')
-            .from('review')
-            .where(
-                'review.residence_id',
-                'in',
-                knex
-                    .select('id')
-                    .from('residence')
-                    .where('place_id', '=', place.id)
-            );
-
-        if (!res[0].avg) return null;
-        return +res[0].avg;
-    }
-
-    @Field(() => RecommendRatio, { nullable: true })
-    async wouldRecommendRatio(): Promise<RecommendRatio | null> {
-        const reviews = await this.reviews();
-        if (reviews === null) return null;
-        const recommend = reviews.filter((r) => r.rating >= 75).length,
-            total = reviews.length,
-            CONVENTIONAL_DENOM = 5;
-
-        return total < CONVENTIONAL_DENOM
-            ? { recommend: recommend, total: total }
-            : {
-                  recommend: (CONVENTIONAL_DENOM * recommend) / total,
-                  total: CONVENTIONAL_DENOM,
-              };
-    }
-
-    @Field(() => Int, { nullable: true })
-    async reviewCount(): Promise<number | null> {
-        const reviews = await this.reviews();
-        if (reviews === null) return null;
-        return reviews === null ? null : reviews.length;
     }
 
     constructor(body: PlaceValidator) {

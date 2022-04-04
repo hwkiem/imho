@@ -50,18 +50,57 @@ export class Review extends Base<Review> {
     @Property()
     public rating: number;
 
-    @Property()
-    flag_string: string;
-
-    /**
-     * The pros, cons and dbks assigned in this review
-     */
     @Field(() => Flags, { nullable: true })
-    flags(@Root() review: Review): Flags | undefined {
-        return review.flag_string ? JSON.parse(review.flag_string) : undefined;
-    }
+    @Property({ type: 'json', nullable: true })
+    public flags?: Flags;
 
     constructor(body: ReviewValidator) {
         super(body);
+
+        // make sure unique flags
+        if (this.flags) {
+            this.flags = {
+                pros: {
+                    bathroom: this.flags.pros.bathroom
+                        ? [...new Set(this.flags.pros.bathroom)]
+                        : undefined,
+                    kitchen: this.flags.pros.kitchen
+                        ? [...new Set(this.flags.pros.kitchen)]
+                        : undefined,
+                    landlord: this.flags.pros.landlord
+                        ? [...new Set(this.flags.pros.landlord)]
+                        : undefined,
+                    location: this.flags.pros.location
+                        ? [...new Set(this.flags.pros.location)]
+                        : undefined,
+                    misc: this.flags.pros.misc
+                        ? [...new Set(this.flags.pros.misc)]
+                        : undefined,
+                },
+                cons: {
+                    bathroom: this.flags.cons.bathroom
+                        ? [...new Set(this.flags.cons.bathroom)]
+                        : undefined,
+                    landlord: this.flags.cons.landlord
+                        ? [...new Set(this.flags.cons.landlord)]
+                        : undefined,
+                    location: this.flags.cons.location
+                        ? [...new Set(this.flags.cons.location)]
+                        : undefined,
+                    maintenance: this.flags.cons.maintenance
+                        ? [...new Set(this.flags.cons.maintenance)]
+                        : undefined,
+                    smells: this.flags.cons.smells
+                        ? [...new Set(this.flags.cons.smells)]
+                        : undefined,
+                    utilities: this.flags.cons.utilities
+                        ? [...new Set(this.flags.cons.utilities)]
+                        : undefined,
+                    misc: this.flags.pros.misc
+                        ? [...new Set(this.flags.cons.misc)]
+                        : undefined,
+                },
+            };
+        }
     }
 }
