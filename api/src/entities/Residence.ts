@@ -92,7 +92,7 @@ export class Residence extends Base<Residence> {
 
         // count flags from each review
         reviews.forEach((review: Review) => {
-            const flags = review.flags(review);
+            const flags = review.flags;
             if (flags === undefined) return;
             // all pros
             // const x = Object.keys(flags.pros) as keyof ProFlags;

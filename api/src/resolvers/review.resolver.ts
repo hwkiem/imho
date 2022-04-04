@@ -64,7 +64,6 @@ export class ReviewResolver {
 
         // create new review
         const review = new Review(input.reviewInput);
-        review.flag_string = JSON.stringify(input.reviewInput.flagInput);
 
         // add user to review if on session
         if (req.session.userId) {
@@ -169,7 +168,6 @@ export class ReviewResolver {
                 }
                 if (review.author.id === req.session.userId) {
                     review.assign(input);
-                    review.flag_string = JSON.stringify(input.flagInput);
                     em.persistAndFlush(review);
                     return { result: review };
                 }
@@ -182,10 +180,8 @@ export class ReviewResolver {
                     ],
                 };
             }
-            // constructor check will not ensure unique arrays here ...
             // review has no author, for now allow edits
             review.assign(input);
-            review.flag_string = JSON.stringify(input.flagInput);
             em.persistAndFlush(review);
 
             return { result: review };
